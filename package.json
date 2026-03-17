@@ -1,0 +1,42 @@
+{
+  "name": "gestion-logements-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "@reduxjs/toolkit": "^2.11.2",
+    "axios": "^1.13.6",
+    "crypto-js": "^4.2.0",
+    "jose": "^6.2.1",
+    "next": "16.1.7",
+    "primeflex": "^4.0.0",
+    "primeicons": "^7.0.0",
+    "primereact": "^10.9.7",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-hook-form": "^7.71.2",
+    "react-redux": "^9.2.0",
+    "recharts": "^3.8.0",
+    "redux-persist": "^6.0.0",
+    "sass": "^1.98.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/crypto-js": "^4.2.2",
+    "@types/node": "^20.19.37",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "babel-plugin-react-compiler": "1.0.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.7",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

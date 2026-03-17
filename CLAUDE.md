@@ -1,7 +1,7 @@
 # Projet : Gestion de Logements à Louer – Frontend
 
 ## Stack technique
-- **Framework** : Next.js 15 TypeScript – App Router (jamais Pages Router)
+- **Framework** : Next.js 16 TypeScript – App Router (jamais Pages Router)
 - **État global** : Redux Toolkit + redux-persist chiffré (CryptoJS)
 - **Styles** : TailwindCSS (utilitaires) + SCSS (cas complexes)
 - **Composants UI** : PrimeReact (composant par défaut pour tout) + PrimeIcons
@@ -143,7 +143,7 @@ NEXT_PUBLIC_CRYPTO_SECRET=...    ← clé de chiffrement redux-persist
 
 ### Phase 0 – Initialisation (partie frontend)
 - P0.1 : Créer repo Git frontend + README + .gitignore
-- P0.3 : Initialiser projet Next.js 15 TypeScript (`create-next-app@latest` – App Router, TailwindCSS)
+- P0.3 : Initialiser projet Next.js 16 TypeScript (`create-next-app@latest` – App Router, TailwindCSS)
 - P0.4 : Configurer variables d'environnement (.env.local + .env.example documenté)
 - P0.7 : Installer toutes les dépendances frontend
 
@@ -184,4 +184,11 @@ NEXT_PUBLIC_CRYPTO_SECRET=...    ← clé de chiffrement redux-persist
 
 ## Étape en cours
 <!-- Mettre à jour après chaque étape validée -->
-P0.1
+F5.1
+
+## Étapes complétées
+
+- P0.1 : Repo Git + README + .gitignore ✓
+- P0.3 : Next.js 16 TypeScript (App Router + TailwindCSS) ✓
+- P0.4 : Variables d'environnement (.env.local + .env.example) ✓
+- P0.7 : Dépendances installées (Redux, Axios, PrimeReact, react-hook-form, zod, jose, sass…) ✓
