@@ -579,20 +579,52 @@ Accessible uniquement au rôle LOCATAIRE, tout en lecture seule.
 
 ---
 
+## Module Config — `/config` (PUBLIC)
+
+Endpoint appelé **au démarrage de l'application** (avant même le login) pour récupérer les limites d'upload définies côté backend. Permet d'éviter toute duplication des valeurs entre backend et frontend.
+
+```
+GET /config   →   accès public, aucun token requis
+```
+
+**Réponse 200 :**
+```json
+{
+  "data": {
+    "upload": {
+      "contrat": {
+        "maxSizeMb": 10,
+        "maxFiles": 1,
+        "mimeTypes": ["application/pdf", "image/jpeg", "image/png", "image/webp", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
+      },
+      "preuve": {
+        "maxSizeMb": 5,
+        "maxFiles": 10,
+        "mimeTypes": ["application/pdf", "image/jpeg", "image/png", "image/webp"]
+      }
+    }
+  }
+}
+```
+
+**Règle d'implémentation :** stocker ces valeurs dans le Redux store (`uiSlice` ou slice dédié `configSlice`) dès le démarrage. Le composant `FileUploader` les lit depuis Redux pour sa validation côté client. Ne jamais hardcoder ces limites dans le frontend.
+
+---
+
 ## Upload de fichiers — contraintes
 
 ### Contrat de bail
 - Endpoint : `POST /occupations/:id/contrat`
 - Champ multipart : `file` (unique)
-- Max : **10 Mo**
-- MIME autorisés : `application/pdf`, `image/jpeg`, `image/png`, `application/msword`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document`
+- Max : provient du backend et stocké dans le store
+- MIME autorisés : provient du backend et stocké dans le store
 - Remplace l'ancien contrat (l'ancien est supprimé côté serveur)
 
 ### Preuves de paiement
 - Endpoints : `POST /paiements/:id/preuves` (ajout), `PATCH /paiements/:id/preuves` (remplacement)
-- Champ multipart : `files` (array, max 10 fichiers)
-- Max : **5 Mo par fichier**
-- Mêmes MIME autorisés
+- Champ multipart : `files` (array, nombre max de fichiers provient du backend et stocké dans le store)
+- Max : provient du backend et stocké dans le store
+- MIME autorisés : idem
 
 ### Téléchargement contrat
 - Endpoint : `GET /occupations/:id/contrat`
@@ -643,7 +675,7 @@ NEXT_PUBLIC_CRYPTO_SECRET=...    ← clé de chiffrement redux-persist
 
 ### Phase 5 – Fondations Frontend
 - F5.1 : Redux Toolkit + redux-persist chiffré (CryptoJS) + Provider dans app/layout.tsx
-  - Slices : `authSlice` (accessToken, user), `uiSlice` (sidebar, notifications)
+  - Slices : `authSlice` (accessToken, user), `uiSlice` (sidebar, notifications), `configSlice`
 - F5.2 : apiClient Axios + intercepteur request (Bearer token) + intercepteur response (refresh auto sur 401)
   - Gérer la rotation du cookie `refresh_token` (cookie HttpOnly, path `/auth`)
 - F5.3 : Services API frontend typés (un fichier par entité dans `services/`)
