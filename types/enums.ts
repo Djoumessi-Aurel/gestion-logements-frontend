@@ -1,0 +1,13 @@
+export enum Role {
+  LOCATAIRE = 'LOCATAIRE',
+  ADMIN_LOGEMENT = 'ADMIN_LOGEMENT',
+  ADMIN_BATIMENT = 'ADMIN_BATIMENT',
+  ADMIN_GLOBAL = 'ADMIN_GLOBAL',
+}
+
+export enum PeriodeType {
+  JOUR = 'JOUR',
+  SEMAINE = 'SEMAINE',
+  MOIS = 'MOIS',
+  ANNEE = 'ANNEE',
+}
