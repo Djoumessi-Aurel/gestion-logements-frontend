@@ -270,7 +270,7 @@ LOCATAIRE | ADMIN_LOGEMENT | ADMIN_BATIMENT | ADMIN_GLOBAL
 
 #### UC-AUTH-05 : Logout
 - Endpoint : `POST /auth/logout`
-- Effacer Redux store → redirect `/login`
+- Effacer Redux store + appeler `clearAccessTokenCookie()` → redirect `/login`
 
 ---
 
@@ -722,11 +722,19 @@ NEXT_PUBLIC_CRYPTO_SECRET=...    ← clé de chiffrement redux-persist
 ---
 
 ## Étape en cours
-F5.1
+F5.5
 
 ## Étapes complétées
 
 - P0.1 : Repo Git + README + .gitignore ✓
+- F5.1 : Redux Toolkit + redux-persist chiffré ✓
+- F5.2 : apiClient Axios + intercepteurs JWT ✓
+- F5.3 : Services API frontend typés ✓
+- F5.4 : middleware.ts – protection des routes + vérification rôle JWT ✓
+  - Fichiers créés : `middleware.ts`, `utils/cookies.ts`
+  - Cookie `access_token` (plain) posé au login/refresh, lu par le middleware
+  - `decodeJwt` (jose) pour extraire le rôle sans vérification de signature
+  - LOCATAIRE → /locataire | autres rôles → / | routes publiques protégées si déjà connecté
 - P0.3 : Next.js 16 TypeScript (App Router + TailwindCSS) ✓
 - P0.4 : Variables d'environnement (.env.local + .env.example) ✓
 - P0.7 : Dépendances installées (Redux, Axios, PrimeReact, react-hook-form, zod, jose, sass…) ✓

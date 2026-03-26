@@ -2,6 +2,7 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { store } from '@/store';
 import { setCredentials, clearCredentials } from '@/store/authSlice';
 import { Role } from '@/types/enums';
+import { setAccessTokenCookie, clearAccessTokenCookie } from '@/utils/cookies';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000';
 
@@ -63,6 +64,7 @@ apiClient.interceptors.response.use(
     // on ne tente pas un nouveau refresh — on déconnecte directement.
     if (originalRequest.url?.includes('/auth/refresh')) {
       store.dispatch(clearCredentials());
+      clearAccessTokenCookie();
       redirectToLogin();
       return Promise.reject(error);
     }
@@ -97,6 +99,8 @@ apiClient.interceptors.response.use(
           user: { id: user.id, username: user.username, role: user.role as Role },
         }),
       );
+      // Synchroniser le cookie middleware avec le nouveau token
+      setAccessTokenCookie(access_token);
 
       processQueue(null, access_token);
       originalRequest.headers.Authorization = `Bearer ${access_token}`;
@@ -104,6 +108,7 @@ apiClient.interceptors.response.use(
     } catch (refreshError) {
       processQueue(refreshError, null);
       store.dispatch(clearCredentials());
+      clearAccessTokenCookie();
       redirectToLogin();
       return Promise.reject(refreshError);
     } finally {
