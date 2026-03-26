@@ -10,6 +10,7 @@ import { AxiosError } from 'axios';
 
 import { batimentsApi } from '@/services/batiments.api';
 import { logementsApi } from '@/services/logements.api';
+import { occupationsApi } from '@/services/occupations.api';
 import type { Batiment, BatimentDashboard } from '@/types/batiment';
 import type { Logement } from '@/types/logement';
 
@@ -45,11 +46,12 @@ export default function BatimentDashboardPage() {
 
   const [batiment,   setBatiment]   = useState<Batiment | null>(null);
   const [dashboard,  setDashboard]  = useState<BatimentDashboard | null>(null);
-  const [logements,  setLogements]  = useState<Logement[] | null>(null);
-  const [loading,    setLoading]    = useState(true);
-  const [error,      setError]      = useState<string | null>(null);
-  const [logsLoading, setLogsLoading] = useState(true);
-  const [logsError,   setLogsError]   = useState<string | null>(null);
+  const [logements,      setLogements]      = useState<Logement[] | null>(null);
+  const [occupiedIds,    setOccupiedIds]    = useState<Set<number>>(new Set());
+  const [loading,        setLoading]        = useState(true);
+  const [error,          setError]          = useState<string | null>(null);
+  const [logsLoading,    setLogsLoading]    = useState(true);
+  const [logsError,      setLogsError]      = useState<string | null>(null);
 
   // ── Chargement ─────────────────────────────────────────────────────────────
   async function loadAll() {
@@ -77,9 +79,19 @@ export default function BatimentDashboardPage() {
     setLogsLoading(true);
     setLogsError(null);
     try {
-      const res = await logementsApi.getAll();
-      // Filtrer uniquement les logements de ce bâtiment
-      setLogements(res.data.data.filter((l) => l.batimentId === batId));
+      const [logsRes, occsRes] = await Promise.all([
+        logementsApi.getAll(),
+        occupationsApi.getAll(),
+      ]);
+      // Logements de ce bâtiment uniquement
+      setLogements(logsRes.data.data.filter((l) => l.batimentId === batId));
+      // Occupations actives = dateFin absente ou null
+      const activeLogIds = new Set(
+        occsRes.data.data
+          .filter((o) => !o.dateFin)
+          .map((o) => o.logementId),
+      );
+      setOccupiedIds(activeLogIds);
     } catch {
       setLogsError('Impossible de charger les logements.');
     } finally {
@@ -199,10 +211,9 @@ export default function BatimentDashboardPage() {
             <Column field="nom" header="Nom" sortable />
             <Column
               header="Statut"
-              body={(l: Logement) => {
-                const occ = l.loyers && l.loyers.length > 0;
-                return <StatusBadge variant={occ ? 'occupe' : 'libre'} />;
-              }}
+              body={(l: Logement) => (
+                <StatusBadge variant={occupiedIds.has(l.id) ? 'occupe' : 'libre'} />
+              )}
               style={{ width: '110px' }}
             />
             <Column
