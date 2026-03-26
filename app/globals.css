@@ -1,4 +1,8 @@
-@import "tailwindcss";
+/* Tailwind v4 : importer séparément pour exclure le preflight
+   (le preflight reset margin/padding/border sur TOUS les éléments et
+   interfère avec les styles internes des composants PrimeReact) */
+@import "tailwindcss/theme" layer(theme);
+@import "tailwindcss/utilities" layer(utilities);
 @import "primeicons/primeicons.css";
 
 :root {
@@ -18,4 +22,33 @@ body {
   background-color: #f8fafc;
   color: var(--color-text-dark);
   font-family: Inter, Arial, Helvetica, sans-serif;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Ajustements PrimeReact — le preflight Tailwind étant désactivé,
+   seuls les écarts intentionnels par rapport au thème lara-light-blue
+   sont corrigés ici.
+───────────────────────────────────────────────────────────────────────────── */
+
+/* Padding interne des inputs (le thème par défaut est trop serré) */
+.p-inputtext {
+  padding: 0.5rem 0.75rem;
+}
+
+/* Password : propager w-full jusqu'à l'input natif
+   Structure v10 : .p-password > .p-icon-field > input.p-password-input */
+.p-password.w-full {
+  width: 100%;
+}
+.p-password.w-full .p-icon-field {
+  width: 100%;
+}
+.p-password.w-full .p-password-input {
+  width: 100%;
+}
+
+/* Icône "oeil" centrée verticalement */
+.p-password .p-icon-field .p-input-icon {
+  display: flex;
+  align-items: center;
 }

@@ -61,12 +61,26 @@ apiClient.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // ⚠️ Éviter la boucle infinie : si la requête échouée est déjà /auth/refresh
-    // on ne tente pas un nouveau refresh — on déconnecte directement.
-    if (originalRequest.url?.includes('/auth/refresh')) {
-      store.dispatch(setSessionExpired(true));
-      store.dispatch(clearCredentials());
-      clearAccessTokenCookie();
+    // ⚠️ Endpoints qui ne doivent JAMAIS déclencher un refresh automatique :
+    // - /auth/refresh  → éviter la boucle infinie
+    // - /auth/login    → 401 = identifiants invalides, pas une session expirée
+    // - /auth/forgot-password, /auth/reset-password → endpoints publics
+    const NO_RETRY_URLS = [
+      '/auth/refresh',
+      '/auth/login',
+      '/auth/forgot-password',
+      '/auth/reset-password',
+    ];
+    const isNoRetryUrl = NO_RETRY_URLS.some((u) => originalRequest.url?.includes(u));
+
+    if (isNoRetryUrl) {
+      if (originalRequest.url?.includes('/auth/refresh')) {
+        // Refresh expiré → session terminée
+        store.dispatch(setSessionExpired(true));
+        store.dispatch(clearCredentials());
+        clearAccessTokenCookie();
+      }
+      // Pour les autres (login, etc.) : laisser l'erreur remonter telle quelle
       return Promise.reject(error);
     }
 
