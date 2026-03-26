@@ -1,26 +1,21 @@
 @import "tailwindcss";
+@import "primeicons/primeicons.css";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-primary: #1e3a8a;
+  --color-primary-medium: #3b82f6;
+  --color-primary-light: #dbeafe;
+  --color-text-dark: #1e293b;
+  --color-success: #166534;
+  --color-success-bg: #dcfce7;
+  --color-error: #991b1b;
+  --color-error-bg: #fee2e2;
+  --color-warning: #92400e;
+  --color-warning-bg: #fef3c7;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #f8fafc;
+  color: var(--color-text-dark);
+  font-family: Inter, Arial, Helvetica, sans-serif;
 }

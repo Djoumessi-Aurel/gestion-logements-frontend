@@ -9,9 +9,9 @@ const PUBLIC_ROUTES = ['/login', '/forgot-password', '/reset-password'];
 
 const LOCATAIRE_BASE = '/locataire';
 
-// ─── Middleware ───────────────────────────────────────────────────────────────
+// ─── Proxy (anciennement middleware, renommé en Next.js 16) ──────────────────
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const isPublicRoute = PUBLIC_ROUTES.some(

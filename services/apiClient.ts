@@ -1,6 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { store } from '@/store';
 import { setCredentials, clearCredentials } from '@/store/authSlice';
+import { setSessionExpired } from '@/store/uiSlice';
 import { Role } from '@/types/enums';
 import { setAccessTokenCookie, clearAccessTokenCookie } from '@/utils/cookies';
 
@@ -63,9 +64,9 @@ apiClient.interceptors.response.use(
     // ⚠️ Éviter la boucle infinie : si la requête échouée est déjà /auth/refresh
     // on ne tente pas un nouveau refresh — on déconnecte directement.
     if (originalRequest.url?.includes('/auth/refresh')) {
+      store.dispatch(setSessionExpired(true));
       store.dispatch(clearCredentials());
       clearAccessTokenCookie();
-      redirectToLogin();
       return Promise.reject(error);
     }
 
@@ -107,20 +108,14 @@ apiClient.interceptors.response.use(
       return apiClient(originalRequest);
     } catch (refreshError) {
       processQueue(refreshError, null);
+      store.dispatch(setSessionExpired(true));
       store.dispatch(clearCredentials());
       clearAccessTokenCookie();
-      redirectToLogin();
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;
     }
   },
 );
-
-function redirectToLogin() {
-  if (typeof window !== 'undefined') {
-    window.location.href = '/login';
-  }
-}
 
 export default apiClient;

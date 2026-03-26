@@ -683,7 +683,7 @@ NEXT_PUBLIC_CRYPTO_SECRET=...    ← clé de chiffrement redux-persist
 - F5.4 : `middleware.ts` – protection des routes + vérification rôle JWT
   - Routes publiques : `/login`, `/forgot-password`, `/reset-password`
   - LOCATAIRE → redirect `/locataire`, autres rôles → dashboard
-- F5.5 : Layouts (racine, `(auth)`, `(dashboard)` avec sidebar + header + notification session expirée)
+- F5.5 : Layouts (racine, `(auth)`, `(dashboard)` avec sidebar + header + footer + notification session expirée)
   - Sidebar : items filtrés par rôle, repliée sur mobile
   - Header : nom utilisateur + rôle + bouton profil + déconnexion
 - F5.6 : Pages Auth
@@ -722,7 +722,7 @@ NEXT_PUBLIC_CRYPTO_SECRET=...    ← clé de chiffrement redux-persist
 ---
 
 ## Étape en cours
-F5.5
+F5.6
 
 ## Étapes complétées
 
@@ -730,11 +730,19 @@ F5.5
 - F5.1 : Redux Toolkit + redux-persist chiffré ✓
 - F5.2 : apiClient Axios + intercepteurs JWT ✓
 - F5.3 : Services API frontend typés ✓
-- F5.4 : middleware.ts – protection des routes + vérification rôle JWT ✓
-  - Fichiers créés : `middleware.ts`, `utils/cookies.ts`
-  - Cookie `access_token` (plain) posé au login/refresh, lu par le middleware
+- F5.4 : proxy.ts – protection des routes + vérification rôle JWT ✓
+  - Fichiers créés : `proxy.ts` (renommé depuis middleware.ts — convention Next.js 16), `utils/cookies.ts`
+  - Cookie `access_token` (plain) posé au login/refresh, lu par le proxy
   - `decodeJwt` (jose) pour extraire le rôle sans vérification de signature
   - LOCATAIRE → /locataire | autres rôles → / | routes publiques protégées si déjà connecté
+- F5.5 : Layouts (auth, dashboard) + Sidebar + Header + SessionGuard ✓
+  - `app/(auth)/layout.tsx` : layout public centré + branding
+  - `app/(dashboard)/layout.tsx` : sidebar + header + SessionGuard
+  - `components/layout/Sidebar.tsx` : nav filtrée par rôle, drawer mobile / fixe desktop
+  - `components/layout/Header.tsx` : username, badge rôle, profil, déconnexion
+  - `components/layout/SessionGuard.tsx` : toast "Session expirée" + redirect /login (déclenché par uiSlice.sessionExpired)
+  - `uiSlice` étendu : `sessionExpired` boolean (dispatché par apiClient, lu par SessionGuard)
+  - PrimeReact 10 configuré : `PrimeReactProvider` dans StoreProvider, thème lara-light-blue, `transpilePackages`
 - P0.3 : Next.js 16 TypeScript (App Router + TailwindCSS) ✓
 - P0.4 : Variables d'environnement (.env.local + .env.example) ✓
 - P0.7 : Dépendances installées (Redux, Axios, PrimeReact, react-hook-form, zod, jose, sass…) ✓

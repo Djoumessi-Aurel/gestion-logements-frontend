@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import StoreProvider from '@/store/StoreProvider';
+import 'primereact/resources/themes/lara-light-blue/theme.css';
 import './globals.css';
 
 export const metadata: Metadata = {
