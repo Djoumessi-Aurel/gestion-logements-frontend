@@ -79,7 +79,7 @@ export default function Sidebar() {
       >
         {/* Logo / titre */}
         <div className="flex items-center gap-3 px-5 py-5 border-b border-white/10">
-          <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-white/15 flex items-center justify-center">
+          <div className="shrink-0 w-9 h-9 rounded-lg bg-white/15 flex items-center justify-center">
             <i className="pi pi-building text-white text-lg" />
           </div>
           <span className="font-semibold text-base leading-tight">
