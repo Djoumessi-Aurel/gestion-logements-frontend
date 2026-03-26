@@ -722,7 +722,7 @@ NEXT_PUBLIC_CRYPTO_SECRET=...    ← clé de chiffrement redux-persist
 ---
 
 ## Étape en cours
-F5.6
+F5.7
 
 ## Étapes complétées
 
@@ -743,6 +743,10 @@ F5.6
   - `components/layout/SessionGuard.tsx` : toast "Session expirée" + redirect /login (déclenché par uiSlice.sessionExpired)
   - `uiSlice` étendu : `sessionExpired` boolean (dispatché par apiClient, lu par SessionGuard)
   - PrimeReact 10 configuré : `PrimeReactProvider` dans StoreProvider, thème lara-light-blue, `transpilePackages`
+- F5.6 : Pages Auth ✓
+  - `/login` : react-hook-form + zod, setAccessTokenCookie au succès, redirect par rôle, erreurs 401/429
+  - `/forgot-password` : message générique toujours affiché (ne révèle pas l'existence du compte), erreur 429
+  - `/reset-password` : lit `?token=` via useSearchParams (Suspense), confirmation mot de passe, erreur 400/429
 - P0.3 : Next.js 16 TypeScript (App Router + TailwindCSS) ✓
 - P0.4 : Variables d'environnement (.env.local + .env.example) ✓
 - P0.7 : Dépendances installées (Redux, Axios, PrimeReact, react-hook-form, zod, jose, sass…) ✓
