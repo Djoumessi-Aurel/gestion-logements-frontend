@@ -1,35 +1,34 @@
 /**
  * Gestion du cookie `access_token` côté client.
  *
- * Ce cookie est lisible par le middleware Next.js (non-HttpOnly) et permet de
+ * Ce cookie est lisible par le proxy Next.js (non-HttpOnly) et permet de
  * protéger les routes sans appel API. Il est synchronisé avec le Redux store :
  * - Après login       → setAccessTokenCookie(token)
  * - Après refresh     → setAccessTokenCookie(newToken)  (dans apiClient.ts)
  * - Après logout      → clearAccessTokenCookie()
+ *
+ * ⚠️  L'expiry du cookie est volontairement calée sur la durée du refresh token
+ * (7 jours), et NON sur l'expiry du JWT access token (quelques minutes/heures).
+ * Raison : le proxy lit ce cookie pour savoir si une session existe. Si le cookie
+ * disparaît à l'expiry du JWT, le proxy redirige vers /login même si le refresh
+ * token est encore valide — l'intercepteur Axios n'a jamais la chance de rafraîchir.
+ * La vraie validation du token est faite par le backend à chaque appel API.
  */
 
 export const ACCESS_TOKEN_COOKIE = 'access_token';
 
-/** Extrait la date d'expiration (exp) du payload JWT (sans vérification de signature). */
-function parseJwtExp(token: string): Date | null {
-  try {
-    const [, payload] = token.split('.');
-    const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
-    return typeof decoded.exp === 'number' ? new Date(decoded.exp * 1000) : null;
-  } catch {
-    return null;
-  }
-}
+// Doit correspondre à REFRESH_TOKEN_EXPIRES_IN côté backend.
+const SESSION_DURATION_DAYS = 7;
 
 /**
- * Pose le cookie `access_token` avec l'expiry du JWT.
+ * Pose le cookie `access_token` avec une expiry de 7 jours (durée du refresh token).
  * Appelé après login et après chaque refresh réussi.
  */
 export function setAccessTokenCookie(token: string): void {
   if (typeof document === 'undefined') return;
-  const exp = parseJwtExp(token);
-  const expStr = exp ? `; expires=${exp.toUTCString()}` : '';
-  document.cookie = `${ACCESS_TOKEN_COOKIE}=${token}; path=/${expStr}; SameSite=Strict`;
+  const exp = new Date();
+  exp.setDate(exp.getDate() + SESSION_DURATION_DAYS);
+  document.cookie = `${ACCESS_TOKEN_COOKIE}=${token}; path=/; expires=${exp.toUTCString()}; SameSite=Strict`;
 }
 
 /**
