@@ -9,6 +9,13 @@ const PUBLIC_ROUTES = ['/login', '/forgot-password', '/reset-password'];
 
 const LOCATAIRE_BASE = '/locataire';
 
+// Vérifie si le chemin appartient à l'espace personnel locataire.
+// On exige un slash final (/locataire/) ou une correspondance exacte (/locataire)
+// pour éviter de matcher /locataires (page d'administration des locataires).
+function isLocataireSpace(pathname: string): boolean {
+  return pathname === LOCATAIRE_BASE || pathname.startsWith(LOCATAIRE_BASE + '/');
+}
+
 // ─── Proxy (anciennement middleware, renommé en Next.js 16) ──────────────────
 
 export function proxy(request: NextRequest) {
@@ -60,13 +67,13 @@ export function proxy(request: NextRequest) {
 
   // ── Contrôle RBAC au niveau des routes ───────────────────────────────────────
 
-  // LOCATAIRE : uniquement /locataire
-  if (role === 'LOCATAIRE' && !pathname.startsWith(LOCATAIRE_BASE)) {
+  // LOCATAIRE : uniquement /locataire (pas /locataires ni les autres routes)
+  if (role === 'LOCATAIRE' && !isLocataireSpace(pathname)) {
     return NextResponse.redirect(new URL(LOCATAIRE_BASE, request.url));
   }
 
-  // Non-LOCATAIRE : interdit sur /locataire
-  if (role && role !== 'LOCATAIRE' && pathname.startsWith(LOCATAIRE_BASE)) {
+  // Non-LOCATAIRE : interdit sur /locataire (mais /locataires reste accessible)
+  if (role && role !== 'LOCATAIRE' && isLocataireSpace(pathname)) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 

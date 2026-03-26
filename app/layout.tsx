@@ -15,7 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <body>
+      <body className='m-0'>
         <StoreProvider>{children}</StoreProvider>
       </body>
     </html>
