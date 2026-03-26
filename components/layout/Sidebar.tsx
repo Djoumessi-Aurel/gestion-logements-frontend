@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setSidebarCollapsed } from '@/store/uiSlice';
 import { Role } from '@/types/enums';
+import { Button } from 'primereact/button';
 
 type NavItem = {
   label: string;
@@ -85,18 +86,17 @@ export default function Sidebar() {
             Gestion<br />Logements
           </span>
           {/* Bouton fermer (mobile) */}
-          <button
-            className="ml-auto lg:hidden text-white/60 hover:text-white"
+          <Button
+            className="ml-auto lg:hidden bg-transparent border-white cursor-pointer"
             onClick={closeMobile}
-            aria-label="Fermer le menu"
           >
             <i className="pi pi-times text-lg" />
-          </button>
+          </Button>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-4 px-2">
-          <ul className="space-y-0.5">
+        <nav className="flex-1 overflow-y-auto py-4 px-3">
+          <ul className="space-y-1">
             {visibleItems.map((item) => (
               <li key={item.path}>
                 <Link
@@ -105,12 +105,12 @@ export default function Sidebar() {
                   className={[
                     'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
                     isActive(item.path)
-                      ? 'bg-white/20 text-white'
-                      : 'text-white/70 hover:bg-white/10 hover:text-white',
+                      ? 'bg-[#3b82f6] text-white shadow-sm'
+                      : 'text-white hover:bg-white/10',
                   ].join(' ')}
                 >
-                  <i className={`pi ${item.icon} text-base w-5 text-center`} />
-                  {item.label}
+                  <i className={`pi ${item.icon} text-base w-5 text-center shrink-0`} />
+                  <span>{item.label}</span>
                 </Link>
               </li>
             ))}
@@ -118,19 +118,19 @@ export default function Sidebar() {
         </nav>
 
         {/* Profil (bas de sidebar) */}
-        <div className="border-t border-white/10 px-2 py-3">
+        <div className="border-t border-white/10 px-3 py-3">
           <Link
             href="/profil"
             onClick={closeMobile}
             className={[
               'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
               pathname === '/profil'
-                ? 'bg-white/20 text-white'
-                : 'text-white/70 hover:bg-white/10 hover:text-white',
+                ? 'bg-[#3b82f6] text-white shadow-sm'
+                : 'text-white hover:bg-white/10',
             ].join(' ')}
           >
-            <i className="pi pi-user text-base w-5 text-center" />
-            Mon profil
+            <i className="pi pi-user text-base w-5 text-center shrink-0" />
+            <span>Mon profil</span>
           </Link>
         </div>
       </aside>

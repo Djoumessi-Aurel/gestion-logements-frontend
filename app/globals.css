@@ -24,6 +24,20 @@ body {
   font-family: Inter, Arial, Helvetica, sans-serif;
 }
 
+/* Reset navigateur placé dans @layer base pour garantir la priorité correcte
+   dans le contexte des CSS Cascade Layers utilisés par Tailwind v4 */
+@layer base {
+  a {
+    text-decoration: none;
+    /* color: inherit; */
+  }
+  ul, ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+}
+
 /* ─────────────────────────────────────────────────────────────────────────────
    Ajustements PrimeReact — le preflight Tailwind étant désactivé,
    seuls les écarts intentionnels par rapport au thème lara-light-blue
