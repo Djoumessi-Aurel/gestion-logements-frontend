@@ -21,6 +21,7 @@ export interface Logement {
   createdAt: string;
   updatedAt: string;
   loyers?: Loyer[];
+  loyerActuel?: Loyer | null; // présent uniquement si ?includeLoyer=true
 }
 
 export interface CreateLogementDto {

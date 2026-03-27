@@ -4,11 +4,11 @@ import type { Logement, Loyer, CreateLogementDto, UpdateLogementDto, CreateLoyer
 import type { Occupation } from '@/types/occupation';
 
 export const logementsApi = {
-  getAll: () =>
-    apiClient.get<ApiResponseList<Logement>>('/logements'),
+  getAll: (params?: { includeLoyer?: boolean }) =>
+    apiClient.get<ApiResponseList<Logement>>('/logements', { params }),
 
-  getById: (id: number) =>
-    apiClient.get<ApiResponse<Logement>>(`/logements/${id}`),
+  getById: (id: number, params?: { includeLoyer?: boolean }) =>
+    apiClient.get<ApiResponse<Logement>>(`/logements/${id}`, { params }),
 
   create: (dto: CreateLogementDto) =>
     apiClient.post<ApiResponse<Logement>>('/logements', dto),

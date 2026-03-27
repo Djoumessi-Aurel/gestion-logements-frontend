@@ -19,7 +19,7 @@ import { AxiosError } from 'axios';
 import { logementsApi } from '@/services/logements.api';
 import { batimentsApi } from '@/services/batiments.api';
 import { occupationsApi } from '@/services/occupations.api';
-import type { Logement, Loyer, CreateLogementDto } from '@/types/logement';
+import type { Logement, CreateLogementDto } from '@/types/logement';
 import type { Batiment } from '@/types/batiment';
 import type { Occupation } from '@/types/occupation';
 import { PeriodeType, Role } from '@/types/enums';
@@ -61,12 +61,6 @@ const PERIODE_OPTIONS = [
 
 // ─── Utilitaires ──────────────────────────────────────────────────────────────
 
-function getLoyerActuel(logement: Logement): Loyer | undefined {
-  if (!logement.loyers?.length) return undefined;
-  return [...logement.loyers].sort(
-    (a, b) => new Date(b.dateDebut).getTime() - new Date(a.dateDebut).getTime(),
-  )[0];
-}
 
 function formatMontant(val: number): string {
   return new Intl.NumberFormat('fr-FR', {
@@ -138,7 +132,7 @@ export default function LogementsPage() {
     setError(null);
     try {
       const [logsRes, occsRes, batsRes] = await Promise.all([
-        logementsApi.getAll(),
+        logementsApi.getAll({ includeLoyer: true }),
         occupationsApi.getAll(0), // uniquement les occupations en cours
         batimentsApi.getAll(),
       ]);
@@ -338,13 +332,12 @@ export default function LogementsPage() {
           <Column
             header="Loyer actuel"
             body={(l: Logement) => {
-              const loyer = getLoyerActuel(l);
-              if (!loyer) return <span className="text-gray-400 text-sm">—</span>;
+              if (!l.loyerActuel) return <span className="text-gray-400 text-sm">—</span>;
               return (
                 <span className="text-sm font-medium">
-                  {formatMontant(loyer.montant)}
+                  {formatMontant(l.loyerActuel.montant)}
                   <span className="text-gray-400 ml-1">
-                    / {labelPeriode(loyer.periodeNombre, loyer.periodeType)}
+                    / {labelPeriode(l.loyerActuel.periodeNombre, l.loyerActuel.periodeType)}
                   </span>
                 </span>
               );
