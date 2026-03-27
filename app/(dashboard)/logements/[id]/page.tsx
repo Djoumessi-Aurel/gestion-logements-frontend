@@ -74,6 +74,11 @@ function extractError(err: unknown, fallback: string): string {
   return fallback;
 }
 
+// Formatage local pour éviter le décalage UTC lors de la sélection de date
+function toDateStr(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 function KpiCard({ label, value, color }: { label: string; value: string | number; color?: string }) {
   return (
     <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
@@ -118,8 +123,8 @@ export default function LogementDetailPage() {
   const addLoyerForm = useForm<AddLoyerFormValues>({
     resolver: zodResolver(addLoyerSchema),
     defaultValues: {
-      montant: undefined, periodeNombre: undefined,
-      periodeType: undefined, dateDebut: undefined,
+      montant: undefined, periodeNombre: 1,
+      periodeType: PeriodeType.MOIS, dateDebut: undefined,
     },
   });
 
@@ -330,8 +335,8 @@ export default function LogementDetailPage() {
                 style={{ backgroundColor: '#1e3a8a', borderColor: '#1e3a8a' }}
                 onClick={() => {
                   addLoyerForm.reset({
-                    montant: undefined, periodeNombre: undefined,
-                    periodeType: undefined, dateDebut: undefined,
+                    montant: undefined, periodeNombre: 1,
+                    periodeType: PeriodeType.MOIS, dateDebut: undefined,
                   });
                   setAddLoyerModal(true);
                 }}
@@ -511,7 +516,7 @@ export default function LogementDetailPage() {
               <Calendar
                 value={field.value ? new Date(field.value) : null}
                 onChange={(e) =>
-                  field.onChange(e.value ? (e.value as Date).toISOString().split('T')[0] : undefined)
+                  field.onChange(e.value ? toDateStr(e.value as Date) : undefined)
                 }
                 dateFormat="dd/mm/yy"
                 className="w-full"

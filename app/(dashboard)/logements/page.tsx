@@ -93,6 +93,11 @@ function extractError(err: unknown, fallback: string): string {
   return fallback;
 }
 
+// Formatage local pour éviter le décalage UTC lors de la sélection de date
+function toDateStr(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function LogementsPage() {
@@ -117,8 +122,8 @@ export default function LogementsPage() {
     resolver: zodResolver(createSchema),
     defaultValues: {
       batimentId: undefined, nom: '', description: '',
-      loyerMontant: undefined, loyerPeriodeNombre: undefined,
-      loyerPeriodeType: undefined, loyerDateDebut: undefined,
+      loyerMontant: undefined, loyerPeriodeNombre: 1,
+      loyerPeriodeType: PeriodeType.MOIS, loyerDateDebut: undefined,
     },
   });
 
@@ -167,8 +172,8 @@ export default function LogementsPage() {
   function openCreate() {
     createForm.reset({
       batimentId: undefined, nom: '', description: '',
-      loyerMontant: undefined, loyerPeriodeNombre: undefined,
-      loyerPeriodeType: undefined, loyerDateDebut: undefined,
+      loyerMontant: undefined, loyerPeriodeNombre: 1,
+      loyerPeriodeType: PeriodeType.MOIS, loyerDateDebut: undefined,
     });
     setModalMode('create');
   }
@@ -514,7 +519,7 @@ export default function LogementsPage() {
                 <Calendar
                   value={field.value ? new Date(field.value) : null}
                   onChange={(e) =>
-                    field.onChange(e.value ? (e.value as Date).toISOString().split('T')[0] : undefined)
+                    field.onChange(e.value ? toDateStr(e.value as Date) : undefined)
                   }
                   dateFormat="dd/mm/yy"
                   className="w-full"
