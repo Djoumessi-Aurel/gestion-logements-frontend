@@ -387,8 +387,15 @@ Accès : ADMIN_LOGEMENT+
 - Endpoint : `GET /occupations`
 - Query param optionnel : `?statut=0` (en cours, `dateFin IS NULL`) | `?statut=1` (terminées, `dateFin IS NOT NULL`) | absent → toutes
 - DataTable : logement, locataire, date début, date fin, statut (actif/terminé), date dernier jour couvert
-- Filtre rapide par statut (onglets ou SelectButton : Toutes / En cours / Terminées)
 - StatusBadge : Actif (bleu) / Terminé (gris)
+
+**Stratégie de chargement (performance) :**
+
+- Arrivée sur la page → charger uniquement `?statut=0` (en cours) — léger et rapide
+- Clic "Terminées" → charger `?statut=1` **une seule fois**, mettre en cache dans le state local (`terminatedOccs`)
+- Clic "Toutes" → fusionner les deux datasets (pas de nouvel appel si les deux sont déjà chargés)
+- State : `activeOccs: Occupation[] | null`, `terminatedOccs: Occupation[] | null` (null = pas encore chargé)
+- SelectButton : "En cours" (défaut) | "Terminées" | "Toutes"
 
 #### UC-OCC-02 : Créer occupation (modal)
 - Champs : `logementId`* (sélecteur parmi logements libres), `locataireId`* (sélecteur parmi locataires libres de préférence), `dateDebut`*
