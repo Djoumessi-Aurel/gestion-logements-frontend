@@ -4,8 +4,11 @@ import type { Occupation, CreateOccupationDto, UpdateOccupationDto, FinOccupatio
 import type { Arriere } from '@/types/arriere';
 
 export const occupationsApi = {
-  getAll: () =>
-    apiClient.get<ApiResponseList<Occupation>>('/occupations'),
+  // statut: 0 = en cours (dateFin IS NULL), 1 = terminées (dateFin IS NOT NULL), absent = toutes
+  getAll: (statut?: 0 | 1) =>
+    apiClient.get<ApiResponseList<Occupation>>('/occupations', {
+      params: statut !== undefined ? { statut } : undefined,
+    }),
 
   getById: (id: number) =>
     apiClient.get<ApiResponse<Occupation>>(`/occupations/${id}`),

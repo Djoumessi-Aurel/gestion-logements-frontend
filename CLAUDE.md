@@ -335,9 +335,13 @@ Accès : ADMIN_LOGEMENT+
 - Endpoint : `DELETE /logements/:id`
 - Erreur 422 : "Impossible de supprimer ce logement : une occupation y est rattachée" (RG-02)
 
-#### UC-LOG-05 : Historique loyers (`/logements/[id]` onglet Loyers)
+#### UC-LOG-05-a : Historique loyers (`/logements/[id]` onglet Loyers)
 - Endpoint : `GET /logements/:id/loyers`
 - Liste chronologique : montant, date début, période
+
+#### UC-LOG-05-b : Historique occupations (`/logements/[id]` onglet Occupations)
+- Endpoint : `GET /logements/:id/occupations`
+- Liste chronologique : locataire, date début, date fin, statut
 
 #### UC-LOG-06 : Ajouter loyer (modal)
 - Champs : `montant`*, `dateDebut`, `periodeNombre`*, `periodeType`*
@@ -381,7 +385,9 @@ Accès : ADMIN_LOGEMENT+
 
 #### UC-OCC-01 : Liste (`/occupations`)
 - Endpoint : `GET /occupations`
+- Query param optionnel : `?statut=0` (en cours, `dateFin IS NULL`) | `?statut=1` (terminées, `dateFin IS NOT NULL`) | absent → toutes
 - DataTable : logement, locataire, date début, date fin, statut (actif/terminé), date dernier jour couvert
+- Filtre rapide par statut (onglets ou SelectButton : Toutes / En cours / Terminées)
 - StatusBadge : Actif (bleu) / Terminé (gris)
 
 #### UC-OCC-02 : Créer occupation (modal)

@@ -81,17 +81,12 @@ export default function BatimentDashboardPage() {
     try {
       const [logsRes, occsRes] = await Promise.all([
         logementsApi.getAll(),
-        occupationsApi.getAll(),
+        occupationsApi.getAll(0), // statut=0 → uniquement les occupations en cours
       ]);
       // Logements de ce bâtiment uniquement
       setLogements(logsRes.data.data.filter((l) => l.batimentId === batId));
-      // Occupations actives = dateFin absente ou null
-      const activeLogIds = new Set(
-        occsRes.data.data
-          .filter((o) => !o.dateFin)
-          .map((o) => o.logementId),
-      );
-      setOccupiedIds(activeLogIds);
+      // Toutes les occupations retournées sont actives (dateFin IS NULL)
+      setOccupiedIds(new Set(occsRes.data.data.map((o) => o.logementId)));
     } catch {
       setLogsError('Impossible de charger les logements.');
     } finally {
