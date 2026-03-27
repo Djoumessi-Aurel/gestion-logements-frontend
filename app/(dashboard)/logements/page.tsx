@@ -33,12 +33,12 @@ import { showConfirm } from '@/components/shared/ConfirmDialog';
 // ─── Schémas ──────────────────────────────────────────────────────────────────
 
 const createSchema = z.object({
-  batimentId:         z.number({ invalid_type_error: 'Sélectionnez un bâtiment' }).min(1, 'Sélectionnez un bâtiment'),
+  batimentId:         z.number({ message: 'Sélectionnez un bâtiment' }).min(1, 'Sélectionnez un bâtiment'),
   nom:                z.string().min(1, 'Le nom est obligatoire'),
   description:        z.string().optional(),
-  loyerMontant:       z.number({ invalid_type_error: 'Le montant est obligatoire' }).positive('Doit être supérieur à 0'),
-  loyerPeriodeNombre: z.number({ invalid_type_error: 'La durée est obligatoire' }).int().positive('Doit être ≥ 1'),
-  loyerPeriodeType:   z.nativeEnum(PeriodeType, { invalid_type_error: 'Sélectionnez un type de période' }),
+  loyerMontant:       z.number({ message: 'Le montant est obligatoire' }).positive('Doit être supérieur à 0'),
+  loyerPeriodeNombre: z.number({ message: 'La durée est obligatoire' }).int().positive('Doit être ≥ 1'),
+  loyerPeriodeType:   z.nativeEnum(PeriodeType, { message: 'Sélectionnez un type de période' }),
   loyerDateDebut:     z.string().optional(),
 });
 

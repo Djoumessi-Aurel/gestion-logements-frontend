@@ -30,9 +30,9 @@ import DataTableWrapper from '@/components/shared/DataTableWrapper';
 // ─── Schéma ajout loyer ───────────────────────────────────────────────────────
 
 const addLoyerSchema = z.object({
-  montant:       z.number({ invalid_type_error: 'Le montant est obligatoire' }).positive('Doit être supérieur à 0'),
-  periodeNombre: z.number({ invalid_type_error: 'La durée est obligatoire' }).int().positive('Doit être ≥ 1'),
-  periodeType:   z.nativeEnum(PeriodeType, { invalid_type_error: 'Sélectionnez un type' }),
+  montant:       z.number({ message: 'Le montant est obligatoire' }).positive('Doit être supérieur à 0'),
+  periodeNombre: z.number({ message: 'La durée est obligatoire' }).int().positive('Doit être ≥ 1'),
+  periodeType:   z.nativeEnum(PeriodeType, { message: 'Sélectionnez un type' }),
   dateDebut:     z.string().optional(),
 });
 
