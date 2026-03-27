@@ -735,7 +735,7 @@ NEXT_PUBLIC_CRYPTO_SECRET=...    ← clé de chiffrement redux-persist
 ---
 
 ## Étape en cours
-F5.7
+F6.3
 
 ## Étapes complétées
 
@@ -760,6 +760,13 @@ F5.7
   - `/login` : react-hook-form + zod, setAccessTokenCookie au succès, redirect par rôle, erreurs 401/429
   - `/forgot-password` : message générique toujours affiché (ne révèle pas l'existence du compte), erreur 429
   - `/reset-password` : lit `?token=` via useSearchParams (Suspense), confirmation mot de passe, erreur 400/429
+- F5.7 : Composants partagés ✓ (PageHeader, DataTableWrapper, StatusBadge, ConfirmDialog, LoadingSpinner, ErrorMessage, FileUploader, ExportModal, RoleGuard)
+- F5.8 : Types TypeScript partagés dans `types/` ✓
+- F6.1 : Pages Bâtiments ✓ (liste CRUD + dashboard `/batiments/[id]`)
+- F6.2 : Pages Logements ✓
+  - `/logements` : liste avec statut (occupationsApi statut=0), locataire actuel, loyer actuel, CRUD modal
+  - `/logements/[id]` : TabView — Dashboard (KPIs, arriérés loc. actuel) | Loyers (lazy load + ajout) | Occupations (lazy load)
+  - Stratégie lazy load : loyers et occupations chargés uniquement au premier clic sur l'onglet
 - P0.3 : Next.js 16 TypeScript (App Router + TailwindCSS) ✓
 - P0.4 : Variables d'environnement (.env.local + .env.example) ✓
 - P0.7 : Dépendances installées (Redux, Axios, PrimeReact, react-hook-form, zod, jose, sass…) ✓

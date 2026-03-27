@@ -1,0 +1,575 @@
+'use client';
+
+import { useEffect, useState, useRef } from 'react';
+import { Column } from 'primereact/column';
+import { Dialog } from 'primereact/dialog';
+import { Button } from 'primereact/button';
+import { InputText } from 'primereact/inputtext';
+import { InputTextarea } from 'primereact/inputtextarea';
+import { InputNumber } from 'primereact/inputnumber';
+import { Dropdown } from 'primereact/dropdown';
+import { Calendar } from 'primereact/calendar';
+import { Toast } from 'primereact/toast';
+import { useForm, Controller } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
+import { AxiosError } from 'axios';
+
+import { logementsApi } from '@/services/logements.api';
+import { batimentsApi } from '@/services/batiments.api';
+import { occupationsApi } from '@/services/occupations.api';
+import type { Logement, Loyer, CreateLogementDto } from '@/types/logement';
+import type { Batiment } from '@/types/batiment';
+import type { Occupation } from '@/types/occupation';
+import { PeriodeType, Role } from '@/types/enums';
+import { useAppSelector } from '@/store/hooks';
+
+import PageHeader from '@/components/shared/PageHeader';
+import DataTableWrapper from '@/components/shared/DataTableWrapper';
+import StatusBadge from '@/components/shared/StatusBadge';
+import { showConfirm } from '@/components/shared/ConfirmDialog';
+
+// ─── Schémas ──────────────────────────────────────────────────────────────────
+
+const createSchema = z.object({
+  batimentId:         z.number({ invalid_type_error: 'Sélectionnez un bâtiment' }).min(1, 'Sélectionnez un bâtiment'),
+  nom:                z.string().min(1, 'Le nom est obligatoire'),
+  description:        z.string().optional(),
+  loyerMontant:       z.number({ invalid_type_error: 'Le montant est obligatoire' }).positive('Doit être supérieur à 0'),
+  loyerPeriodeNombre: z.number({ invalid_type_error: 'La durée est obligatoire' }).int().positive('Doit être ≥ 1'),
+  loyerPeriodeType:   z.nativeEnum(PeriodeType, { invalid_type_error: 'Sélectionnez un type de période' }),
+  loyerDateDebut:     z.string().optional(),
+});
+
+const editSchema = z.object({
+  nom:         z.string().min(1, 'Le nom est obligatoire'),
+  description: z.string().optional(),
+});
+
+type CreateFormValues = z.infer<typeof createSchema>;
+type EditFormValues   = z.infer<typeof editSchema>;
+
+// ─── Constantes ───────────────────────────────────────────────────────────────
+
+const PERIODE_OPTIONS = [
+  { label: 'Jour(s)',     value: PeriodeType.JOUR },
+  { label: 'Semaine(s)', value: PeriodeType.SEMAINE },
+  { label: 'Mois',       value: PeriodeType.MOIS },
+  { label: 'Année(s)',   value: PeriodeType.ANNEE },
+];
+
+// ─── Utilitaires ──────────────────────────────────────────────────────────────
+
+function getLoyerActuel(logement: Logement): Loyer | undefined {
+  if (!logement.loyers?.length) return undefined;
+  return [...logement.loyers].sort(
+    (a, b) => new Date(b.dateDebut).getTime() - new Date(a.dateDebut).getTime(),
+  )[0];
+}
+
+function formatMontant(val: number): string {
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency', currency: 'XAF', maximumFractionDigits: 0,
+  }).format(val);
+}
+
+function formatDate(val: string): string {
+  return new Date(val).toLocaleDateString('fr-FR');
+}
+
+function labelPeriode(nombre: number, type: PeriodeType): string {
+  const labels: Record<PeriodeType, string> = {
+    [PeriodeType.JOUR]:    'j',
+    [PeriodeType.SEMAINE]: 'sem',
+    [PeriodeType.MOIS]:    'mois',
+    [PeriodeType.ANNEE]:   'an',
+  };
+  return `${nombre} ${labels[type]}`;
+}
+
+function extractError(err: unknown, fallback: string): string {
+  if (err instanceof AxiosError) return err.response?.data?.message ?? fallback;
+  return fallback;
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
+export default function LogementsPage() {
+  const router = useRouter();
+  const toast  = useRef<Toast>(null);
+  const role   = useAppSelector((s) => s.auth.user?.role);
+
+  // ── État ───────────────────────────────────────────────────────────────────
+  const [logements,  setLogements]  = useState<Logement[] | null>(null);
+  const [batiments,  setBatiments]  = useState<Batiment[]>([]);
+  const [occMap,     setOccMap]     = useState<Map<number, Occupation>>(new Map());
+  const [batMap,     setBatMap]     = useState<Map<number, Batiment>>(new Map());
+  const [loading,    setLoading]    = useState(true);
+  const [error,      setError]      = useState<string | null>(null);
+  const [modalMode,  setModalMode]  = useState<'create' | 'edit' | null>(null);
+  const [editing,    setEditing]    = useState<Logement | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+
+  // ── Formulaires ────────────────────────────────────────────────────────────
+  const createForm = useForm<CreateFormValues>({
+    resolver: zodResolver(createSchema),
+    defaultValues: {
+      batimentId: undefined, nom: '', description: '',
+      loyerMontant: undefined, loyerPeriodeNombre: undefined,
+      loyerPeriodeType: undefined, loyerDateDebut: undefined,
+    },
+  });
+
+  const editForm = useForm<EditFormValues>({
+    resolver: zodResolver(editSchema),
+    defaultValues: { nom: '', description: '' },
+  });
+
+  // ── Chargement ─────────────────────────────────────────────────────────────
+  async function loadData() {
+    setLoading(true);
+    setError(null);
+    try {
+      const [logsRes, occsRes, batsRes] = await Promise.all([
+        logementsApi.getAll(),
+        occupationsApi.getAll(0), // uniquement les occupations en cours
+        batimentsApi.getAll(),
+      ]);
+
+      const bats = batsRes.data.data;
+      setBatiments(bats);
+      setBatMap(new Map(bats.map((b) => [b.id, b])));
+      setLogements(logsRes.data.data);
+
+      const map = new Map<number, Occupation>();
+      for (const occ of occsRes.data.data) map.set(occ.logementId, occ);
+      setOccMap(map);
+    } catch {
+      setError('Impossible de charger les logements.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => { loadData(); }, []);
+
+  // ── Modal ──────────────────────────────────────────────────────────────────
+  function openCreate() {
+    createForm.reset({
+      batimentId: undefined, nom: '', description: '',
+      loyerMontant: undefined, loyerPeriodeNombre: undefined,
+      loyerPeriodeType: undefined, loyerDateDebut: undefined,
+    });
+    setModalMode('create');
+  }
+
+  function openEdit(log: Logement) {
+    setEditing(log);
+    editForm.reset({ nom: log.nom, description: log.description ?? '' });
+    setModalMode('edit');
+  }
+
+  function closeModal() {
+    setModalMode(null);
+    setEditing(null);
+  }
+
+  // ── Soumission créer ───────────────────────────────────────────────────────
+  const onCreateSubmit = createForm.handleSubmit(async (values) => {
+    setSubmitting(true);
+    try {
+      const dto: CreateLogementDto = {
+        batimentId:         values.batimentId,
+        nom:                values.nom,
+        loyerMontant:       values.loyerMontant,
+        loyerPeriodeNombre: values.loyerPeriodeNombre,
+        loyerPeriodeType:   values.loyerPeriodeType,
+        ...(values.description    ? { description:    values.description    } : {}),
+        ...(values.loyerDateDebut ? { loyerDateDebut: values.loyerDateDebut } : {}),
+      };
+      await logementsApi.create(dto);
+      toast.current?.show({ severity: 'success', summary: 'Logement créé', life: 3000 });
+      closeModal();
+      loadData();
+    } catch (err) {
+      toast.current?.show({
+        severity: 'error', summary: 'Erreur',
+        detail: extractError(err, 'Impossible de créer le logement.'), life: 4000,
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  });
+
+  // ── Soumission modifier ────────────────────────────────────────────────────
+  const onEditSubmit = editForm.handleSubmit(async (values) => {
+    if (!editing) return;
+    setSubmitting(true);
+    try {
+      await logementsApi.update(editing.id, values);
+      toast.current?.show({ severity: 'success', summary: 'Logement modifié', life: 3000 });
+      closeModal();
+      loadData();
+    } catch (err) {
+      toast.current?.show({
+        severity: 'error', summary: 'Erreur',
+        detail: extractError(err, 'Impossible de modifier le logement.'), life: 4000,
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  });
+
+  // ── Suppression ────────────────────────────────────────────────────────────
+  function handleDelete(log: Logement) {
+    showConfirm({
+      header:      'Supprimer le logement',
+      message:     `Supprimer « ${log.nom} » ? Cette action est irréversible.`,
+      acceptLabel: 'Supprimer',
+      onAccept:    async () => {
+        setDeletingId(log.id);
+        try {
+          await logementsApi.delete(log.id);
+          toast.current?.show({ severity: 'success', summary: 'Logement supprimé', life: 3000 });
+          loadData();
+        } catch (err) {
+          toast.current?.show({
+            severity: 'error', summary: 'Erreur',
+            detail: extractError(err, 'Impossible de supprimer ce logement.'), life: 4000,
+          });
+        } finally {
+          setDeletingId(null);
+        }
+      },
+    });
+  }
+
+  // ── RBAC ───────────────────────────────────────────────────────────────────
+  const canEdit   = role === Role.ADMIN_BATIMENT || role === Role.ADMIN_GLOBAL;
+  const canDelete = canEdit;
+
+  // ── Colonnes ───────────────────────────────────────────────────────────────
+  function actionsBody(log: Logement) {
+    return (
+      <div className="flex items-center gap-1">
+        <Button
+          icon="pi pi-chart-bar"
+          rounded text
+          tooltip="Dashboard"
+          tooltipOptions={{ position: 'top' }}
+          onClick={() => router.push(`/logements/${log.id}`)}
+        />
+        {canEdit && (
+          <Button
+            icon="pi pi-pencil"
+            rounded text severity="secondary"
+            tooltip="Modifier"
+            tooltipOptions={{ position: 'top' }}
+            onClick={() => openEdit(log)}
+          />
+        )}
+        {canDelete && (
+          <Button
+            icon="pi pi-trash"
+            rounded text severity="danger"
+            tooltip="Supprimer"
+            tooltipOptions={{ position: 'top' }}
+            loading={deletingId === log.id}
+            onClick={() => handleDelete(log)}
+          />
+        )}
+      </div>
+    );
+  }
+
+  // ── Rendu ──────────────────────────────────────────────────────────────────
+  return (
+    <>
+      <Toast ref={toast} />
+
+      <PageHeader
+        title="Logements"
+        breadcrumb={[{ label: 'Dashboard', path: '/' }, { label: 'Logements' }]}
+        action={{
+          label:   'Nouveau logement',
+          icon:    'pi-plus',
+          onClick: openCreate,
+          visible: canEdit,
+        }}
+      />
+
+      <div className="bg-white rounded-xl shadow-sm p-4">
+        <DataTableWrapper
+          data={logements}
+          loading={loading}
+          error={error}
+          onRetry={loadData}
+          emptyMessage="Aucun logement enregistré."
+        >
+          <Column field="nom" header="Nom" sortable filter filterPlaceholder="Filtrer…" />
+
+          <Column
+            header="Bâtiment"
+            sortable sortField="batimentId"
+            filter filterField="batimentId"
+            filterPlaceholder="Filtrer…"
+            body={(l: Logement) => {
+              const nom = l.batiment?.nom ?? batMap.get(l.batimentId)?.nom;
+              return nom ?? <span className="text-gray-400 text-sm">—</span>;
+            }}
+          />
+
+          <Column
+            header="Loyer actuel"
+            body={(l: Logement) => {
+              const loyer = getLoyerActuel(l);
+              if (!loyer) return <span className="text-gray-400 text-sm">—</span>;
+              return (
+                <span className="text-sm font-medium">
+                  {formatMontant(loyer.montant)}
+                  <span className="text-gray-400 ml-1">
+                    / {labelPeriode(loyer.periodeNombre, loyer.periodeType)}
+                  </span>
+                </span>
+              );
+            }}
+          />
+
+          <Column
+            header="Statut"
+            body={(l: Logement) => <StatusBadge variant={occMap.has(l.id) ? 'occupe' : 'libre'} />}
+            style={{ width: '110px' }}
+          />
+
+          <Column
+            header="Locataire actuel"
+            body={(l: Logement) => {
+              const occ = occMap.get(l.id);
+              if (!occ) return <span className="text-gray-400 text-sm">—</span>;
+              if (occ.locataire) {
+                return (
+                  <span className="text-sm">
+                    {occ.locataire.prenom} {occ.locataire.nom}
+                  </span>
+                );
+              }
+              return <span className="text-sm text-gray-500">ID #{occ.locataireId}</span>;
+            }}
+          />
+
+          <Column
+            header="Dernier jour couvert"
+            body={(l: Logement) => {
+              const occ = occMap.get(l.id);
+              if (!occ) return <span className="text-gray-400 text-sm">—</span>;
+              return <span className="text-sm">{formatDate(occ.dateDernierJourCouvert)}</span>;
+            }}
+            style={{ width: '170px' }}
+          />
+
+          <Column
+            header="Actions"
+            body={actionsBody}
+            style={{ width: '130px', textAlign: 'center' }}
+            exportable={false}
+          />
+        </DataTableWrapper>
+      </div>
+
+      {/* ── Modal Créer ────────────────────────────────────────────────────── */}
+      <Dialog
+        visible={modalMode === 'create'}
+        onHide={closeModal}
+        header="Nouveau logement"
+        style={{ width: '520px' }}
+        modal draggable={false} resizable={false}
+        footer={
+          <div className="flex justify-end gap-2">
+            <Button label="Annuler" severity="secondary" outlined onClick={closeModal} disabled={submitting} />
+            <Button
+              label="Créer" icon="pi pi-check" loading={submitting}
+              onClick={onCreateSubmit}
+              style={{ backgroundColor: '#1e3a8a', borderColor: '#1e3a8a' }}
+            />
+          </div>
+        }
+      >
+        <form onSubmit={onCreateSubmit} className="space-y-4 pt-2">
+          {/* Bâtiment */}
+          <div>
+            <label className="block text-sm font-medium text-[#1e293b] mb-1">
+              Bâtiment <span className="text-red-500">*</span>
+            </label>
+            <Controller name="batimentId" control={createForm.control} render={({ field }) => (
+              <Dropdown
+                value={field.value}
+                onChange={(e) => field.onChange(e.value)}
+                options={batiments.map((b) => ({ label: b.nom, value: b.id }))}
+                placeholder="Sélectionner un bâtiment"
+                className={`w-full ${createForm.formState.errors.batimentId ? 'p-invalid' : ''}`}
+                filter
+                emptyMessage="Aucun bâtiment disponible"
+              />
+            )} />
+            {createForm.formState.errors.batimentId && (
+              <p className="text-xs text-[#991b1b] mt-1">{createForm.formState.errors.batimentId.message}</p>
+            )}
+          </div>
+
+          {/* Nom */}
+          <div>
+            <label className="block text-sm font-medium text-[#1e293b] mb-1">
+              Nom <span className="text-red-500">*</span>
+            </label>
+            <Controller name="nom" control={createForm.control} render={({ field }) => (
+              <InputText
+                {...field}
+                className={`w-full ${createForm.formState.errors.nom ? 'p-invalid' : ''}`}
+                placeholder="Appartement A1"
+              />
+            )} />
+            {createForm.formState.errors.nom && (
+              <p className="text-xs text-[#991b1b] mt-1">{createForm.formState.errors.nom.message}</p>
+            )}
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block text-sm font-medium text-[#1e293b] mb-1">Description</label>
+            <Controller name="description" control={createForm.control} render={({ field }) => (
+              <InputTextarea
+                {...field} value={field.value ?? ''} rows={2}
+                className="w-full" autoResize placeholder="Optionnel"
+              />
+            )} />
+          </div>
+
+          <hr className="border-gray-200" />
+          <p className="text-sm font-semibold text-[#1e293b]">Loyer initial</p>
+
+          {/* Montant + Durée */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-[#1e293b] mb-1">
+                Montant <span className="text-red-500">*</span>
+              </label>
+              <Controller name="loyerMontant" control={createForm.control} render={({ field }) => (
+                <InputNumber
+                  value={field.value ?? null}
+                  onValueChange={(e) => field.onChange(e.value)}
+                  className={`w-full ${createForm.formState.errors.loyerMontant ? 'p-invalid' : ''}`}
+                  placeholder="50000" min={1}
+                />
+              )} />
+              {createForm.formState.errors.loyerMontant && (
+                <p className="text-xs text-[#991b1b] mt-1">{createForm.formState.errors.loyerMontant.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#1e293b] mb-1">
+                Durée période <span className="text-red-500">*</span>
+              </label>
+              <Controller name="loyerPeriodeNombre" control={createForm.control} render={({ field }) => (
+                <InputNumber
+                  value={field.value ?? null}
+                  onValueChange={(e) => field.onChange(e.value)}
+                  className={`w-full ${createForm.formState.errors.loyerPeriodeNombre ? 'p-invalid' : ''}`}
+                  placeholder="1" min={1}
+                />
+              )} />
+              {createForm.formState.errors.loyerPeriodeNombre && (
+                <p className="text-xs text-[#991b1b] mt-1">{createForm.formState.errors.loyerPeriodeNombre.message}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Type + Date début */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-[#1e293b] mb-1">
+                Type de période <span className="text-red-500">*</span>
+              </label>
+              <Controller name="loyerPeriodeType" control={createForm.control} render={({ field }) => (
+                <Dropdown
+                  value={field.value}
+                  onChange={(e) => field.onChange(e.value)}
+                  options={PERIODE_OPTIONS}
+                  placeholder="Sélectionner…"
+                  className={`w-full ${createForm.formState.errors.loyerPeriodeType ? 'p-invalid' : ''}`}
+                />
+              )} />
+              {createForm.formState.errors.loyerPeriodeType && (
+                <p className="text-xs text-[#991b1b] mt-1">{createForm.formState.errors.loyerPeriodeType.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#1e293b] mb-1">Date début loyer</label>
+              <Controller name="loyerDateDebut" control={createForm.control} render={({ field }) => (
+                <Calendar
+                  value={field.value ? new Date(field.value) : null}
+                  onChange={(e) =>
+                    field.onChange(e.value ? (e.value as Date).toISOString().split('T')[0] : undefined)
+                  }
+                  dateFormat="dd/mm/yy"
+                  className="w-full"
+                  placeholder="Aujourd'hui si vide"
+                  showIcon
+                />
+              )} />
+            </div>
+          </div>
+        </form>
+      </Dialog>
+
+      {/* ── Modal Modifier ─────────────────────────────────────────────────── */}
+      <Dialog
+        visible={modalMode === 'edit'}
+        onHide={closeModal}
+        header={`Modifier « ${editing?.nom ?? ''} »`}
+        style={{ width: '460px' }}
+        modal draggable={false} resizable={false}
+        footer={
+          <div className="flex justify-end gap-2">
+            <Button label="Annuler" severity="secondary" outlined onClick={closeModal} disabled={submitting} />
+            <Button
+              label="Enregistrer" icon="pi pi-check" loading={submitting}
+              onClick={onEditSubmit}
+              style={{ backgroundColor: '#1e3a8a', borderColor: '#1e3a8a' }}
+            />
+          </div>
+        }
+      >
+        <form onSubmit={onEditSubmit} className="space-y-4 pt-2">
+          <div>
+            <label className="block text-sm font-medium text-[#1e293b] mb-1">
+              Nom <span className="text-red-500">*</span>
+            </label>
+            <Controller name="nom" control={editForm.control} render={({ field }) => (
+              <InputText
+                {...field}
+                className={`w-full ${editForm.formState.errors.nom ? 'p-invalid' : ''}`}
+              />
+            )} />
+            {editForm.formState.errors.nom && (
+              <p className="text-xs text-[#991b1b] mt-1">{editForm.formState.errors.nom.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-[#1e293b] mb-1">Description</label>
+            <Controller name="description" control={editForm.control} render={({ field }) => (
+              <InputTextarea
+                {...field} value={field.value ?? ''} rows={3}
+                className="w-full" autoResize
+              />
+            )} />
+          </div>
+        </form>
+      </Dialog>
+    </>
+  );
+}
