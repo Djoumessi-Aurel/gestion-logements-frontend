@@ -16,8 +16,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError } from 'axios';
 
 import { logementsApi } from '@/services/logements.api';
+import { locatairesApi } from '@/services/locataires.api';
 import type { Logement, Loyer, LogementDashboard, CreateLoyerDto } from '@/types/logement';
 import type { Occupation } from '@/types/occupation';
+import type { Locataire } from '@/types/locataire';
 import { PeriodeType, Role } from '@/types/enums';
 import { useAppSelector } from '@/store/hooks';
 
@@ -108,6 +110,7 @@ export default function LogementDetailPage() {
 
   // ── État onglet Occupations ────────────────────────────────────────────────
   const [occupations, setOccupations] = useState<Occupation[] | null>(null);
+  const [locMap,      setLocMap]      = useState<Map<number, Locataire>>(new Map());
   const [occsLoading, setOccsLoading] = useState(false);
   const [occsError,   setOccsError]   = useState<string | null>(null);
   const [occsLoaded,  setOccsLoaded]  = useState(false);
@@ -167,8 +170,12 @@ export default function LogementDetailPage() {
     setOccsLoading(true);
     setOccsError(null);
     try {
-      const res = await logementsApi.getOccupations(logId);
-      setOccupations(res.data.data);
+      const [occsRes, locsRes] = await Promise.all([
+        logementsApi.getOccupations(logId),
+        locatairesApi.getAll(),
+      ]);
+      setOccupations(occsRes.data.data);
+      setLocMap(new Map(locsRes.data.data.map((l) => [l.id, l])));
       setOccsLoaded(true);
     } catch {
       setOccsError('Impossible de charger les occupations.');
@@ -375,17 +382,17 @@ export default function LogementDetailPage() {
           >
             <Column
               header="Locataire"
-              body={(o: Occupation) =>
-                o.locataire ? (
+              body={(o: Occupation) => {
+                const loc = o.locataire ?? locMap.get(o.locataireId);
+                if (!loc) return <span className="text-gray-400 text-sm">—</span>;
+                return (
                   <Button
-                    label={`${o.locataire.prenom} ${o.locataire.nom}`}
+                    label={`${loc.prenom} ${loc.nom}`}
                     text size="small"
                     onClick={() => router.push(`/locataires/${o.locataireId}`)}
                   />
-                ) : (
-                  <span className="text-gray-400 text-sm">ID #{o.locataireId}</span>
-                )
-              }
+                );
+              }}
             />
             <Column
               header="Date début"
