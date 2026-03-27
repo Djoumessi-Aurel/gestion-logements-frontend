@@ -4,6 +4,9 @@
       "Bash(npx tsc:*)",
       "Bash(npx next:*)",
       "Bash(npm install:*)"
+    ],
+    "additionalDirectories": [
+      "e:\\Informatique\\fichiers web\\nest js\\gestion logements\\frontend\\app\\(dashboard)\\locataires"
     ]
   }
 }

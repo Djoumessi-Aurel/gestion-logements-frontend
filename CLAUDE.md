@@ -735,7 +735,7 @@ NEXT_PUBLIC_CRYPTO_SECRET=...    ← clé de chiffrement redux-persist
 ---
 
 ## Étape en cours
-F6.3
+F6.4
 
 ## Étapes complétées
 
@@ -767,6 +767,10 @@ F6.3
   - `/logements` : liste avec statut (occupationsApi statut=0), locataire actuel, loyer actuel, CRUD modal
   - `/logements/[id]` : TabView — Dashboard (KPIs, arriérés loc. actuel) | Loyers (lazy load + ajout) | Occupations (lazy load)
   - Stratégie lazy load : loyers et occupations chargés uniquement au premier clic sur l'onglet
+- F6.3 : Pages Locataires ✓
+  - `/locataires` : liste (nom, prénom, téléphone, email, statut libre, logement actuel, dernier jour couvert en rouge si retard), CRUD modal
+  - Chargement : locataires + occupations actives (statut=0) + users LOCATAIRE en parallèle
+  - `/locataires/[id]` : dashboard — infos, arriérés (liste ou badge à jour), KPIs occupations, solvabilité, assiduité
 - P0.3 : Next.js 16 TypeScript (App Router + TailwindCSS) ✓
 - P0.4 : Variables d'environnement (.env.local + .env.example) ✓
 - P0.7 : Dépendances installées (Redux, Axios, PrimeReact, react-hook-form, zod, jose, sass…) ✓
