@@ -71,15 +71,16 @@ export default function LocatairesPage() {
   const role   = useAppSelector((s) => s.auth.user?.role);
 
   // ── État ───────────────────────────────────────────────────────────────────
-  const [locataires,  setLocataires]  = useState<Locataire[] | null>(null);
-  const [occMap,      setOccMap]      = useState<Map<number, Occupation>>(new Map());
-  const [usersLoc,    setUsersLoc]    = useState<Utilisateur[]>([]);
-  const [loading,     setLoading]     = useState(true);
-  const [error,       setError]       = useState<string | null>(null);
-  const [modalMode,   setModalMode]   = useState<'create' | 'edit' | null>(null);
-  const [editing,     setEditing]     = useState<Locataire | null>(null);
-  const [submitting,  setSubmitting]  = useState(false);
-  const [deletingId,  setDeletingId]  = useState<number | null>(null);
+  const [locataires,    setLocataires]    = useState<Locataire[] | null>(null);
+  const [occMap,        setOccMap]        = useState<Map<number, Occupation>>(new Map());
+  const [usersLoc,      setUsersLoc]      = useState<Utilisateur[]>([]);
+  const [loading,       setLoading]       = useState(true);
+  const [error,         setError]         = useState<string | null>(null);
+  const [globalFilter,  setGlobalFilter]  = useState('');
+  const [modalMode,     setModalMode]     = useState<'create' | 'edit' | null>(null);
+  const [editing,       setEditing]       = useState<Locataire | null>(null);
+  const [submitting,    setSubmitting]    = useState(false);
+  const [deletingId,    setDeletingId]    = useState<number | null>(null);
 
   // ── Formulaires ────────────────────────────────────────────────────────────
   const createForm = useForm<CreateFormValues>({
@@ -295,27 +296,40 @@ export default function LocatairesPage() {
       />
 
       <div className="bg-white rounded-xl shadow-sm p-4">
+        {/* Filtre global */}
+        <div className="mb-4 relative max-w-sm">
+          <i className="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
+          <InputText
+            value={globalFilter}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+            placeholder="Rechercher (nom, prénom, téléphone, email)…"
+            className="w-full"
+            style={{ paddingLeft: '2.25rem', paddingRight: globalFilter ? '2rem' : undefined }}
+          />
+          {globalFilter && (
+            <button
+              type="button"
+              onClick={() => setGlobalFilter('')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-transparent border-none text-gray-400 hover:text-gray-700 transition-colors"
+            >
+              <i className="pi pi-times text-lg" />
+            </button>
+          )}
+        </div>
+
         <DataTableWrapper
           data={locataires}
           loading={loading}
           error={error}
           onRetry={loadData}
           emptyMessage="Aucun locataire enregistré."
+          filterDisplay={undefined}
+          globalFilter={globalFilter}
+          globalFilterFields={['nom', 'prenom', 'telephone', 'email']}
         >
-          <Column
-            field="nom" header="Nom" sortable
-            filter filterPlaceholder="Filtrer…" filterMatchMode="contains"
-          />
-
-          <Column
-            field="prenom" header="Prénom" sortable
-            filter filterPlaceholder="Filtrer…" filterMatchMode="contains"
-          />
-
-          <Column
-            field="telephone" header="Téléphone" sortable
-            filter filterPlaceholder="Filtrer…" filterMatchMode="contains"
-          />
+          <Column field="nom"       header="Nom"       sortable />
+          <Column field="prenom"    header="Prénom"    sortable />
+          <Column field="telephone" header="Téléphone" sortable />
 
           <Column
             field="email" header="Email"
@@ -324,7 +338,6 @@ export default function LocatairesPage() {
                 ? <span className="text-sm">{loc.email}</span>
                 : <span className="text-gray-400 text-sm">—</span>
             }
-            filter filterPlaceholder="Filtrer…" filterMatchMode="contains"
           />
 
           <Column
