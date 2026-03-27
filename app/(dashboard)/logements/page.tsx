@@ -19,11 +19,9 @@ import { AxiosError } from 'axios';
 import { logementsApi } from '@/services/logements.api';
 import { batimentsApi } from '@/services/batiments.api';
 import { occupationsApi } from '@/services/occupations.api';
-import { locatairesApi } from '@/services/locataires.api';
 import type { Logement, Loyer, CreateLogementDto } from '@/types/logement';
 import type { Batiment } from '@/types/batiment';
 import type { Occupation } from '@/types/occupation';
-import type { Locataire } from '@/types/locataire';
 import { PeriodeType, Role } from '@/types/enums';
 import { useAppSelector } from '@/store/hooks';
 
@@ -107,7 +105,6 @@ export default function LogementsPage() {
   const [batiments,  setBatiments]  = useState<Batiment[]>([]);
   const [occMap,     setOccMap]     = useState<Map<number, Occupation>>(new Map());
   const [batMap,     setBatMap]     = useState<Map<number, Batiment>>(new Map());
-  const [locMap,     setLocMap]     = useState<Map<number, Locataire>>(new Map());
   const [loading,    setLoading]    = useState(true);
   const [error,      setError]      = useState<string | null>(null);
   const [modalMode,  setModalMode]  = useState<'create' | 'edit' | null>(null);
@@ -135,11 +132,10 @@ export default function LogementsPage() {
     setLoading(true);
     setError(null);
     try {
-      const [logsRes, occsRes, batsRes, locsRes] = await Promise.all([
+      const [logsRes, occsRes, batsRes] = await Promise.all([
         logementsApi.getAll(),
         occupationsApi.getAll(0), // uniquement les occupations en cours
         batimentsApi.getAll(),
-        locatairesApi.getAll(),
       ]);
 
       const bats = batsRes.data.data;
@@ -158,8 +154,6 @@ export default function LogementsPage() {
       const map = new Map<number, Occupation>();
       for (const occ of occsRes.data.data) map.set(occ.logementId, occ);
       setOccMap(map);
-
-      setLocMap(new Map(locsRes.data.data.map((l) => [l.id, l])));
     } catch {
       setError('Impossible de charger les logements.');
     } finally {
@@ -362,10 +356,8 @@ export default function LogementsPage() {
             header="Locataire actuel"
             body={(l: Logement) => {
               const occ = occMap.get(l.id);
-              if (!occ) return <span className="text-gray-400 text-sm">—</span>;
-              const loc = occ.locataire ?? locMap.get(occ.locataireId);
-              if (!loc) return <span className="text-gray-400 text-sm">—</span>;
-              return <span className="text-sm">{loc.prenom} {loc.nom}</span>;
+              if (!occ?.locataire) return <span className="text-gray-400 text-sm">—</span>;
+              return <span className="text-sm">{occ.locataire.prenom} {occ.locataire.nom}</span>;
             }}
           />
 
