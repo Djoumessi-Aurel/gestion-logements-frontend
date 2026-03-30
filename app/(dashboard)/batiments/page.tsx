@@ -51,13 +51,14 @@ export default function BatimentsPage() {
   const role    = useAppSelector((s) => s.auth.user?.role);
 
   // ── État ───────────────────────────────────────────────────────────────────
-  const [batiments, setBatiments]   = useState<Batiment[] | null>(null);
-  const [loading, setLoading]       = useState(true);
-  const [error, setError]           = useState<string | null>(null);
-  const [modalVisible, setModal]    = useState(false);
-  const [editing, setEditing]       = useState<Batiment | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [batiments,    setBatiments]    = useState<Batiment[] | null>(null);
+  const [loading,      setLoading]      = useState(true);
+  const [error,        setError]        = useState<string | null>(null);
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [modalVisible, setModal]        = useState(false);
+  const [editing,      setEditing]      = useState<Batiment | null>(null);
+  const [submitting,   setSubmitting]   = useState(false);
+  const [deletingId,   setDeletingId]   = useState<number | null>(null);
 
   // ── Formulaire ─────────────────────────────────────────────────────────────
   const { control, handleSubmit, reset, formState: { errors: formErrors } } = useForm<FormValues>({
@@ -203,15 +204,39 @@ export default function BatimentsPage() {
       />
 
       <div className="bg-white rounded-xl shadow-sm p-4">
+        {/* Filtre global */}
+        <div className="mb-4 relative max-w-sm">
+          <i className="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
+          <InputText
+            value={globalFilter}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+            placeholder="Rechercher (nom, adresse, description)…"
+            className="w-full"
+            style={{ paddingLeft: '2.25rem', paddingRight: globalFilter ? '2rem' : undefined }}
+          />
+          {globalFilter && (
+            <button
+              type="button"
+              onClick={() => setGlobalFilter('')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-transparent border-none text-gray-400 hover:text-gray-700 transition-colors"
+            >
+              <i className="pi pi-times text-lg" />
+            </button>
+          )}
+        </div>
+
         <DataTableWrapper
           data={batiments}
           loading={loading}
           error={error}
           onRetry={loadBatiments}
           emptyMessage="Aucun bâtiment enregistré."
+          filterDisplay={undefined}
+          globalFilter={globalFilter}
+          globalFilterFields={['nom', 'adresse', 'description']}
         >
-          <Column field="nom"      header="Nom"         sortable filter filterPlaceholder="Filtrer…" />
-          <Column field="adresse"  header="Adresse"     sortable filter filterPlaceholder="Filtrer…" />
+          <Column field="nom"     header="Nom"     sortable />
+          <Column field="adresse" header="Adresse" sortable />
           <Column field="description" header="Description" style={{ maxWidth: '260px' }}
             body={(b: Batiment) => b.description ?? <span className="text-gray-400 text-sm">—</span>}
           />
