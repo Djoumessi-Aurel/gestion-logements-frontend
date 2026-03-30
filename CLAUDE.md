@@ -401,6 +401,7 @@ Accès : ADMIN_LOGEMENT+
 - Champs : `logementId`* (sélecteur parmi logements libres), `locataireId`* (sélecteur parmi locataires libres de préférence), `dateDebut`*
 - Endpoint : `POST /occupations`
 - Erreur 422 : "Ce logement est actuellement occupé" (RG-05)
+- **Dupliqué dans `/logements`** : bouton "Occuper" sur chaque ligne de logement libre (logementId pré-rempli, non modifiable)
 
 #### UC-OCC-03 : Modifier occupation (modal)
 - Champs : `dateDebut`, `locataireId`
@@ -439,6 +440,8 @@ Accès : ADMIN_LOGEMENT+
 - Filtre par occupation, logement, locataire, période
 
 #### UC-PAI-02 : Formulaire paiement (modal avec toggle Option 1 / Option 2)
+
+- **Dupliqué dans `/occupations`** : bouton "Enregistrer un paiement" sur chaque ligne d'occupation active (occupationId pré-rempli)
 
 **Option 1 – par nombre de loyers :**
 - Champs : `occupationId`*, `nombreDeLoyers`*, `datePaiement`, `commentaire`
@@ -711,8 +714,8 @@ NEXT_PUBLIC_CRYPTO_SECRET=...    ← clé de chiffrement redux-persist
 - F6.1 : Pages Bâtiments (UC-BAT-01 à UC-BAT-04) : liste, CRUD modal, dashboard bâtiment
 - F6.2 : Pages Logements (UC-LOG-01 à UC-LOG-07) : liste, CRUD modal, historique loyers, ajout loyer, dashboard logement
 - F6.3 : Pages Locataires (UC-LOC-01 à UC-LOC-05) : liste avec badge arriéré, CRUD modal, dashboard locataire
-- F6.4 : Pages Occupations (UC-OCC-01 à UC-OCC-08) : liste, CRUD modal, fin d'occupation, upload contrat, téléchargement contrat, arriérés
-- F6.5 : Formulaire Paiement (UC-PAI-01 à UC-PAI-05) : Option 1/2 avec calcul temps réel, toggle, upload preuves
+- F6.4 : Pages Occupations (UC-OCC-01 à UC-OCC-08) : liste, CRUD modal, fin d'occupation, upload contrat, téléchargement contrat, arriérés + bouton "Occuper" dupliqué dans `/logements` (UC-OCC-02 avec logementId pré-rempli)
+- F6.5 : Formulaire Paiement (UC-PAI-01 à UC-PAI-05) : Option 1/2 avec calcul temps réel, toggle, upload preuves + bouton "Enregistrer un paiement" dupliqué dans `/occupations` (UC-PAI-02 avec occupationId pré-rempli)
 - F6.6 : Pages Utilisateurs (UC-USR-01 à UC-USR-07) : liste, CRUD modal, activation, reset mdp, attribution bâtiments/logements
 - F6.7 : Espace Locataire (UC-LOC-PERSO) : lecture seule, arriéré ou prochain paiement, historique paiements
 - F6.8 : Page Profil (`/profil`) : infos utilisateur + changement mot de passe (UC-AUTH-04)
