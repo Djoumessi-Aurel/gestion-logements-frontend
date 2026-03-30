@@ -34,7 +34,7 @@ const createSchema = z.object({
   prenom:        z.string().min(1, 'Le prénom est obligatoire'),
   telephone:     z.string().min(1, 'Le téléphone est obligatoire'),
   email:         z.string().email('Email invalide').optional().or(z.literal('')),
-  utilisateurId: z.number().optional(),
+  utilisateurId: z.number().nullable().optional(),
 });
 
 const editSchema = z.object({
@@ -42,7 +42,7 @@ const editSchema = z.object({
   prenom:        z.string().min(1, 'Le prénom est obligatoire'),
   telephone:     z.string().min(1, 'Le téléphone est obligatoire'),
   email:         z.string().email('Email invalide').optional().or(z.literal('')),
-  utilisateurId: z.number().optional(),
+  utilisateurId: z.number().nullable().optional(),
 });
 
 type CreateFormValues = z.infer<typeof createSchema>;
@@ -151,8 +151,8 @@ export default function LocatairesPage() {
         nom:       values.nom,
         prenom:    values.prenom,
         telephone: values.telephone,
-        ...(values.email         ? { email:         values.email         } : {}),
-        ...(values.utilisateurId ? { utilisateurId: values.utilisateurId } : {}),
+        ...(values.email              ? { email:         values.email              } : {}),
+        ...(values.utilisateurId != null ? { utilisateurId: values.utilisateurId } : {}),
       });
       toast.current?.show({ severity: 'success', summary: 'Locataire créé', life: 3000 });
       closeModal();
@@ -176,8 +176,8 @@ export default function LocatairesPage() {
         nom:       values.nom,
         prenom:    values.prenom,
         telephone: values.telephone,
-        ...(values.email         !== undefined ? { email:         values.email || undefined } : {}),
-        ...(values.utilisateurId !== undefined ? { utilisateurId: values.utilisateurId     } : {}),
+        ...(values.email              ? { email:         values.email              } : {}),
+        ...(values.utilisateurId != null ? { utilisateurId: values.utilisateurId } : {}),
       });
       toast.current?.show({ severity: 'success', summary: 'Locataire modifié', life: 3000 });
       closeModal();
