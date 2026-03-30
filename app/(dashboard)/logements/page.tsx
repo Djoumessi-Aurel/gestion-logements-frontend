@@ -100,16 +100,17 @@ export default function LogementsPage() {
   const role   = useAppSelector((s) => s.auth.user?.role);
 
   // ── État ───────────────────────────────────────────────────────────────────
-  const [logements,  setLogements]  = useState<Logement[] | null>(null);
-  const [batiments,  setBatiments]  = useState<Batiment[]>([]);
-  const [occMap,     setOccMap]     = useState<Map<number, Occupation>>(new Map());
-  const [batMap,     setBatMap]     = useState<Map<number, Batiment>>(new Map());
-  const [loading,    setLoading]    = useState(true);
-  const [error,      setError]      = useState<string | null>(null);
-  const [modalMode,  setModalMode]  = useState<'create' | 'edit' | null>(null);
-  const [editing,    setEditing]    = useState<Logement | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [logements,    setLogements]    = useState<Logement[] | null>(null);
+  const [batiments,    setBatiments]    = useState<Batiment[]>([]);
+  const [occMap,       setOccMap]       = useState<Map<number, Occupation>>(new Map());
+  const [batMap,       setBatMap]       = useState<Map<number, Batiment>>(new Map());
+  const [loading,      setLoading]      = useState(true);
+  const [error,        setError]        = useState<string | null>(null);
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [modalMode,    setModalMode]    = useState<'create' | 'edit' | null>(null);
+  const [editing,      setEditing]      = useState<Logement | null>(null);
+  const [submitting,   setSubmitting]   = useState(false);
+  const [deletingId,   setDeletingId]   = useState<number | null>(null);
 
   // ── Formulaires ────────────────────────────────────────────────────────────
   const createForm = useForm<CreateFormValues>({
@@ -308,22 +309,42 @@ export default function LogementsPage() {
       />
 
       <div className="bg-white rounded-xl shadow-sm p-4">
+        {/* Filtre global */}
+        <div className="mb-4 relative max-w-sm">
+          <i className="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
+          <InputText
+            value={globalFilter}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+            placeholder="Rechercher (nom, bâtiment)…"
+            className="w-full"
+            style={{ paddingLeft: '2.25rem', paddingRight: globalFilter ? '2rem' : undefined }}
+          />
+          {globalFilter && (
+            <button
+              type="button"
+              onClick={() => setGlobalFilter('')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-transparent border-none text-gray-400 hover:text-gray-700 transition-colors"
+            >
+              <i className="pi pi-times text-lg" />
+            </button>
+          )}
+        </div>
+
         <DataTableWrapper
           data={logements}
           loading={loading}
           error={error}
           onRetry={loadData}
           emptyMessage="Aucun logement enregistré."
+          filterDisplay={undefined}
+          globalFilter={globalFilter}
+          globalFilterFields={['nom', 'batiment.nom']}
         >
-          <Column
-            field="nom" header="Nom" sortable
-            filter filterPlaceholder="Filtrer…" filterMatchMode="contains"
-          />
+          <Column field="nom" header="Nom" sortable />
 
           <Column
             header="Bâtiment"
             sortable sortField="batiment.nom"
-            filter filterField="batiment.nom" filterPlaceholder="Filtrer…" filterMatchMode="contains"
             body={(l: Logement) =>
               l.batiment?.nom ?? <span className="text-gray-400 text-sm">—</span>
             }
