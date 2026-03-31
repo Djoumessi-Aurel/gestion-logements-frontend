@@ -50,7 +50,7 @@ const editSchema = z.object({
 });
 
 const occupierSchema = z.object({
-  locataireId: z.number({ required_error: 'Sélectionnez un locataire' }),
+  locataireId: z.number({ message: 'Sélectionnez un locataire' }),
   dateDebut:   z.string().min(1, 'La date de début est obligatoire'),
 });
 

@@ -33,8 +33,8 @@ import FileUploader from '@/components/shared/FileUploader';
 // ─── Schémas ──────────────────────────────────────────────────────────────────
 
 const createSchema = z.object({
-  logementId:  z.number({ required_error: 'Sélectionnez un logement' }),
-  locataireId: z.number({ required_error: 'Sélectionnez un locataire' }),
+  logementId:  z.number({ message: 'Sélectionnez un logement' }),
+  locataireId: z.number({ message: 'Sélectionnez un locataire' }),
   dateDebut:   z.string().min(1, 'La date de début est obligatoire'),
 });
 
