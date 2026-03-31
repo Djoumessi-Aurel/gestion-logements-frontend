@@ -206,7 +206,7 @@ export default function LogementsPage() {
 
   function openOccuper(log: Logement) {
     setOccLogement(log);
-    occForm.reset({ locataireId: undefined, dateDebut: '' });
+    occForm.reset({ locataireId: undefined, dateDebut: toDateStr(new Date()) });
     setOccModalOpen(true);
   }
 
@@ -691,11 +691,11 @@ export default function LogementsPage() {
               <Dropdown
                 value={field.value ?? null}
                 onChange={(e) => field.onChange(e.value)}
-                options={locataires.filter((l) => l.libre).map((l) => ({ label: `${l.prenom} ${l.nom}`, value: l.id }))}
-                placeholder="Sélectionner un locataire libre"
+                options={locataires.map((l) => ({ label: `${l.prenom} ${l.nom}`, value: l.id }))}
+                placeholder="Sélectionner un locataire"
                 className={`w-full ${occForm.formState.errors.locataireId ? 'p-invalid' : ''}`}
                 filter
-                emptyMessage="Aucun locataire libre"
+                emptyMessage="Aucun locataire disponible"
               />
             )} />
             {occForm.formState.errors.locataireId && (

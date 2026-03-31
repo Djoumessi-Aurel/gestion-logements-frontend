@@ -136,7 +136,7 @@ export default function OccupationsPage() {
     return logements.filter((l) => !occupiedIds.has(l.id));
   }, [logements, activeOccs]);
 
-  const freeLocataires = useMemo(() => locataires.filter((l) => l.libre), [locataires]);
+  // Tous les locataires sont proposés à la création (un locataire peut occuper plusieurs logements)
 
   // ── Chargement initial ──────────────────────────────────────────────────────
   async function loadInitial() {
@@ -186,7 +186,7 @@ export default function OccupationsPage() {
 
   // ── Modals ──────────────────────────────────────────────────────────────────
   function openCreate() {
-    createForm.reset({ logementId: undefined, locataireId: undefined, dateDebut: '' });
+    createForm.reset({ logementId: undefined, locataireId: undefined, dateDebut: toDateStr(new Date()) });
     setModalMode('create');
   }
 
@@ -604,11 +604,11 @@ export default function OccupationsPage() {
               <Dropdown
                 value={field.value ?? null}
                 onChange={(e) => field.onChange(e.value)}
-                options={freeLocataires.map((l) => ({ label: `${l.prenom} ${l.nom}`, value: l.id }))}
-                placeholder="Sélectionner un locataire libre"
+                options={locataires.map((l) => ({ label: `${l.prenom} ${l.nom}`, value: l.id }))}
+                placeholder="Sélectionner un locataire"
                 className={`w-full ${createForm.formState.errors.locataireId ? 'p-invalid' : ''}`}
                 filter
-                emptyMessage="Aucun locataire libre"
+                emptyMessage="Aucun locataire disponible"
               />
             )} />
             {createForm.formState.errors.locataireId && (
