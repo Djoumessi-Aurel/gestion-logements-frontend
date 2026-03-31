@@ -1,10 +1,10 @@
 import apiClient from './apiClient';
-import type { ApiResponse, ApiResponseList } from '@/types/api';
+import type { ApiResponse, ApiResponsePaginated } from '@/types/api';
 import type { Paiement, CreatePaiementOption1Dto, CreatePaiementOption2Dto, UpdatePaiementDto } from '@/types/paiement';
 
 export const paiementsApi = {
-  getAll: () =>
-    apiClient.get<ApiResponseList<Paiement>>('/paiements'),
+  getAll: (params?: { page?: number; limit?: number }) =>
+    apiClient.get<ApiResponsePaginated<Paiement>>('/paiements', { params }),
 
   getById: (id: number) =>
     apiClient.get<ApiResponse<Paiement>>(`/paiements/${id}`),

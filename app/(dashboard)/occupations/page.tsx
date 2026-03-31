@@ -29,6 +29,7 @@ import DataTableWrapper from '@/components/shared/DataTableWrapper';
 import StatusBadge from '@/components/shared/StatusBadge';
 import { showConfirm } from '@/components/shared/ConfirmDialog';
 import FileUploader from '@/components/shared/FileUploader';
+import PaiementFormDialog from '@/components/shared/PaiementFormDialog';
 
 // ─── Schémas ──────────────────────────────────────────────────────────────────
 
@@ -91,6 +92,10 @@ export default function OccupationsPage() {
   const [terminatedOccs, setTerminatedOccs] = useState<Occupation[] | null>(null);
   const [logements,      setLogements]      = useState<Logement[]>([]);
   const [locataires,     setLocataires]     = useState<Locataire[]>([]);
+
+  // ── État modal paiement ─────────────────────────────────────────────────────
+  const [paiModalVisible, setPaiModalVisible] = useState(false);
+  const [paiLockedOccId,  setPaiLockedOccId]  = useState<number | undefined>(undefined);
   const [loading,        setLoading]        = useState(true);
   const [loadingTab,     setLoadingTab]     = useState(false);
   const [error,          setError]          = useState<string | null>(null);
@@ -145,7 +150,7 @@ export default function OccupationsPage() {
     try {
       const [occsRes, logsRes, locsRes] = await Promise.all([
         occupationsApi.getAll(0),
-        logementsApi.getAll(),
+        logementsApi.getAll({ includeLoyer: true }),
         locatairesApi.getAll(),
       ]);
       setActiveOccs(occsRes.data.data);
@@ -371,6 +376,17 @@ export default function OccupationsPage() {
     });
   }
 
+  // ── Modal paiement ──────────────────────────────────────────────────────────
+  function openPaiModal(occ: Occupation) {
+    setPaiLockedOccId(occ.id);
+    setPaiModalVisible(true);
+  }
+
+  async function handlePaiSuccess() {
+    const res = await occupationsApi.getAll(0);
+    setActiveOccs(res.data.data);
+  }
+
   // ── RBAC ────────────────────────────────────────────────────────────────────
   const canManage = role === Role.ADMIN_LOGEMENT || role === Role.ADMIN_BATIMENT || role === Role.ADMIN_GLOBAL;
 
@@ -386,6 +402,15 @@ export default function OccupationsPage() {
             tooltip="Voir les arriérés"
             tooltipOptions={{ position: 'top' }}
             onClick={() => openArrieres(occ)}
+          />
+        )}
+        {canManage && isActive && (
+          <Button
+            icon="pi pi-wallet"
+            rounded text severity="success"
+            tooltip="Enregistrer un paiement"
+            tooltipOptions={{ position: 'top' }}
+            onClick={() => openPaiModal(occ)}
           />
         )}
         {canManage && isActive && (
@@ -768,6 +793,17 @@ export default function OccupationsPage() {
           />
         </div>
       </Dialog>
+
+      {/* ── Modal Paiement (depuis occupation) ───────────────────────────────── */}
+      <PaiementFormDialog
+        visible={paiModalVisible}
+        onHide={() => setPaiModalVisible(false)}
+        occupations={activeOccs ?? []}
+        logements={logements}
+        lockedOccupationId={paiLockedOccId}
+        toast={toast}
+        onSuccess={handlePaiSuccess}
+      />
 
       {/* ── Modal Arriérés ────────────────────────────────────────────────────── */}
       <Dialog

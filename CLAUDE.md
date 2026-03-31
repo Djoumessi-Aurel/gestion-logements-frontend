@@ -743,7 +743,7 @@ NEXT_PUBLIC_CRYPTO_SECRET=...    ← clé de chiffrement redux-persist
 ---
 
 ## Étape en cours
-F6.5
+F6.6
 
 ## Étapes complétées
 
@@ -782,6 +782,13 @@ F6.5
   - `/locataires` : liste (nom, prénom, téléphone, email, statut libre, logement actuel, dernier jour couvert en rouge si retard), CRUD modal
   - Chargement : locataires + occupations actives (statut=0) + users LOCATAIRE en parallèle
   - `/locataires/[id]` : dashboard — infos, arriérés (liste ou badge à jour), KPIs occupations, solvabilité, assiduité
+- F6.5 : Paiements ✓
+  - `/paiements` : liste paginée serveur (lazy DataTable, page/limit), CRUD modal, upload preuves (ajout ou remplacement)
+  - `PaiementFormDialog` : composant partagé, toggle Option 1 (nombre de loyers, calcul temps réel) / Option 2 (montant libre, RG-12)
+  - Calcul temps réel opt1 : `debutPeriode = dateDernierJourCouvert + 1 j` (lu sur l'occupation), `finPeriode` et `montantPaye` calculés via `addPeriode`
+  - Loyer actif résolu via `logement.loyerActuel` (chargé avec `?includeLoyer=true`)
+  - `/occupations` : bouton "Enregistrer un paiement" (pi-wallet) sur chaque occupation active → `PaiementFormDialog` avec occupationId verrouillé
+  - Après paiement créé dans `/occupations` : rechargement des occupations actives (RG-11 : dateDernierJourCouvert mis à jour)
 - P0.3 : Next.js 16 TypeScript (App Router + TailwindCSS) ✓
 - P0.4 : Variables d'environnement (.env.local + .env.example) ✓
 - P0.7 : Dépendances installées (Redux, Axios, PrimeReact, react-hook-form, zod, jose, sass…) ✓

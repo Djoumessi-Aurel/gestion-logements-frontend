@@ -3,7 +3,8 @@
     "allow": [
       "Bash(npx tsc:*)",
       "Bash(npx next:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(ls \"e:/Informatique/fichiers web/nest js/gestion logements/frontend/app/\\(dashboard\\)/\")"
     ],
     "additionalDirectories": [
       "e:\\Informatique\\fichiers web\\nest js\\gestion logements\\frontend\\app\\(dashboard)\\locataires"
