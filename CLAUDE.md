@@ -738,7 +738,7 @@ NEXT_PUBLIC_CRYPTO_SECRET=...    ← clé de chiffrement redux-persist
 ---
 
 ## Étape en cours
-F6.4
+F6.5
 
 ## Étapes complétées
 
@@ -771,6 +771,9 @@ F6.4
   - `/logements/[id]` : TabView — Dashboard (KPIs, arriérés loc. actuel) | Loyers (lazy load + ajout) | Occupations (lazy load)
   - Stratégie lazy load : loyers et occupations chargés uniquement au premier clic sur l'onglet
 - F6.3 : Pages Locataires ✓
+- F6.4 : Pages Occupations ✓
+  - `/occupations` : liste (tabs lazy loading En cours/Terminées/Toutes), CRUD modal, fin d'occupation, upload/download contrat, modal arriérés
+  - `/logements` : bouton "Occuper" (pi-user-plus) sur logements libres → modal création occupation avec logementId pré-rempli (ADMIN_LOGEMENT+)
   - `/locataires` : liste (nom, prénom, téléphone, email, statut libre, logement actuel, dernier jour couvert en rouge si retard), CRUD modal
   - Chargement : locataires + occupations actives (statut=0) + users LOCATAIRE en parallèle
   - `/locataires/[id]` : dashboard — infos, arriérés (liste ou badge à jour), KPIs occupations, solvabilité, assiduité

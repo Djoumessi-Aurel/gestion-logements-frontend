@@ -19,9 +19,11 @@ import { AxiosError } from 'axios';
 import { logementsApi } from '@/services/logements.api';
 import { batimentsApi } from '@/services/batiments.api';
 import { occupationsApi } from '@/services/occupations.api';
+import { locatairesApi } from '@/services/locataires.api';
 import type { Logement, CreateLogementDto } from '@/types/logement';
 import type { Batiment } from '@/types/batiment';
 import type { Occupation } from '@/types/occupation';
+import type { Locataire } from '@/types/locataire';
 import { PeriodeType, Role } from '@/types/enums';
 import { useAppSelector } from '@/store/hooks';
 
@@ -47,8 +49,14 @@ const editSchema = z.object({
   description: z.string().optional(),
 });
 
-type CreateFormValues = z.infer<typeof createSchema>;
-type EditFormValues   = z.infer<typeof editSchema>;
+const occupierSchema = z.object({
+  locataireId: z.number({ required_error: 'Sélectionnez un locataire' }),
+  dateDebut:   z.string().min(1, 'La date de début est obligatoire'),
+});
+
+type CreateFormValues  = z.infer<typeof createSchema>;
+type EditFormValues    = z.infer<typeof editSchema>;
+type OccupierFormValues = z.infer<typeof occupierSchema>;
 
 // ─── Constantes ───────────────────────────────────────────────────────────────
 
@@ -102,6 +110,7 @@ export default function LogementsPage() {
   // ── État ───────────────────────────────────────────────────────────────────
   const [logements,    setLogements]    = useState<Logement[] | null>(null);
   const [batiments,    setBatiments]    = useState<Batiment[]>([]);
+  const [locataires,   setLocataires]   = useState<Locataire[]>([]);
   const [occMap,       setOccMap]       = useState<Map<number, Occupation>>(new Map());
   const [batMap,       setBatMap]       = useState<Map<number, Batiment>>(new Map());
   const [loading,      setLoading]      = useState(true);
@@ -111,6 +120,9 @@ export default function LogementsPage() {
   const [editing,      setEditing]      = useState<Logement | null>(null);
   const [submitting,   setSubmitting]   = useState(false);
   const [deletingId,   setDeletingId]   = useState<number | null>(null);
+  const [occModalOpen,  setOccModalOpen]  = useState(false);
+  const [occLogement,   setOccLogement]   = useState<Logement | null>(null);
+  const [occSubmitting, setOccSubmitting] = useState(false);
 
   // ── Formulaires ────────────────────────────────────────────────────────────
   const createForm = useForm<CreateFormValues>({
@@ -127,16 +139,24 @@ export default function LogementsPage() {
     defaultValues: { nom: '', description: '' },
   });
 
+  const occForm = useForm<OccupierFormValues>({
+    resolver: zodResolver(occupierSchema),
+    defaultValues: { locataireId: undefined, dateDebut: '' },
+  });
+
   // ── Chargement ─────────────────────────────────────────────────────────────
   async function loadData() {
     setLoading(true);
     setError(null);
     try {
-      const [logsRes, occsRes, batsRes] = await Promise.all([
+      const [logsRes, occsRes, batsRes, locsRes] = await Promise.all([
         logementsApi.getAll({ includeLoyer: true }),
         occupationsApi.getAll(0), // uniquement les occupations en cours
         batimentsApi.getAll(),
+        locatairesApi.getAll(),
       ]);
+
+      setLocataires(locsRes.data.data);
 
       const bats = batsRes.data.data;
       const localBatMap = new Map(bats.map((b) => [b.id, b]));
@@ -184,6 +204,17 @@ export default function LogementsPage() {
     setEditing(null);
   }
 
+  function openOccuper(log: Logement) {
+    setOccLogement(log);
+    occForm.reset({ locataireId: undefined, dateDebut: '' });
+    setOccModalOpen(true);
+  }
+
+  function closeOccModal() {
+    setOccModalOpen(false);
+    setOccLogement(null);
+  }
+
   // ── Soumission créer ───────────────────────────────────────────────────────
   const onCreateSubmit = createForm.handleSubmit(async (values) => {
     setSubmitting(true);
@@ -208,6 +239,29 @@ export default function LogementsPage() {
       });
     } finally {
       setSubmitting(false);
+    }
+  });
+
+  // ── Soumission occuper ─────────────────────────────────────────────────────
+  const onOccSubmit = occForm.handleSubmit(async (values) => {
+    if (!occLogement) return;
+    setOccSubmitting(true);
+    try {
+      await occupationsApi.create({
+        logementId:  occLogement.id,
+        locataireId: values.locataireId,
+        dateDebut:   values.dateDebut,
+      });
+      toast.current?.show({ severity: 'success', summary: 'Occupation créée', life: 3000 });
+      closeOccModal();
+      loadData();
+    } catch (err) {
+      toast.current?.show({
+        severity: 'error', summary: 'Erreur',
+        detail: extractError(err, "Impossible de créer l'occupation."), life: 4000,
+      });
+    } finally {
+      setOccSubmitting(false);
     }
   });
 
@@ -255,11 +309,13 @@ export default function LogementsPage() {
   }
 
   // ── RBAC ───────────────────────────────────────────────────────────────────
-  const canEdit   = role === Role.ADMIN_BATIMENT || role === Role.ADMIN_GLOBAL;
-  const canDelete = canEdit;
+  const canEdit      = role === Role.ADMIN_BATIMENT || role === Role.ADMIN_GLOBAL;
+  const canDelete    = canEdit;
+  const canManageOcc = role === Role.ADMIN_LOGEMENT || role === Role.ADMIN_BATIMENT || role === Role.ADMIN_GLOBAL;
 
   // ── Colonnes ───────────────────────────────────────────────────────────────
   function actionsBody(log: Logement) {
+    const isOccupe = occMap.has(log.id);
     return (
       <div className="flex items-center gap-1">
         <Button
@@ -269,6 +325,15 @@ export default function LogementsPage() {
           tooltipOptions={{ position: 'top' }}
           onClick={() => router.push(`/logements/${log.id}`)}
         />
+        {canManageOcc && !isOccupe && (
+          <Button
+            icon="pi pi-user-plus"
+            rounded text severity="success"
+            tooltip="Occuper"
+            tooltipOptions={{ position: 'top' }}
+            onClick={() => openOccuper(log)}
+          />
+        )}
         {canEdit && (
           <Button
             icon="pi pi-pencil"
@@ -588,6 +653,74 @@ export default function LogementsPage() {
                 className="w-full" autoResize
               />
             )} />
+          </div>
+        </form>
+      </Dialog>
+
+      {/* ── Modal Occuper ──────────────────────────────────────────────────── */}
+      <Dialog
+        visible={occModalOpen}
+        onHide={closeOccModal}
+        header={`Occuper « ${occLogement?.nom ?? ''} »`}
+        style={{ width: '460px' }}
+        modal draggable={false} resizable={false}
+        footer={
+          <div className="flex justify-end gap-2">
+            <Button label="Annuler" severity="secondary" outlined onClick={closeOccModal} disabled={occSubmitting} />
+            <Button
+              label="Créer l'occupation" icon="pi pi-check" loading={occSubmitting}
+              onClick={onOccSubmit}
+              style={{ backgroundColor: '#1e3a8a', borderColor: '#1e3a8a' }}
+            />
+          </div>
+        }
+      >
+        <form onSubmit={onOccSubmit} className="space-y-4 pt-2">
+          {/* Logement (lecture seule) */}
+          <div>
+            <label className="block text-sm font-medium text-[#1e293b] mb-1">Logement</label>
+            <InputText value={occLogement?.nom ?? ''} className="w-full" readOnly disabled />
+          </div>
+
+          {/* Locataire */}
+          <div>
+            <label className="block text-sm font-medium text-[#1e293b] mb-1">
+              Locataire <span className="text-red-500">*</span>
+            </label>
+            <Controller name="locataireId" control={occForm.control} render={({ field }) => (
+              <Dropdown
+                value={field.value ?? null}
+                onChange={(e) => field.onChange(e.value)}
+                options={locataires.filter((l) => l.libre).map((l) => ({ label: `${l.prenom} ${l.nom}`, value: l.id }))}
+                placeholder="Sélectionner un locataire libre"
+                className={`w-full ${occForm.formState.errors.locataireId ? 'p-invalid' : ''}`}
+                filter
+                emptyMessage="Aucun locataire libre"
+              />
+            )} />
+            {occForm.formState.errors.locataireId && (
+              <p className="text-xs text-[#991b1b] mt-1">{occForm.formState.errors.locataireId.message}</p>
+            )}
+          </div>
+
+          {/* Date début */}
+          <div>
+            <label className="block text-sm font-medium text-[#1e293b] mb-1">
+              Date de début <span className="text-red-500">*</span>
+            </label>
+            <Controller name="dateDebut" control={occForm.control} render={({ field }) => (
+              <Calendar
+                value={field.value ? new Date(field.value) : null}
+                onChange={(e) => field.onChange(e.value ? toDateStr(e.value as Date) : '')}
+                dateFormat="dd/mm/yy"
+                className={`w-full ${occForm.formState.errors.dateDebut ? 'p-invalid' : ''}`}
+                placeholder="Sélectionner une date"
+                showIcon
+              />
+            )} />
+            {occForm.formState.errors.dateDebut && (
+              <p className="text-xs text-[#991b1b] mt-1">{occForm.formState.errors.dateDebut.message}</p>
+            )}
           </div>
         </form>
       </Dialog>
