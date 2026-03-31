@@ -85,6 +85,9 @@ types/                        ← Interfaces TypeScript partagées
 // Création
 { statusCode: 201, message: "Ressource créée", data: { ... } }
 
+// Liste paginée (ex: GET /paiements) — utiliser ApiResponsePaginated<T>
+{ statusCode: 200, message: "Opération réussie", data: [...], meta: { total, page, limit, totalPages } }
+
 // Sans données (suppression, logout)
 { statusCode: 200, message: "Opération réussie" }
 
@@ -436,6 +439,8 @@ Accès : ADMIN_LOGEMENT+
 
 #### UC-PAI-01 : Liste (`/paiements`)
 - Endpoint : `GET /paiements`
+- **Pagination côté serveur** : query params `page` (défaut 1) et `limit` (défaut 20, max 100)
+- Réponse inclut un champ `meta` : `{ total, page, limit, totalPages }` — utiliser pour la pagination du DataTable
 - DataTable : occupation, locataire, logement, période, montant payé, date paiement, nombre loyers
 - Filtre par occupation, logement, locataire, période
 
