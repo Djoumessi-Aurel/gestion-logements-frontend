@@ -395,15 +395,13 @@ export default function OccupationsPage() {
     const isActive = !occ.dateFin;
     return (
       <div className="flex items-center gap-1 flex-wrap">
-        {isActive && (
-          <Button
-            icon="pi pi-exclamation-circle"
-            rounded text severity="warning"
-            tooltip="Voir les arriérés"
-            tooltipOptions={{ position: 'top' }}
-            onClick={() => openArrieres(occ)}
-          />
-        )}
+        <Button
+          icon="pi pi-exclamation-circle"
+          rounded text severity="warning"
+          tooltip="Voir les arriérés"
+          tooltipOptions={{ position: 'top' }}
+          onClick={() => openArrieres(occ)}
+        />
         {canManage && isActive && (
           <Button
             icon="pi pi-wallet"
@@ -447,7 +445,7 @@ export default function OccupationsPage() {
             onClick={() => downloadContrat(occ)}
           />
         )}
-        {canManage && (
+        {canManage && isActive && (
           <Button
             icon="pi pi-trash"
             rounded text severity="danger"
