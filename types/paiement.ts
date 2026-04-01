@@ -1,8 +1,10 @@
 import type { Fichier } from './fichier';
+import type { Occupation } from './occupation';
 
 export interface Paiement {
   id: number;
   occupationId: number;
+  occupation?: Occupation;
   debutPeriode: string;
   finPeriode: string;
   montantPaye: number;

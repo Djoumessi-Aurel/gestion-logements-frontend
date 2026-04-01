@@ -3,11 +3,11 @@ import type { ApiResponse, ApiResponsePaginated } from '@/types/api';
 import type { Paiement, CreatePaiementOption1Dto, CreatePaiementOption2Dto, UpdatePaiementDto } from '@/types/paiement';
 
 export const paiementsApi = {
-  getAll: (params?: { page?: number; limit?: number }) =>
+  getAll: (params?: { page?: number; limit?: number; includeRelations?: boolean }) =>
     apiClient.get<ApiResponsePaginated<Paiement>>('/paiements', { params }),
 
-  getById: (id: number) =>
-    apiClient.get<ApiResponse<Paiement>>(`/paiements/${id}`),
+  getById: (id: number, includeRelations?: boolean) =>
+    apiClient.get<ApiResponse<Paiement>>(`/paiements/${id}`, { params: includeRelations ? { includeRelations: true } : undefined }),
 
   createOption1: (dto: CreatePaiementOption1Dto) =>
     apiClient.post<ApiResponse<Paiement>>('/paiements/option1', dto),

@@ -101,31 +101,24 @@ export default function PaiementsPage() {
 
   const [globalFilter, setGlobalFilter] = useState('');
 
-  // ── Lookup occMap pour l'affichage ──────────────────────────────────────────
-  const occMap = useMemo(
-    () => new Map(occupations.map((o) => [o.id, o])),
-    [occupations],
-  );
-
   // ── Filtrage client (sur la page courante) ───────────────────────────────────
   const filteredPaiements = useMemo(() => {
     const q = globalFilter.trim().toLowerCase();
     if (!q) return paiements;
     return paiements.filter((p) => {
-      const occ = occMap.get(p.occupationId);
-      const logNom    = occ?.logement?.nom?.toLowerCase()     ?? '';
-      const locNom    = occ?.locataire?.nom?.toLowerCase()    ?? '';
-      const locPrenom = occ?.locataire?.prenom?.toLowerCase() ?? '';
+      const logNom    = p.occupation?.logement?.nom?.toLowerCase()     ?? '';
+      const locNom    = p.occupation?.locataire?.nom?.toLowerCase()    ?? '';
+      const locPrenom = p.occupation?.locataire?.prenom?.toLowerCase() ?? '';
       return logNom.includes(q) || locNom.includes(q) || locPrenom.includes(q);
     });
-  }, [paiements, occMap, globalFilter]);
+  }, [paiements, globalFilter]);
 
   // ── Chargement ──────────────────────────────────────────────────────────────
   async function loadPaiements(p = page, limit = pageSize) {
     setLoading(true);
     setError(null);
     try {
-      const res = await paiementsApi.getAll({ page: p, limit });
+      const res = await paiementsApi.getAll({ page: p, limit, includeRelations: true });
       setPaiements(res.data.data);
       setTotal(res.data.meta.total);
     } catch {
@@ -140,8 +133,8 @@ export default function PaiementsPage() {
       setLoading(true);
       try {
         const [paiRes, occRes, logRes] = await Promise.all([
-          paiementsApi.getAll({ page: 1, limit: pageSize }),
-          occupationsApi.getAll(0),
+          paiementsApi.getAll({ page: 1, limit: pageSize, includeRelations: true }),
+          occupationsApi.getAll(0), // Occupations en cours uniquement
           logementsApi.getAll({ includeLoyer: true }),
         ]);
         setPaiements(paiRes.data.data);
@@ -353,20 +346,19 @@ export default function PaiementsPage() {
           <Column
             header="Logement"
             sortable={false}
-            body={(p: Paiement) => {
-              const occ = occMap.get(p.occupationId);
-              return occ?.logement?.nom ?? <span className="text-gray-400 text-sm">Occ. #{p.occupationId}</span>;
-            }}
+            body={(p: Paiement) =>
+              p.occupation?.logement?.nom
+                ?? <span className="text-gray-400 text-sm">Occ. #{p.occupationId}</span>
+            }
           />
           <Column
             header="Locataire"
             sortable={false}
-            body={(p: Paiement) => {
-              const occ = occMap.get(p.occupationId);
-              return occ?.locataire
-                ? <span>{occ.locataire.prenom} {occ.locataire.nom}</span>
-                : <span className="text-gray-400 text-sm">—</span>;
-            }}
+            body={(p: Paiement) =>
+              p.occupation?.locataire
+                ? <span>{p.occupation.locataire.prenom} {p.occupation.locataire.nom}</span>
+                : <span className="text-gray-400 text-sm">—</span>
+            }
           />
           <Column
             header="Période"
@@ -429,7 +421,7 @@ export default function PaiementsPage() {
         toast={toast}
         onSuccess={async () => {
           const [paiRes, occRes] = await Promise.all([
-            paiementsApi.getAll({ page: 1, limit: pageSize }),
+            paiementsApi.getAll({ page: 1, limit: pageSize, includeRelations: true }),
             occupationsApi.getAll(0),
           ]);
           setPaiements(paiRes.data.data);
