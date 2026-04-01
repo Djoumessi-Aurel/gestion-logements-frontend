@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useMemo, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { Column } from 'primereact/column';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
@@ -84,8 +85,9 @@ function toDateStr(d: Date): string {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function OccupationsPage() {
-  const toast = useRef<Toast>(null);
-  const role  = useAppSelector((s) => s.auth.user?.role);
+  const toast  = useRef<Toast>(null);
+  const role   = useAppSelector((s) => s.auth.user?.role);
+  const router = useRouter();
 
   // ── Données ─────────────────────────────────────────────────────────────────
   const [activeOccs,     setActiveOccs]     = useState<Occupation[] | null>(null);
@@ -396,6 +398,13 @@ export default function OccupationsPage() {
     return (
       <div className="flex items-center gap-1 flex-wrap">
         <Button
+          icon="pi pi-chart-bar"
+          rounded text severity="info"
+          tooltip="Voir le dashboard"
+          tooltipOptions={{ position: 'top' }}
+          onClick={() => router.push(`/occupations/${occ.id}`)}
+        />
+        <Button
           icon="pi pi-exclamation-circle"
           rounded text severity="warning"
           tooltip="Voir les arriérés"
@@ -567,12 +576,12 @@ export default function OccupationsPage() {
                 </span>
               );
             }}
-            style={{ width: '170px' }}
+            style={{ width: '150px' }}
           />
           <Column
             header="Actions"
             body={actionsBody}
-            style={{ width: '210px', textAlign: 'center' }}
+            style={{ width: '240px', textAlign: 'center' }}
             exportable={false}
           />
         </DataTableWrapper>

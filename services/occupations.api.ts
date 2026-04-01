@@ -1,6 +1,6 @@
 import apiClient from './apiClient';
 import type { ApiResponse, ApiResponseList } from '@/types/api';
-import type { Occupation, CreateOccupationDto, UpdateOccupationDto, FinOccupationDto } from '@/types/occupation';
+import type { Occupation, CreateOccupationDto, UpdateOccupationDto, FinOccupationDto, OccupationDashboard } from '@/types/occupation';
 import type { Arriere } from '@/types/arriere';
 
 export const occupationsApi = {
@@ -40,4 +40,7 @@ export const occupationsApi = {
 
   downloadContrat: (id: number) =>
     apiClient.get(`/occupations/${id}/contrat`, { responseType: 'blob' }),
+
+  getDashboard: (id: number) =>
+    apiClient.get<ApiResponse<OccupationDashboard>>(`/occupations/${id}/dashboard`),
 };

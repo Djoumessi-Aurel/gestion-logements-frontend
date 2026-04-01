@@ -38,4 +38,8 @@ export const paiementsApi = {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
+
+  // Téléchargement d'une preuve individuelle (streaming blob)
+  downloadPreuve: (id: number, fichierId: number) =>
+    apiClient.get(`/paiements/${id}/preuves/${fichierId}`, { responseType: 'blob' }),
 };

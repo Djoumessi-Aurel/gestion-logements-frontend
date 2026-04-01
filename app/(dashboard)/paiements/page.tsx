@@ -104,6 +104,7 @@ export default function PaiementsPage() {
   const [preuveFiles,      setPreuveFiles]      = useState<File[]>([]);
   const [preuveMode,       setPreuveMode]       = useState<'add' | 'replace'>('add');
   const [uploadingPreuves, setUploadingPreuves] = useState(false);
+  const [downloadingFichierId, setDownloadingFichierId] = useState<number | null>(null);
 
   // ── Formulaire édition ──────────────────────────────────────────────────────
   const editForm = useForm<EditFormValues>({
@@ -263,6 +264,27 @@ export default function PaiementsPage() {
       });
     } finally {
       setUploadingPreuves(false);
+    }
+  }
+
+  // ── Téléchargement preuve ────────────────────────────────────────────────────
+  async function handleDownloadPreuve(paiementId: number, fichierId: number, nomOriginal: string) {
+    setDownloadingFichierId(fichierId);
+    try {
+      const res = await paiementsApi.downloadPreuve(paiementId, fichierId);
+      const url  = URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href     = url;
+      link.download = nomOriginal;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      toast.current?.show({
+        severity: 'error', summary: 'Erreur',
+        detail: extractError(err, 'Impossible de télécharger ce fichier.'), life: 4000,
+      });
+    } finally {
+      setDownloadingFichierId(null);
     }
   }
 
@@ -564,6 +586,14 @@ export default function PaiementsPage() {
                     <i className={`${mimeIcon(f.mimeType)} text-[#1e3a8a] text-lg shrink-0`} />
                     <span className="text-sm text-[#1e293b] truncate flex-1">{f.nomOriginal}</span>
                     <span className="text-xs text-gray-400 shrink-0">{formatSize(f.taille)}</span>
+                    <Button
+                      icon={downloadingFichierId === f.id ? 'pi pi-spin pi-spinner' : 'pi pi-download'}
+                      rounded text severity="info"
+                      tooltip="Télécharger"
+                      tooltipOptions={{ position: 'top' }}
+                      disabled={downloadingFichierId !== null}
+                      onClick={() => handleDownloadPreuve(selectedPaiement!.id, f.id, f.nomOriginal)}
+                    />
                   </li>
                 ))}
               </ul>
