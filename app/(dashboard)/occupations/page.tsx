@@ -338,7 +338,8 @@ export default function OccupationsPage() {
       const res         = await occupationsApi.downloadContrat(occ.id);
       const disposition = res.headers['content-disposition'] as string | undefined;
       const match       = disposition?.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-      const filename    = match?.[1]?.replace(/['"]/g, '') ?? `contrat_occupation_${occ.id}`;
+      const rawName     = match?.[1]?.replace(/['"]/g, '') ?? `contrat_occupation_${occ.id}`;
+      const filename    = decodeURIComponent(rawName);
       const url  = URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement('a');
       link.href     = url;
