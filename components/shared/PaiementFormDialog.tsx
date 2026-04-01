@@ -265,7 +265,7 @@ export default function PaiementFormDialog({
             </div>
           ) : payOption === 'option1' ? (
             <>
-              <Controller name="occupationId" control={opt1Form.control} render={({ field }) => (
+              <Controller key="occ-opt1" name="occupationId" control={opt1Form.control} render={({ field }) => (
                 <Dropdown
                   value={field.value ?? null}
                   onChange={(e) => field.onChange(e.value)}
@@ -281,7 +281,7 @@ export default function PaiementFormDialog({
             </>
           ) : (
             <>
-              <Controller name="occupationId" control={opt2Form.control} render={({ field }) => (
+              <Controller key="occ-opt2" name="occupationId" control={opt2Form.control} render={({ field }) => (
                 <Dropdown
                   value={field.value ?? null}
                   onChange={(e) => field.onChange(e.value)}
