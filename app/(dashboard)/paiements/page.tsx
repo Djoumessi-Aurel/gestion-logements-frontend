@@ -156,7 +156,7 @@ export default function PaiementsPage() {
     editForm.reset({
       datePaiement: p.datePaiement,
       commentaire:  p.commentaire ?? '',
-      montantPaye:  p.montantPaye,
+      montantPaye:  Number(p.montantPaye),
       finPeriode:   p.finPeriode,
     });
     setModalMode('edit');
