@@ -203,7 +203,7 @@ export default function OccupationsPage() {
 
   function openFin(occ: Occupation) {
     setSelectedOcc(occ);
-    finForm.reset({ dateFin: '' });
+    finForm.reset({ dateFin: toDateStr(new Date()) });
     setModalMode('fin');
   }
 
@@ -745,6 +745,7 @@ export default function OccupationsPage() {
                 dateFormat="dd/mm/yy"
                 className={`w-full ${finForm.formState.errors.dateFin ? 'p-invalid' : ''}`}
                 placeholder="Sélectionner une date"
+                maxDate={new Date()}
                 showIcon
               />
             )} />
