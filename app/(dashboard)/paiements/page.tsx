@@ -63,6 +63,18 @@ function extractError(err: unknown, fallback: string): string {
   return fallback;
 }
 
+function formatSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} o`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} Ko`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`;
+}
+
+function mimeIcon(mimeType: string): string {
+  if (mimeType === 'application/pdf') return 'pi pi-file-pdf';
+  if (mimeType.startsWith('image/'))  return 'pi pi-image';
+  return 'pi pi-file';
+}
+
 const PREUVES_OPTIONS = [
   { label: 'Ajouter',       value: 'add'     },
   { label: 'Remplacer tout', value: 'replace' },
@@ -519,40 +531,69 @@ export default function PaiementsPage() {
         visible={modalMode === 'preuves'}
         onHide={closeModal}
         header="Preuves de paiement"
-        style={{ width: '480px' }}
+        style={{ width: '520px' }}
         modal draggable={false} resizable={false}
         footer={
           <div className="flex justify-end gap-2">
-            <Button label="Annuler" severity="secondary" outlined onClick={closeModal} disabled={uploadingPreuves} />
-            <Button
-              label="Uploader" icon="pi pi-upload" loading={uploadingPreuves}
-              disabled={preuveFiles.length === 0}
-              onClick={handlePreuvesUpload}
-              style={{ backgroundColor: '#1e3a8a', borderColor: '#1e3a8a' }}
-            />
+            <Button label="Fermer" severity="secondary" outlined onClick={closeModal} disabled={uploadingPreuves} />
+            {canManage && (
+              <Button
+                label="Uploader" icon="pi pi-upload" loading={uploadingPreuves}
+                disabled={preuveFiles.length === 0}
+                onClick={handlePreuvesUpload}
+                style={{ backgroundColor: '#1e3a8a', borderColor: '#1e3a8a' }}
+              />
+            )}
           </div>
         }
       >
-        <div className="space-y-4 pt-2">
-          {(selectedPaiement?.preuves?.length ?? 0) > 0 && (
-            <div className="flex justify-center">
-              <SelectButton
-                value={preuveMode}
-                onChange={(e) => e.value && setPreuveMode(e.value)}
-                options={PREUVES_OPTIONS}
-                optionLabel="label"
-                optionValue="value"
+        <div className="space-y-5 pt-2">
+
+          {/* ── Fichiers existants ── */}
+          {(selectedPaiement?.preuves?.length ?? 0) > 0 ? (
+            <div>
+              <p className="text-sm font-medium text-[#1e293b] mb-2">
+                Fichiers enregistrés ({selectedPaiement!.preuves!.length})
+              </p>
+              <ul className="space-y-2">
+                {selectedPaiement!.preuves!.map((f) => (
+                  <li
+                    key={f.id}
+                    className="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2"
+                  >
+                    <i className={`${mimeIcon(f.mimeType)} text-[#1e3a8a] text-lg shrink-0`} />
+                    <span className="text-sm text-[#1e293b] truncate flex-1">{f.nomOriginal}</span>
+                    <span className="text-xs text-gray-400 shrink-0">{formatSize(f.taille)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-400 italic">Aucune preuve enregistrée pour ce paiement.</p>
+          )}
+
+          {/* ── Upload (admins uniquement) ── */}
+          {canManage && (
+            <div>
+              {(selectedPaiement?.preuves?.length ?? 0) > 0 && (
+                <div className="flex justify-center mb-3">
+                  <SelectButton
+                    value={preuveMode}
+                    onChange={(e) => e.value && setPreuveMode(e.value)}
+                    options={PREUVES_OPTIONS}
+                    optionLabel="label"
+                    optionValue="value"
+                  />
+                </div>
+              )}
+              <FileUploader
+                uploadType="preuve"
+                onFilesSelected={setPreuveFiles}
+                disabled={uploadingPreuves}
               />
             </div>
           )}
-          <FileUploader
-            uploadType="preuve"
-            onFilesSelected={setPreuveFiles}
-            disabled={uploadingPreuves}
-            existingFiles={
-              selectedPaiement?.preuves?.map((f) => ({ nomOriginal: f.nomOriginal, taille: f.taille })) ?? []
-            }
-          />
+
         </div>
       </Dialog>
     </>
