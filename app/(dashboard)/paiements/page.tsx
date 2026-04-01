@@ -259,33 +259,36 @@ export default function PaiementsPage() {
 
   // ── Colonnes ────────────────────────────────────────────────────────────────
   function actionsBody(p: Paiement) {
+    const occActive = !p.occupation?.dateFin;
     return (
       <div className="flex items-center gap-1">
+        {canManage && occActive && (
+          <Button
+            icon="pi pi-pencil"
+            rounded text severity="secondary"
+            tooltip="Modifier"
+            tooltipOptions={{ position: 'top' }}
+            onClick={() => openEdit(p)}
+          />
+        )}
         {canManage && (
-          <>
-            <Button
-              icon="pi pi-pencil"
-              rounded text severity="secondary"
-              tooltip="Modifier"
-              tooltipOptions={{ position: 'top' }}
-              onClick={() => openEdit(p)}
-            />
-            <Button
-              icon="pi pi-file"
-              rounded text severity="info"
-              tooltip="Preuves"
-              tooltipOptions={{ position: 'top' }}
-              onClick={() => openPreuves(p)}
-            />
-            <Button
-              icon="pi pi-trash"
-              rounded text severity="danger"
-              tooltip="Supprimer"
-              tooltipOptions={{ position: 'top' }}
-              loading={deletingId === p.id}
-              onClick={() => handleDelete(p)}
-            />
-          </>
+          <Button
+            icon="pi pi-file"
+            rounded text severity="info"
+            tooltip="Preuves"
+            tooltipOptions={{ position: 'top' }}
+            onClick={() => openPreuves(p)}
+          />
+        )}
+        {canManage && occActive && (
+          <Button
+            icon="pi pi-trash"
+            rounded text severity="danger"
+            tooltip="Supprimer"
+            tooltipOptions={{ position: 'top' }}
+            loading={deletingId === p.id}
+            onClick={() => handleDelete(p)}
+          />
         )}
       </div>
     );

@@ -576,20 +576,21 @@ Accessible uniquement au rôle LOCATAIRE, tout en lecture seule.
 
 ## Règles métier à afficher côté frontend (RG-01 à RG-12)
 
-| Règle | Déclencheur                                | Message à afficher                                                |
-|-------|--------------------------------------------|-------------------------------------------------------------------|
-| RG-01 | DELETE /locataires/:id → 422               | "Impossible de supprimer : une occupation est liée à ce locataire" |
-| RG-02 | DELETE /logements/:id → 422                | "Impossible de supprimer : une occupation est liée à ce logement" |
-| RG-03 | DELETE /batiments/:id → 422                | "Impossible de supprimer : des logements sont rattachés à ce bâtiment" |
-| RG-04 | DELETE /users/:id → 405                    | Bouton suppression JAMAIS affiché                                 |
-| RG-05 | POST /occupations → 422                    | "Ce logement est déjà occupé"                                     |
-| RG-06 | PATCH/DELETE /occupations/:id → 422        | "Impossible de modifier : des paiements existent ou l'occupation est terminée" |
-| RG-07 | PATCH/DELETE /paiements/:id → 422          | "Seul le dernier paiement d'une occupation peut être modifié ou supprimé" |
-| RG-08 | Preuves : tout paiement modifiable         | Upload preuves toujours disponible, même pour anciens paiements   |
-| RG-09 | POST /logements/:id/loyers → 409           | "Un loyer avec cette date de début existe déjà pour ce logement"  |
-| RG-10 | Création occupation                        | Afficher `dateDernierJourCouvert = dateDebut - 1 jour`            |
-| RG-11 | Après chaque paiement                      | Mettre à jour l'affichage de `dateDernierJourCouvert`            |
-| RG-12 | Option 2 client-side                       | "La fin de période doit être ≥ au début de période"               |
+| Règle | Déclencheur | Message à afficher |
+| ----- | ----------- | ----------------- |
+| RG-01 | DELETE /locataires/:id → 422 | "Impossible de supprimer : une occupation est liée à ce locataire" |
+| RG-02 | DELETE /logements/:id → 422 | "Impossible de supprimer : une occupation est liée à ce logement" |
+| RG-03 | DELETE /batiments/:id → 422 | "Impossible de supprimer : des logements sont rattachés à ce bâtiment" |
+| RG-04 | DELETE /users/:id → 405 | Bouton suppression JAMAIS affiché |
+| RG-05 | POST /occupations → 422 | "Ce logement est déjà occupé" |
+| RG-06 | PATCH/DELETE /occupations/:id → 422 | "Impossible de modifier : des paiements existent ou l'occupation est terminée" |
+| RG-07 | PATCH/DELETE /paiements/:id → 422 | "Seul le dernier paiement d'une occupation peut être modifié ou supprimé" |
+| RG-07b | Occupation terminée (dateFin définie) | Aucun paiement lié à une occupation terminée n'est modifiable/supprimable — masquer les boutons Modifier et Supprimer côté client |
+| RG-08 | Preuves : tout paiement modifiable | Upload preuves toujours disponible, même pour anciens paiements |
+| RG-09 | POST /logements/:id/loyers → 409 | "Un loyer avec cette date de début existe déjà pour ce logement" |
+| RG-10 | Création occupation | Afficher `dateDernierJourCouvert = dateDebut - 1 jour` |
+| RG-11 | Après chaque paiement | Mettre à jour l'affichage de `dateDernierJourCouvert` |
+| RG-12 | Option 2 client-side | "La fin de période doit être ≥ au début de période" |
 
 ---
 
