@@ -6,6 +6,7 @@ import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { Calendar } from 'primereact/calendar';
 import { InputNumber } from 'primereact/inputnumber';
+import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { SelectButton } from 'primereact/selectbutton';
 import { Toast } from 'primereact/toast';
@@ -98,11 +99,26 @@ export default function PaiementsPage() {
     defaultValues: { datePaiement: '', commentaire: '', montantPaye: undefined, finPeriode: '' },
   });
 
+  const [globalFilter, setGlobalFilter] = useState('');
+
   // ── Lookup occMap pour l'affichage ──────────────────────────────────────────
   const occMap = useMemo(
     () => new Map(occupations.map((o) => [o.id, o])),
     [occupations],
   );
+
+  // ── Filtrage client (sur la page courante) ───────────────────────────────────
+  const filteredPaiements = useMemo(() => {
+    const q = globalFilter.trim().toLowerCase();
+    if (!q) return paiements;
+    return paiements.filter((p) => {
+      const occ = occMap.get(p.occupationId);
+      const logNom    = occ?.logement?.nom?.toLowerCase()     ?? '';
+      const locNom    = occ?.locataire?.nom?.toLowerCase()    ?? '';
+      const locPrenom = occ?.locataire?.prenom?.toLowerCase() ?? '';
+      return logNom.includes(q) || locNom.includes(q) || locPrenom.includes(q);
+    });
+  }, [paiements, occMap, globalFilter]);
 
   // ── Chargement ──────────────────────────────────────────────────────────────
   async function loadPaiements(p = page, limit = pageSize) {
@@ -299,8 +315,29 @@ export default function PaiementsPage() {
       />
 
       <div className="bg-white rounded-xl shadow-sm p-4">
+        <div className="flex justify-end mb-3">
+          <div className="relative max-w-sm w-full sm:w-auto">
+            <i className="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
+            <InputText
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              placeholder="Rechercher (logement, locataire)…"
+              className="w-full"
+              style={{ paddingLeft: '2.25rem', paddingRight: globalFilter ? '2rem' : undefined }}
+            />
+            {globalFilter && (
+              <button
+                type="button"
+                onClick={() => setGlobalFilter('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-transparent border-none text-gray-400 hover:text-gray-700 transition-colors"
+              >
+                <i className="pi pi-times text-lg" />
+              </button>
+            )}
+          </div>
+        </div>
         <DataTableWrapper
-          data={paiements}
+          data={filteredPaiements}
           loading={loading}
           error={error}
           onRetry={() => loadPaiements()}
