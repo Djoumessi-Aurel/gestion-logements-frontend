@@ -748,7 +748,7 @@ NEXT_PUBLIC_CRYPTO_SECRET=...    ← clé de chiffrement redux-persist
 ---
 
 ## Étape en cours
-F6.6
+F6.7
 
 ## Étapes complétées
 
@@ -787,6 +787,10 @@ F6.6
   - `/locataires` : liste (nom, prénom, téléphone, email, statut libre, logement actuel, dernier jour couvert en rouge si retard), CRUD modal
   - Chargement : locataires + occupations actives (statut=0) + users LOCATAIRE en parallèle
   - `/locataires/[id]` : dashboard — infos, arriérés (liste ou badge à jour), KPIs occupations, solvabilité, assiduité
+- F6.6 : Pages Utilisateurs ✓
+  - `/utilisateurs` : liste avec filtre global (nom, username, email, téléphone), badges rôle et statut, CRUD modal (mdp auto-généré affiché en readonly), toggle activer/désactiver, reset mdp (mdp auto-généré affiché en readonly)
+  - `/utilisateurs/[id]` : fiche éditable (nom, prénom, téléphone, email, rôle), boutons activer/désactiver et reset mdp, attribution bâtiments (ADMIN_GLOBAL → ADMIN_BATIMENT), attribution logements (ADMIN_BATIMENT+ → ADMIN_LOGEMENT), redirect vers /profil si l'admin consulte son propre compte
+  - `roleLabels` et `roleColors` exportés depuis la page liste pour réutilisation
 - F6.5 : Paiements ✓
   - `/paiements` : liste paginée serveur (lazy DataTable, page/limit), CRUD modal, upload preuves (ajout ou remplacement)
   - `PaiementFormDialog` : composant partagé, toggle Option 1 (nombre de loyers, calcul temps réel) / Option 2 (montant libre, RG-12)
