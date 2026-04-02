@@ -341,10 +341,16 @@ export default function UtilisateurDetailPage() {
         </div>
 
         {isSelf ? (
-          <div className="bg-[#fef3c7] border border-yellow-200 rounded-lg p-3 text-sm text-[#92400e]">
+          <div className="bg-[#fef3c7] flex items-center border border-yellow-200 rounded-lg p-3 text-sm text-[#92400e]">
             <i className="pi pi-info-circle mr-2" />
             Pour modifier votre propre profil, rendez-vous sur la page{' '}
-            <button className="underline font-medium" onClick={() => router.push('/profil')}>Profil</button>.
+            {/* <button className="underline font-medium" onClick={() => router.push('/profil')}>Profil</button>. */}
+            <Button
+              className='p-1'
+              label='Profil'
+              text size="small"
+              onClick={() => router.push('/profil')}
+            />
           </div>
         ) : canEdit ? (
           <form onSubmit={handleSubmit(submitEdit)} className="space-y-4">

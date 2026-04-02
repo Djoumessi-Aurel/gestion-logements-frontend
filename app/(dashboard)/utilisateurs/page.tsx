@@ -84,6 +84,7 @@ export default function UtilisateursPage() {
   const router      = useRouter();
   const toast       = useRef<Toast>(null);
   const currentRole = useAppSelector((s) => s.auth.user?.role);
+  const currentId   = useAppSelector((s) => s.auth.user?.id);
   const canCreate   = currentRole && currentRole !== Role.LOCATAIRE;
 
   // ── État ───────────────────────────────────────────────────────────────────
@@ -275,7 +276,7 @@ export default function UtilisateursPage() {
         <Column
           header="Nom"
           body={(u: Utilisateur) => (
-            <span className="font-medium text-[#1e293b]">{u.prenom} {u.nom}</span>
+            <span className="font-medium text-sm text-[#1e293b]">{u.prenom} {u.nom}</span>
           )}
           sortable
           sortField="nom"
@@ -295,16 +296,16 @@ export default function UtilisateursPage() {
               {roleLabels[u.role]}
             </span>
           )}
-          style={{ minWidth: '130px' }}
+          style={{ minWidth: '100px' }}
         />
         <Column
           header="Téléphone"
-          body={(u: Utilisateur) => u.telephone}
+          body={(u: Utilisateur) => <span className='text-sm'>{u.telephone}</span>}
           style={{ minWidth: '120px' }}
         />
         <Column
           header="Email"
-          body={(u: Utilisateur) => u.email ?? <span className="text-gray-400 text-sm">—</span>}
+          body={(u: Utilisateur) =>u.email ? <span className='text-sm'>{u.email}</span> : <span className="text-gray-400 text-sm">—</span>}
           style={{ minWidth: '160px' }}
         />
         <Column
@@ -331,15 +332,17 @@ export default function UtilisateursPage() {
                 tooltipOptions={{ position: 'top' }}
                 onClick={() => router.push(`/utilisateurs/${u.id}`)}
               />
-              <Button
-                icon={u.isActive ? 'pi pi-ban' : 'pi pi-check-circle'}
-                size="small"
-                text
-                severity={u.isActive ? 'warning' : 'success'}
-                tooltip={u.isActive ? 'Désactiver' : 'Activer'}
-                tooltipOptions={{ position: 'top' }}
-                onClick={() => toggleActive(u)}
-              />
+              {u.id !== currentId && (
+                <Button
+                  icon={u.isActive ? 'pi pi-ban' : 'pi pi-check-circle'}
+                  size="small"
+                  text
+                  severity={u.isActive ? 'warning' : 'success'}
+                  tooltip={u.isActive ? 'Désactiver' : 'Activer'}
+                  tooltipOptions={{ position: 'top' }}
+                  onClick={() => toggleActive(u)}
+                />
+              )}
               <Button
                 icon="pi pi-key"
                 size="small"
