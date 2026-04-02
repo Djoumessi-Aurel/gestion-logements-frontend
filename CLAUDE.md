@@ -488,7 +488,9 @@ Accès : ADMIN_LOGEMENT+
 - Chaque admin ne voit que les utilisateurs de son périmètre
 
 #### UC-USR-02 : Créer utilisateur (modal)
-- Champs : `nom`*, `prenom`*, `telephone`*, `email`, `username`*, `password`* (min 8), `role`*
+
+- Champs : `nom`*, `prenom`*, `telephone`*, `email`, `username`*, `role`*
+- Le mot de passe est **généré automatiquement** (non saisi par l'admin) et **affiché en lecture seule** dans le modal après génération (avant soumission). L'admin le communique à l'utilisateur qui pourra le modifier lui-même via son profil.
 - Rôles affichables selon le rôle de l'admin connecté :
   - ADMIN_LOGEMENT : peut créer LOCATAIRE uniquement
   - ADMIN_BATIMENT : peut créer LOCATAIRE, ADMIN_LOGEMENT
@@ -508,6 +510,8 @@ Accès : ADMIN_LOGEMENT+
 - La suppression est **interdite** (RG-04) — ne jamais afficher un bouton "Supprimer"
 
 #### UC-USR-05 : Réinitialiser mot de passe (admin)
+
+- Le nouveau mot de passe est **généré automatiquement** (non saisi par l'admin) et **affiché en lecture seule** dans un modal de confirmation. L'admin le communique à l'utilisateur.
 - Endpoint : `PATCH /users/:id/reset-password` avec `{ newPassword }`
 
 #### UC-USR-06 : Attribuer un bâtiment à ADMIN_BATIMENT
