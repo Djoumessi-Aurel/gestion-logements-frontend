@@ -344,7 +344,6 @@ export default function UtilisateurDetailPage() {
           <div className="bg-[#fef3c7] flex items-center border border-yellow-200 rounded-lg p-3 text-sm text-[#92400e]">
             <i className="pi pi-info-circle mr-2" />
             Pour modifier votre propre profil, rendez-vous sur la page{' '}
-            {/* <button className="underline font-medium" onClick={() => router.push('/profil')}>Profil</button>. */}
             <Button
               className='p-1'
               label='Profil'
@@ -581,6 +580,14 @@ export default function UtilisateurDetailPage() {
                 readOnly
                 value={resetPassword}
                 className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 font-mono text-gray-700 select-all cursor-text"
+              />
+              <Button
+                type="button"
+                icon="pi pi-copy"
+                outlined
+                tooltip="Copier"
+                tooltipOptions={{ position: 'top' }}
+                onClick={() => navigator.clipboard.writeText(resetPassword)}
               />
               <Button
                 type="button"
