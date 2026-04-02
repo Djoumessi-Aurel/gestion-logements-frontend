@@ -128,16 +128,21 @@ export default function OccupationDashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
           <div>
             <span className="text-gray-500">Logement</span>
-            <p className="font-medium text-[#1e293b] mt-0.5">{logement.nom}</p>
+            <Button
+              className='block p-0'
+              label={logement.nom}
+              text size="small"
+              onClick={() => router.push(`/logements/${logement.id}`)}
+            />
           </div>
           <div>
             <span className="text-gray-500">Locataire</span>
-            <button
-              className="block font-medium text-[#1e3a8a] hover:underline mt-0.5 text-left"
+            <Button
+              className='block p-0'
+              label={`${locataire.prenom} ${locataire.nom}`}
+              text size="small"
               onClick={() => router.push(`/locataires/${locataire.id}`)}
-            >
-              {locataire.prenom} {locataire.nom}
-            </button>
+            />
           </div>
           <div>
             <span className="text-gray-500">Date de début</span>
