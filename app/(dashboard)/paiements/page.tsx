@@ -29,6 +29,7 @@ import PageHeader from '@/components/shared/PageHeader';
 import DataTableWrapper from '@/components/shared/DataTableWrapper';
 import { showConfirm } from '@/components/shared/ConfirmDialog';
 import FileUploader from '@/components/shared/FileUploader';
+import ExportModal from '@/components/shared/ExportModal';
 import PaiementFormDialog from '@/components/shared/PaiementFormDialog';
 
 // ─── Schéma édition ───────────────────────────────────────────────────────────
@@ -290,6 +291,9 @@ export default function PaiementsPage() {
 
   // ── RBAC ────────────────────────────────────────────────────────────────────
   const canManage = role === Role.ADMIN_LOGEMENT || role === Role.ADMIN_BATIMENT || role === Role.ADMIN_GLOBAL;
+  const canExport = canManage;
+
+  const [exportVisible, setExportVisible] = useState(false);
 
   // ── Colonnes ────────────────────────────────────────────────────────────────
   function actionsBody(p: Paiement) {
@@ -336,6 +340,12 @@ export default function PaiementsPage() {
       <PageHeader
         title="Paiements"
         breadcrumb={[{ label: 'Dashboard', path: '/' }, { label: 'Paiements' }]}
+        actions={[{
+          label:   'Exporter',
+          icon:    'pi-download',
+          onClick: () => setExportVisible(true),
+          visible: canExport,
+        }]}
         action={{
           label:   'Nouveau paiement',
           icon:    'pi-plus',
@@ -626,6 +636,13 @@ export default function PaiementsPage() {
 
         </div>
       </Dialog>
+
+      <ExportModal
+        visible={exportVisible}
+        onHide={() => setExportVisible(false)}
+        entityLabel="Paiements"
+        endpoint="paiements"
+      />
     </>
   );
 }

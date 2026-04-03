@@ -23,6 +23,7 @@ import { Role } from '@/types/enums';
 import { useAppSelector } from '@/store/hooks';
 
 import PageHeader from '@/components/shared/PageHeader';
+import ExportModal from '@/components/shared/ExportModal';
 import DataTableWrapper from '@/components/shared/DataTableWrapper';
 import StatusBadge from '@/components/shared/StatusBadge';
 import { showConfirm } from '@/components/shared/ConfirmDialog';
@@ -217,7 +218,10 @@ export default function LocatairesPage() {
   }
 
   // ── RBAC ───────────────────────────────────────────────────────────────────
-  const canWrite = role !== Role.LOCATAIRE;
+  const canWrite  = role !== Role.LOCATAIRE;
+  const canExport = canWrite;
+
+  const [exportVisible, setExportVisible] = useState(false);
 
   // ── Colonnes ───────────────────────────────────────────────────────────────
   function statutBody(loc: Locataire) {
@@ -287,6 +291,12 @@ export default function LocatairesPage() {
       <PageHeader
         title="Locataires"
         breadcrumb={[{ label: 'Dashboard', path: '/' }, { label: 'Locataires' }]}
+        actions={[{
+          label:   'Exporter',
+          icon:    'pi-download',
+          onClick: () => setExportVisible(true),
+          visible: canExport,
+        }]}
         action={{
           label:   'Nouveau locataire',
           icon:    'pi-plus',
@@ -580,6 +590,13 @@ export default function LocatairesPage() {
           </div>
         </form>
       </Dialog>
+
+      <ExportModal
+        visible={exportVisible}
+        onHide={() => setExportVisible(false)}
+        entityLabel="Locataires"
+        endpoint="locataires"
+      />
     </>
   );
 }

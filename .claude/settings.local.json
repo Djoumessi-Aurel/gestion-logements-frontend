@@ -5,7 +5,8 @@
       "Bash(npx next:*)",
       "Bash(npm install:*)",
       "Bash(ls \"e:/Informatique/fichiers web/nest js/gestion logements/frontend/app/\\(dashboard\\)/\")",
-      "Bash(ls \"e:/Informatique/fichiers web/nest js/gestion logements/frontend/app/\\(dashboard\\)\")"
+      "Bash(ls \"e:/Informatique/fichiers web/nest js/gestion logements/frontend/app/\\(dashboard\\)\")",
+      "Bash(wc -l \"e:/Informatique/fichiers web/nest js/gestion logements/frontend/app/\\(dashboard\\)/occupations/page.tsx\" \"e:/Informatique/fichiers web/nest js/gestion logements/frontend/app/\\(dashboard\\)/logements/page.tsx\" \"e:/Informatique/fichiers web/nest js/gestion logements/frontend/app/\\(dashboard\\)/locataires/page.tsx\" \"e:/Informatique/fichiers web/nest js/gestion logements/frontend/app/\\(dashboard\\)/batiments/page.tsx\")"
     ],
     "additionalDirectories": [
       "e:\\Informatique\\fichiers web\\nest js\\gestion logements\\frontend\\app\\(dashboard)\\locataires",

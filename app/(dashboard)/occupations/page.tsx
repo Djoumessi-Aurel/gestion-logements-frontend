@@ -30,6 +30,7 @@ import DataTableWrapper from '@/components/shared/DataTableWrapper';
 import StatusBadge from '@/components/shared/StatusBadge';
 import { showConfirm } from '@/components/shared/ConfirmDialog';
 import FileUploader from '@/components/shared/FileUploader';
+import ExportModal from '@/components/shared/ExportModal';
 import PaiementFormDialog from '@/components/shared/PaiementFormDialog';
 
 // ─── Schémas ──────────────────────────────────────────────────────────────────
@@ -395,6 +396,9 @@ export default function OccupationsPage() {
 
   // ── RBAC ────────────────────────────────────────────────────────────────────
   const canManage = role === Role.ADMIN_LOGEMENT || role === Role.ADMIN_BATIMENT || role === Role.ADMIN_GLOBAL;
+  const canExport = canManage;
+
+  const [exportVisible, setExportVisible] = useState(false);
 
   // ── Colonnes ────────────────────────────────────────────────────────────────
   function actionsBody(occ: Occupation) {
@@ -480,6 +484,12 @@ export default function OccupationsPage() {
       <PageHeader
         title="Occupations"
         breadcrumb={[{ label: 'Dashboard', path: '/' }, { label: 'Occupations' }]}
+        actions={[{
+          label:   'Exporter',
+          icon:    'pi-download',
+          onClick: () => setExportVisible(true),
+          visible: canExport,
+        }]}
         action={{
           label:   'Nouvelle occupation',
           icon:    'pi-plus',
@@ -864,6 +874,13 @@ export default function OccupationsPage() {
           )}
         </div>
       </Dialog>
+
+      <ExportModal
+        visible={exportVisible}
+        onHide={() => setExportVisible(false)}
+        entityLabel="Occupations"
+        endpoint="occupations"
+      />
     </>
   );
 }

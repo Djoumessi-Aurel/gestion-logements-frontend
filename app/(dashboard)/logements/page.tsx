@@ -31,6 +31,7 @@ import PageHeader from '@/components/shared/PageHeader';
 import DataTableWrapper from '@/components/shared/DataTableWrapper';
 import StatusBadge from '@/components/shared/StatusBadge';
 import { showConfirm } from '@/components/shared/ConfirmDialog';
+import ExportModal from '@/components/shared/ExportModal';
 
 // ─── Schémas ──────────────────────────────────────────────────────────────────
 
@@ -302,6 +303,9 @@ export default function LogementsPage() {
   const canEdit      = role === Role.ADMIN_BATIMENT || role === Role.ADMIN_GLOBAL;
   const canDelete    = canEdit;
   const canManageOcc = role === Role.ADMIN_LOGEMENT || role === Role.ADMIN_BATIMENT || role === Role.ADMIN_GLOBAL;
+  const canExport    = canManageOcc;
+
+  const [exportVisible, setExportVisible] = useState(false);
 
   // ── Données enrichies pour le filtre global ────────────────────────────────
   const displayLogements = (logements ?? []).map((l) => {
@@ -364,6 +368,12 @@ export default function LogementsPage() {
       <PageHeader
         title="Logements"
         breadcrumb={[{ label: 'Dashboard', path: '/' }, { label: 'Logements' }]}
+        actions={[{
+          label:   'Exporter',
+          icon:    'pi-download',
+          onClick: () => setExportVisible(true),
+          visible: canExport,
+        }]}
         action={{
           label:   'Nouveau logement',
           icon:    'pi-plus',
@@ -723,6 +733,13 @@ export default function LogementsPage() {
           </div>
         </form>
       </Dialog>
+
+      <ExportModal
+        visible={exportVisible}
+        onHide={() => setExportVisible(false)}
+        entityLabel="Logements"
+        endpoint="logements"
+      />
     </>
   );
 }

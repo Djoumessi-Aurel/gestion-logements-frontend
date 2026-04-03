@@ -18,6 +18,7 @@ import type { Batiment, CreateBatimentDto } from '@/types/batiment';
 import { Role } from '@/types/enums';
 
 import PageHeader from '@/components/shared/PageHeader';
+import ExportModal from '@/components/shared/ExportModal';
 import DataTableWrapper from '@/components/shared/DataTableWrapper';
 import RoleGuard from '@/components/shared/RoleGuard';
 import { showConfirm } from '@/components/shared/ConfirmDialog';
@@ -153,6 +154,9 @@ export default function BatimentsPage() {
   // ── Colonnes DataTable ─────────────────────────────────────────────────────
   const canEdit   = role === Role.ADMIN_BATIMENT || role === Role.ADMIN_GLOBAL;
   const canDelete = role === Role.ADMIN_GLOBAL;
+  const canExport = canEdit;
+
+  const [exportVisible, setExportVisible] = useState(false);
 
   function actionsBody(bat: Batiment) {
     return (
@@ -195,6 +199,12 @@ export default function BatimentsPage() {
       <PageHeader
         title="Bâtiments"
         breadcrumb={[{ label: 'Dashboard', path: '/' }, { label: 'Bâtiments' }]}
+        actions={[{
+          label:   'Exporter',
+          icon:    'pi-download',
+          onClick: () => setExportVisible(true),
+          visible: canExport,
+        }]}
         action={{
           label:   'Nouveau bâtiment',
           icon:    'pi-plus',
@@ -310,6 +320,13 @@ export default function BatimentsPage() {
           </div>
         </form>
       </Dialog>
+
+      <ExportModal
+        visible={exportVisible}
+        onHide={() => setExportVisible(false)}
+        entityLabel="Bâtiments"
+        endpoint="batiments"
+      />
     </>
   );
 }

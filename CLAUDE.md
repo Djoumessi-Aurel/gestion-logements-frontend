@@ -748,10 +748,18 @@ NEXT_PUBLIC_CRYPTO_SECRET=...    ← clé de chiffrement redux-persist
 ---
 
 ## Étape en cours
-F7.2
+F7.6
 
 ## Étapes complétées
 
+- F7.5 : ExportModal intégré ✓
+  - PageHeader étendu avec prop `actions?: ActionButton[]` (boutons secondaires outlined)
+  - Bouton "Exporter" ajouté sur : `/paiements`, `/occupations`, `/logements`, `/locataires`, `/batiments`
+  - RBAC : `/export/batiments` → ADMIN_BATIMENT+, les autres → ADMIN_LOGEMENT+
+  - Page `/export` : hub avec carte par rapport + accès au classeur complet (Excel multi-onglets)
+- F7.2 : Dashboard Bâtiment ✓ (déjà fait en F6.1)
+- F7.3 : Dashboard Logement ✓ (déjà fait en F6.2)
+- F7.4 : Dashboard Locataire ✓ (déjà fait en F6.3)
 - F7.1 : Dashboard principal ✓
   - KPIs : total bâtiments (ADMIN_BATIMENT+), logements, occupés/vacants + taux d'occupation, occupations actives, arriérés occ. actives, arriérés total, total perçu
   - Liste occupations actives triée par `dateDernierJourCouvert` ASC — badge rouge/vert, liens logement + dashboard occupation

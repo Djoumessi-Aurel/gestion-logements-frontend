@@ -27,12 +27,15 @@ interface Props {
   breadcrumb?: BreadcrumbItem[];
   /** Bouton d'action principal (ex : "Nouveau bâtiment") */
   action?: ActionButton;
+  /** Boutons d'action secondaires (ex : "Exporter") — affichés en outlined à gauche du bouton principal */
+  actions?: ActionButton[];
 }
 
 // ─── Composant ────────────────────────────────────────────────────────────────
 
-export default function PageHeader({ title, breadcrumb, action }: Props) {
-  const showAction = action && action.visible !== false;
+export default function PageHeader({ title, breadcrumb, action, actions }: Props) {
+  const showAction      = action && action.visible !== false;
+  const visibleActions  = (actions ?? []).filter((a) => a.visible !== false);
 
   return (
     <div className="flex items-start justify-between mb-6 gap-4">
@@ -60,16 +63,30 @@ export default function PageHeader({ title, breadcrumb, action }: Props) {
         <h1 className="text-2xl font-bold text-[#1e293b] truncate">{title}</h1>
       </div>
 
-      {/* Bouton d'action */}
-      {showAction && (
-        <Button
-          label={action.label}
-          icon={action.icon ? `pi ${action.icon}` : undefined}
-          onClick={action.onClick}
-          loading={action.loading}
-          className="shrink-0"
-          style={{ backgroundColor: '#1e3a8a', borderColor: '#1e3a8a' }}
-        />
+      {/* Boutons d'action */}
+      {(showAction || visibleActions.length > 0) && (
+        <div className="flex items-center gap-2 shrink-0">
+          {visibleActions.map((a, i) => (
+            <Button
+              key={i}
+              label={a.label}
+              icon={a.icon ? `pi ${a.icon}` : undefined}
+              onClick={a.onClick}
+              loading={a.loading}
+              severity="secondary"
+              outlined
+            />
+          ))}
+          {showAction && (
+            <Button
+              label={action.label}
+              icon={action.icon ? `pi ${action.icon}` : undefined}
+              onClick={action.onClick}
+              loading={action.loading}
+              style={{ backgroundColor: '#1e3a8a', borderColor: '#1e3a8a' }}
+            />
+          )}
+        </div>
       )}
     </div>
   );
