@@ -748,10 +748,13 @@ NEXT_PUBLIC_CRYPTO_SECRET=...    ← clé de chiffrement redux-persist
 ---
 
 ## Étape en cours
-F7.1
+F7.2
 
 ## Étapes complétées
 
+- F7.1 : Dashboard principal ✓
+  - KPIs : total bâtiments (ADMIN_BATIMENT+), logements, occupés/vacants + taux d'occupation, occupations actives, arriérés occ. actives, arriérés total, total perçu
+  - Liste occupations actives triée par `dateDernierJourCouvert` ASC — badge rouge/vert, liens logement + dashboard occupation
 - P0.1 : Repo Git + README + .gitignore ✓
 - F5.1 : Redux Toolkit + redux-persist chiffré ✓
 - F5.2 : apiClient Axios + intercepteurs JWT ✓
