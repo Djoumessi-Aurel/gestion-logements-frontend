@@ -58,20 +58,25 @@ export default function LocataireEspacePage() {
   const [dashboard, setDashboard] = useState<LocataireDashboard | null>(null);
   const [loading,   setLoading]   = useState(true);
   const [error,     setError]     = useState<string | null>(null);
+  const [noProfile, setNoProfile] = useState(false);
 
   async function load() {
     setLoading(true);
     setError(null);
+    setNoProfile(false);
     try {
       // Le backend retourne uniquement le locataire lié au compte connecté
       const locsRes = await locatairesApi.getAll();
+      if (locsRes.data.data.length === 0) {
+        setNoProfile(true);
+        return;
+      }
       const loc = locsRes.data.data[0];
-      if (!loc) throw new Error('Aucun profil locataire trouvé.');
 
       const dashRes = await locatairesApi.getDashboard(loc.id);
       setLocataire(loc);
       setDashboard(dashRes.data.data);
-    } catch {
+    } catch(error) {
       setError('Impossible de charger votre profil.');
     } finally {
       setLoading(false);
@@ -81,6 +86,18 @@ export default function LocataireEspacePage() {
   useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) return <LoadingSpinner />;
+  if (noProfile) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
+        <i className="pi pi-user-minus text-4xl text-gray-300" />
+        <p className="text-lg font-semibold text-[#1e293b]">Aucun profil locataire associé</p>
+        <p className="text-sm text-gray-500 max-w-sm">
+          Votre compte n&apos;est lié à aucun locataire pour l&apos;instant.<br />
+          Contactez un administrateur pour régulariser votre situation.
+        </p>
+      </div>
+    );
+  }
   if (error || !locataire || !dashboard) {
     return <ErrorMessage message={error ?? 'Données introuvables.'} onRetry={load} />;
   }
