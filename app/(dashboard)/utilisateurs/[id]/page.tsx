@@ -486,6 +486,8 @@ export default function UtilisateurDetailPage() {
               placeholder="Sélectionner un bâtiment"
               className="flex-1"
               disabled={availableBats.length === 0}
+              filter
+              filterPlaceholder="Rechercher…"
             />
             <Button
               label="Attribuer"
@@ -534,6 +536,8 @@ export default function UtilisateurDetailPage() {
               placeholder="Sélectionner un logement"
               className="flex-1"
               disabled={availableLogs.length === 0}
+              filter
+              filterPlaceholder="Rechercher…"
             />
             <Button
               label="Attribuer"
