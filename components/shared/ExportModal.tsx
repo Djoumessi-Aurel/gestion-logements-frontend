@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { SelectButton } from 'primereact/selectbutton';
-import { Calendar } from 'primereact/calendar';
+// import { Calendar } from 'primereact/calendar'; // TODO: réactiver avec filtrage par date
 import { exportApi, downloadBlob, ExportFormat } from '@/services/export.api';
 import ErrorMessage from './ErrorMessage';
 
@@ -42,11 +42,9 @@ export default function ExportModal({
   batimentId,
   logementId,
 }: Props) {
-  const [format, setFormat]       = useState<ExportFormat>('excel');
-  const [dateDebut, setDateDebut] = useState<Date | null>(null);
-  const [dateFin, setDateFin]     = useState<Date | null>(null);
-  const [loading, setLoading]     = useState(false);
-  const [error, setError]         = useState<string | null>(null);
+  const [format,  setFormat]  = useState<ExportFormat>('excel');
+  const [loading, setLoading] = useState(false);
+  const [error,   setError]   = useState<string | null>(null);
 
   // ── Déclenchement de l'export ──────────────────────────────────────────────
 
@@ -56,8 +54,7 @@ export default function ExportModal({
 
     const params = {
       format,
-      dateDebut: dateDebut ? dateDebut.toISOString().slice(0, 10) : undefined,
-      dateFin:   dateFin   ? dateFin.toISOString().slice(0, 10)   : undefined,
+      // dateDebut et dateFin omis temporairement (filtrage backend à finaliser)
       batimentId,
       logementId,
     };
@@ -84,8 +81,6 @@ export default function ExportModal({
 
   function handleHide() {
     setFormat('excel');
-    setDateDebut(null);
-    setDateFin(null);
     setError(null);
     onHide();
   }
@@ -144,37 +139,8 @@ export default function ExportModal({
           )}
         </div>
 
-        {/* Période */}
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-sm font-medium text-[#1e293b] mb-1">
-              Date début
-            </label>
-            <Calendar
-              value={dateDebut}
-              onChange={(e) => setDateDebut(e.value as Date | null)}
-              dateFormat="dd/mm/yy"
-              showIcon
-              placeholder="Optionnel"
-              className="w-full"
-              maxDate={dateFin ?? undefined}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-[#1e293b] mb-1">
-              Date fin
-            </label>
-            <Calendar
-              value={dateFin}
-              onChange={(e) => setDateFin(e.value as Date | null)}
-              dateFormat="dd/mm/yy"
-              showIcon
-              placeholder="Optionnel"
-              className="w-full"
-              minDate={dateDebut ?? undefined}
-            />
-          </div>
-        </div>
+        {/* Période — masquée temporairement (filtrage par date à finaliser côté backend) */}
+        {/* TODO: réactiver quand le backend gère correctement dateDebut/dateFin pour chaque entité */}
 
         {/* Erreur */}
         <ErrorMessage message={error} inline />
