@@ -303,6 +303,15 @@ export default function LogementsPage() {
   const canDelete    = canEdit;
   const canManageOcc = role === Role.ADMIN_LOGEMENT || role === Role.ADMIN_BATIMENT || role === Role.ADMIN_GLOBAL;
 
+  // ── Données enrichies pour le filtre global ────────────────────────────────
+  const displayLogements = (logements ?? []).map((l) => {
+    const occ = occMap.get(l.id);
+    return {
+      ...l,
+      locataireNom: occ?.locataire ? `${occ.locataire.prenom} ${occ.locataire.nom}` : '',
+    };
+  });
+
   // ── Colonnes ───────────────────────────────────────────────────────────────
   function actionsBody(log: Logement) {
     const isOccupe = occMap.has(log.id);
@@ -370,7 +379,7 @@ export default function LogementsPage() {
           <InputText
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
-            placeholder="Rechercher (nom, bâtiment)…"
+            placeholder="Rechercher (nom, bâtiment, locataire)…"
             className="w-full"
             style={{ paddingLeft: '2.25rem', paddingRight: globalFilter ? '2rem' : undefined }}
           />
@@ -386,14 +395,14 @@ export default function LogementsPage() {
         </div>
 
         <DataTableWrapper
-          data={logements}
+          data={displayLogements}
           loading={loading}
           error={error}
           onRetry={loadData}
           emptyMessage="Aucun logement enregistré."
           filterDisplay={undefined}
           globalFilter={globalFilter}
-          globalFilterFields={['nom', 'batiment.nom']}
+          globalFilterFields={['nom', 'batiment.nom', 'locataireNom']}
         >
           <Column field="nom" header="Nom" sortable />
 

@@ -1,10 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Button } from 'primereact/button';
 
 import { locatairesApi } from '@/services/locataires.api';
+import { occupationsApi } from '@/services/occupations.api';
 import type { Locataire, LocataireDashboard } from '@/types/locataire';
+import type { Occupation } from '@/types/occupation';
+import type { OccupationDashboard, OccupationDashboardPaiement } from '@/types/occupation';
 import type { Arriere } from '@/types/arriere';
+import { PeriodeType } from '@/types/enums';
 
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
@@ -20,6 +25,16 @@ function formatMontant(val: number): string {
 
 function formatDate(val: string): string {
   return new Date(val).toLocaleDateString('fr-FR');
+}
+
+function labelPeriode(nombre: number, type: PeriodeType): string {
+  const labels: Record<PeriodeType, string> = {
+    [PeriodeType.JOUR]:    'jour(s)',
+    [PeriodeType.SEMAINE]: 'semaine(s)',
+    [PeriodeType.MOIS]:    'mois',
+    [PeriodeType.ANNEE]:   'an(s)',
+  };
+  return `${nombre} ${labels[type]}`;
 }
 
 // ─── Sous-composants ──────────────────────────────────────────────────────────
@@ -51,14 +66,162 @@ function ArriereBadge({ arriere }: { arriere: Arriere }) {
   );
 }
 
+// ─── Panneau occupation avec paiements lazy ────────────────────────────────────
+
+type DashState = OccupationDashboard | 'loading' | 'error' | null;
+
+function PaiementsTable({ paiements }: { paiements: OccupationDashboardPaiement[] }) {
+  if (paiements.length === 0) {
+    return <p className="text-sm text-gray-400 text-center py-4">Aucun paiement enregistré.</p>;
+  }
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="text-left text-xs text-gray-500 uppercase border-b border-gray-100">
+            <th className="pb-2 pr-4 font-medium">Période</th>
+            <th className="pb-2 pr-4 font-medium">Montant payé</th>
+            <th className="pb-2 pr-4 font-medium">Nb loyers</th>
+            <th className="pb-2 pr-4 font-medium">Date paiement</th>
+            <th className="pb-2 font-medium">Ponctualité</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-50">
+          {paiements.map((p) => (
+            <tr key={p.id} className="hover:bg-gray-50">
+              <td className="py-2 pr-4 whitespace-nowrap text-gray-700">
+                {formatDate(p.debutPeriode)} → {formatDate(p.finPeriode)}
+              </td>
+              <td className="py-2 pr-4 font-semibold text-[#1e293b]">
+                {formatMontant(p.montantPaye)}
+              </td>
+              <td className="py-2 pr-4 text-center text-gray-600">
+                {p.nombreDeLoyers != null ? p.nombreDeLoyers : <span className="text-gray-300">—</span>}
+              </td>
+              <td className="py-2 pr-4 text-gray-600">
+                {formatDate(p.datePaiement)}
+              </td>
+              <td className="py-2">
+                {p.enRetard ? (
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#991b1b] bg-[#fee2e2] px-2 py-0.5 rounded-full">
+                    <i className="pi pi-clock text-xs" /> En retard
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#166534] bg-[#dcfce7] px-2 py-0.5 rounded-full">
+                    <i className="pi pi-check text-xs" /> À temps
+                  </span>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function OccupationPanel({ occ }: { occ: Occupation }) {
+  const [expanded, setExpanded]     = useState(false);
+  const [dashState, setDashState]   = useState<DashState>(null);
+
+  async function loadDashboard() {
+    setDashState('loading');
+    try {
+      const res = await occupationsApi.getDashboard(occ.id);
+      setDashState(res.data.data);
+    } catch {
+      setDashState('error');
+    }
+  }
+
+  function toggle() {
+    if (!expanded && dashState === null) {
+      loadDashboard();
+    }
+    setExpanded((v) => !v);
+  }
+
+  const estActive = !occ.dateFin;
+  const logementNom = occ.logement?.nom ?? `Occupation #${occ.id}`;
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      {/* En-tête */}
+      <div className="flex items-center justify-between p-4 gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <i className="pi pi-home text-[#3b82f6] shrink-0" />
+          <div className="min-w-0">
+            <p className="font-semibold text-[#1e293b] truncate">{logementNom}</p>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Début : {formatDate(occ.dateDebut)}
+              {occ.dateFin && <> · Fin : {formatDate(occ.dateFin)}</>}
+              {occ.logement?.loyers && occ.logement.loyers.length > 0 && (
+                <> · {formatMontant(occ.logement.loyers[0].montant)} / {labelPeriode(occ.logement.loyers[0].periodeNombre, occ.logement.loyers[0].periodeType)}</>
+              )}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${
+            estActive ? 'bg-[#dbeafe] text-[#1e3a8a]' : 'bg-gray-100 text-gray-500'
+          }`}>
+            {estActive ? 'Active' : 'Terminée'}
+          </span>
+          <Button
+            icon={expanded ? 'pi pi-chevron-up' : 'pi pi-chevron-down'}
+            text
+            size="small"
+            label={expanded ? 'Masquer les paiements' : 'Afficher les paiements'}
+            onClick={toggle}
+            className="text-xs text-[#3b82f6]"
+          />
+        </div>
+      </div>
+
+      {/* Corps (paiements) */}
+      {expanded && (
+        <div className="border-t border-gray-100 p-4">
+          {dashState === null || dashState === 'loading' ? (
+            <div className="flex justify-center py-4">
+              <i className="pi pi-spin pi-spinner text-[#3b82f6] text-xl" />
+            </div>
+          ) : dashState === 'error' ? (
+            <div className="flex items-center gap-2 text-sm text-[#991b1b] py-2">
+              <i className="pi pi-times-circle" />
+              Impossible de charger les paiements.
+              <button className="underline ml-1" onClick={loadDashboard}>Réessayer</button>
+            </div>
+          ) : (
+            <>
+              {dashState.arrieres && (
+                <div className="mb-3 bg-[#fee2e2] border border-red-200 rounded-lg p-3 flex items-start gap-2">
+                  <i className="pi pi-exclamation-triangle text-[#991b1b] mt-0.5 shrink-0" />
+                  <p className="text-sm font-semibold text-[#991b1b]">
+                    Arriéré : {formatMontant(dashState.arrieres.montantDu)}
+                    <span className="font-normal text-xs ml-2">
+                      ({formatDate(dashState.arrieres.debutPeriodeDue)} → {formatDate(dashState.arrieres.finPeriodeDue)})
+                    </span>
+                  </p>
+                </div>
+              )}
+              <PaiementsTable paiements={dashState.paiements} />
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function LocataireEspacePage() {
-  const [locataire, setLocataire] = useState<Locataire | null>(null);
-  const [dashboard, setDashboard] = useState<LocataireDashboard | null>(null);
-  const [loading,   setLoading]   = useState(true);
-  const [error,     setError]     = useState<string | null>(null);
-  const [noProfile, setNoProfile] = useState(false);
+  const [locataire,   setLocataire]   = useState<Locataire | null>(null);
+  const [dashboard,   setDashboard]   = useState<LocataireDashboard | null>(null);
+  const [occupations, setOccupations] = useState<Occupation[]>([]);
+  const [loading,     setLoading]     = useState(true);
+  const [error,       setError]       = useState<string | null>(null);
+  const [noProfile,   setNoProfile]   = useState(false);
 
   async function load() {
     setLoading(true);
@@ -73,10 +236,15 @@ export default function LocataireEspacePage() {
       }
       const loc = locsRes.data.data[0];
 
-      const dashRes = await locatairesApi.getDashboard(loc.id);
+      const [dashRes, occsRes] = await Promise.all([
+        locatairesApi.getDashboard(loc.id),
+        occupationsApi.getAll(),
+      ]);
       setLocataire(loc);
       setDashboard(dashRes.data.data);
-    } catch(error) {
+      setOccupations(occsRes.data.data);
+    } catch (err) {
+      console.log(err);
       setError('Impossible de charger votre profil.');
     } finally {
       setLoading(false);
@@ -157,18 +325,29 @@ export default function LocataireEspacePage() {
         </div>
       )}
 
-      {/* ── Occupations ────────────────────────────────────────────────────── */}
+      {/* ── Occupations KPIs ───────────────────────────────────────────────── */}
       <div>
         <h2 className="text-base font-semibold text-[#1e293b] mb-3">Occupations</h2>
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
           <KpiCard label="Total" value={String(dashboard.totalOccupations)} />
           <KpiCard
             label="Active(s)"
             value={String(dashboard.nbOccupationsActives)}
             color={dashboard.nbOccupationsActives > 0 ? 'text-[#1e3a8a]' : 'text-gray-400'}
           />
-          <KpiCard label="Taux d'occupation" value={`${tauxOccupation} %`} />
+          {/* <KpiCard label="Taux d'occupation" value={`${tauxOccupation} %`} /> */}
         </div>
+
+        {/* Liste des occupations avec paiements */}
+        {occupations.length > 0 ? (
+          <div className="space-y-3">
+            {occupations.map((occ) => (
+              <OccupationPanel key={occ.id} occ={occ} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-gray-400">Aucune occupation enregistrée.</p>
+        )}
       </div>
 
       {/* ── Solvabilité ────────────────────────────────────────────────────── */}

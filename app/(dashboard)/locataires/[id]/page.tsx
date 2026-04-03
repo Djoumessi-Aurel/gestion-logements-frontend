@@ -166,10 +166,10 @@ export default function LocataireDashboardPage() {
             value={String(dashboard.nbOccupationsActives)}
             color={dashboard.nbOccupationsActives > 0 ? 'text-[#1e3a8a]' : 'text-gray-400'}
           />
-          <KpiCard
+          {/* <KpiCard
             label="Taux d'occupation"
             value={`${tauxOccupation} %`}
-          />
+          /> */}
         </div>
       </div>
 
