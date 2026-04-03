@@ -507,6 +507,9 @@ export default function OccupationsPage() {
             options={TAB_OPTIONS}
             optionLabel="label"
             optionValue="value"
+            pt={{
+                  button: { className: 'text-base px-2 py-1 md:px-3 md:py-2' } // Sizing the individual buttons
+              }} 
           />
           <div className="relative max-w-sm w-full sm:w-auto">
             <i className="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
@@ -595,7 +598,7 @@ export default function OccupationsPage() {
           <Column
             header="Actions"
             body={actionsBody}
-            style={{ width: '240px', textAlign: 'center' }}
+            style={{ width: '240px', minWidth: '240px', textAlign: 'center' }}
             exportable={false}
           />
         </DataTableWrapper>

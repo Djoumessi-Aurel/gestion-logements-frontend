@@ -55,7 +55,7 @@ function KpiCard({
       )}
       <div className="min-w-0">
         <p className="text-xs text-gray-500 uppercase tracking-wide">{label}</p>
-        <p className={`text-2xl font-bold mt-0.5 ${color ?? 'text-[#1e293b]'}`}>{value}</p>
+        <p className={`text-lg md:text-xl lg:text-2xl wrap-break-word font-bold mt-0.5 ${color ?? 'text-[#1e293b]'}`}>{value}</p>
         {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
       </div>
     </div>

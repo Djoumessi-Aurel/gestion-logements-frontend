@@ -251,6 +251,9 @@ export default function PaiementFormDialog({
             options={TOGGLE_OPTIONS}
             optionLabel="label"
             optionValue="value"
+            pt={{
+                  button: { className: 'text-base px-2 py-1 md:px-3 md:py-2' } // Sizing the individual buttons
+              }}
           />
         </div>
 

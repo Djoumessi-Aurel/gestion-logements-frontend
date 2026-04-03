@@ -30,7 +30,7 @@ function KpiCard({ label, value, sub, color }: { label: string; value: string | 
   return (
     <div className="bg-white rounded-xl shadow-sm p-5">
       <p className="text-sm text-gray-500 mb-1">{label}</p>
-      <p className={`text-2xl font-bold ${color ?? 'text-[#1e293b]'}`}>{value}</p>
+      <p className={`text-2xl wrap-break-word font-bold ${color ?? 'text-[#1e293b]'}`}>{value}</p>
       {sub && <p className="text-xs text-gray-400 mt-1">{sub}</p>}
     </div>
   );

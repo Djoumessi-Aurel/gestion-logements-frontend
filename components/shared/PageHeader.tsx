@@ -60,12 +60,12 @@ export default function PageHeader({ title, breadcrumb, action, actions }: Props
             ))}
           </nav>
         )}
-        <h1 className="text-2xl font-bold text-[#1e293b] truncate">{title}</h1>
+        <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-[#1e293b] truncate">{title}</h1>
       </div>
 
       {/* Boutons d'action */}
       {(showAction || visibleActions.length > 0) && (
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex flex-col-reverse sm:flex-row items-center gap-2 shrink-0">
           {visibleActions.map((a, i) => (
             <Button
               key={i}
@@ -75,6 +75,7 @@ export default function PageHeader({ title, breadcrumb, action, actions }: Props
               loading={a.loading}
               severity="secondary"
               outlined
+              className='text-sm px-1.5 py-1 md:text-base md:px-3 md:py-2'
             />
           ))}
           {showAction && (
@@ -84,6 +85,7 @@ export default function PageHeader({ title, breadcrumb, action, actions }: Props
               onClick={action.onClick}
               loading={action.loading}
               style={{ backgroundColor: '#1e3a8a', borderColor: '#1e3a8a' }}
+              className='text-sm px-1.5 py-1 md:text-base md:px-3 md:py-2'
             />
           )}
         </div>
