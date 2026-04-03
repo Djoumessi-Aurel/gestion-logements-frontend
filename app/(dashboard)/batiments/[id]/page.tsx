@@ -137,11 +137,6 @@ export default function BatimentDashboardPage() {
           { label: 'Bâtiments', path: '/batiments' },
           { label: batiment.nom },
         ]}
-        action={{
-          label:   'Voir les logements',
-          icon:    'pi-warehouse',
-          onClick: () => router.push('/logements'),
-        }}
       />
 
       {batiment.adresse && (

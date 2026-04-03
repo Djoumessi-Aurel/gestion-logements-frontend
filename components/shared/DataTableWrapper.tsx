@@ -59,8 +59,8 @@ export default function DataTableWrapper<T extends AnyRecord>({
       stripedRows
       showGridlines
       tableStyle={{ minWidth: '40rem' }}
-      paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
-      currentPageReportTemplate="{first}-{last} sur {totalRecords}"
+      paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
+      currentPageReportTemplate="{first} à {last} sur {totalRecords}"
       {...tableProps}
     >
       {children}
