@@ -9,6 +9,15 @@ const PUBLIC_ROUTES = ['/login', '/forgot-password', '/reset-password'];
 
 const LOCATAIRE_BASE = '/locataire';
 
+// Routes accessibles à tous les rôles authentifiés (y compris LOCATAIRE)
+const SHARED_PROTECTED_ROUTES = ['/profil'];
+
+function isSharedProtectedRoute(pathname: string): boolean {
+  return SHARED_PROTECTED_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(route + '/'),
+  );
+}
+
 // Vérifie si le chemin appartient à l'espace personnel locataire.
 // On exige un slash final (/locataire/) ou une correspondance exacte (/locataire)
 // pour éviter de matcher /locataires (page d'administration des locataires).
@@ -67,8 +76,8 @@ export function proxy(request: NextRequest) {
 
   // ── Contrôle RBAC au niveau des routes ───────────────────────────────────────
 
-  // LOCATAIRE : uniquement /locataire (pas /locataires ni les autres routes)
-  if (role === 'LOCATAIRE' && !isLocataireSpace(pathname)) {
+  // LOCATAIRE : uniquement /locataire + routes partagées (ex : /profil)
+  if (role === 'LOCATAIRE' && !isLocataireSpace(pathname) && !isSharedProtectedRoute(pathname)) {
     return NextResponse.redirect(new URL(LOCATAIRE_BASE, request.url));
   }
 

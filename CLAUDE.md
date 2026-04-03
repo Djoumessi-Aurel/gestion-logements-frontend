@@ -748,7 +748,7 @@ NEXT_PUBLIC_CRYPTO_SECRET=...    ← clé de chiffrement redux-persist
 ---
 
 ## Étape en cours
-F6.8
+F7.1
 
 ## Étapes complétées
 
@@ -792,6 +792,11 @@ F6.8
   - Chargement : `GET /occupations` → trouver l'active → `getDashboard` (loyer + arriérés) + `GET /paiements?includeRelations=true` en parallèle
   - `enRetard` calculé client-side : `datePaiement > dateAttenduePaiement`
   - `addOneDay` sans décalage UTC pour afficher la date du prochain paiement
+- F6.8 : Page Profil ✓
+  - `/profil` : infos utilisateur (nom, prénom, username, téléphone, email, rôle, membre depuis) via `GET /auth/me`
+  - Formulaire changement de mot de passe : mot de passe actuel + nouveau (min 8 car.) + confirmation, validation zod
+  - Erreur 400 → message depuis `errors[]` ou `message` (ex : "Mot de passe actuel incorrect")
+  - Accessible à tous les rôles authentifiés (y compris LOCATAIRE) — proxy.ts mis à jour avec `SHARED_PROTECTED_ROUTES`
 - F6.6 : Pages Utilisateurs ✓
   - `/utilisateurs` : liste avec filtre global (nom, username, email, téléphone), badges rôle et statut, CRUD modal (mdp auto-généré affiché en readonly), toggle activer/désactiver, reset mdp (mdp auto-généré affiché en readonly)
   - `/utilisateurs/[id]` : fiche éditable (nom, prénom, téléphone, email, rôle), boutons activer/désactiver et reset mdp, attribution bâtiments (ADMIN_GLOBAL → ADMIN_BATIMENT), attribution logements (ADMIN_BATIMENT+ → ADMIN_LOGEMENT), redirect vers /profil si l'admin consulte son propre compte
