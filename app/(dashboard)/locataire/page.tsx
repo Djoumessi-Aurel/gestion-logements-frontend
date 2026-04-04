@@ -147,8 +147,8 @@ function OccupationPanel({ occ }: { occ: Occupation }) {
   return (
     <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
       {/* En-tête */}
-      <div className="flex items-center justify-between p-4 gap-3">
-        <div className="flex items-center gap-3 min-w-0">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 min-w-0">
           <i className="pi pi-home text-[#3b82f6] shrink-0" />
           <div className="min-w-0">
             <p className="font-semibold text-[#1e293b] truncate">{logementNom}</p>
