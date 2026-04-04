@@ -49,7 +49,7 @@ export default function PageHeader({ title, breadcrumb, action, actions }: Props
                 {item.path ? (
                   <Link
                     href={item.path}
-                    className="hover:text-[#1e3a8a] transition-colors"
+                    className="text-[#0000ee] hover:text-[#1e3a8a] transition-colors"
                   >
                     {item.label}
                   </Link>
