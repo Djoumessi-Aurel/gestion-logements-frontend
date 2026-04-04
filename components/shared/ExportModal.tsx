@@ -66,7 +66,7 @@ export default function ExportModal({
 
       const ext      = format === 'excel' ? 'xlsx' : 'pdf';
       const date     = new Date().toISOString().slice(0, 10);
-      const filename = `${endpoint}_${date}.${ext}`;
+      const filename = `rapport_${endpoint}_${date}.${ext}`;
 
       downloadBlob(new Blob([response.data]), filename);
       onHide();
