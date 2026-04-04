@@ -13,7 +13,7 @@ import ExportModal from '@/components/shared/ExportModal';
 type ExportEntry = {
   label: string;
   description: string;
-  endpoint: 'paiements' | 'arrieres' | 'logements' | 'locataires' | 'batiments' | 'occupations' | 'complet';
+  endpoint: 'paiements' | 'arrieres' | 'logements' | 'locataires' | 'batiments' | 'occupations' | 'utilisateurs' | 'complet';
   icon: string;
   minRole: Role;
   complet?: boolean;
@@ -53,6 +53,13 @@ const EXPORTS: ExportEntry[] = [
     description: 'Toutes les occupations passées et en cours',
     endpoint:    'occupations',
     icon:        'pi-calendar',
+    minRole:     Role.ADMIN_LOGEMENT,
+  },
+  {
+    label:       'Utilisateurs',
+    description: 'Liste des utilisateurs dans votre périmètre (rôle, statut, date création)',
+    endpoint:    'utilisateurs',
+    icon:        'pi-users',
     minRole:     Role.ADMIN_LOGEMENT,
   },
   {

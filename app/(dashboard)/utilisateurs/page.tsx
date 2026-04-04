@@ -21,6 +21,7 @@ import { useAppSelector } from '@/store/hooks';
 import PageHeader from '@/components/shared/PageHeader';
 import DataTableWrapper from '@/components/shared/DataTableWrapper';
 import { showConfirm } from '@/components/shared/ConfirmDialog';
+import ExportModal from '@/components/shared/ExportModal';
 
 // ─── Utilitaires ──────────────────────────────────────────────────────────────
 
@@ -86,12 +87,16 @@ export default function UtilisateursPage() {
   const currentRole = useAppSelector((s) => s.auth.user?.role);
   const currentId   = useAppSelector((s) => s.auth.user?.id);
   const canCreate   = currentRole && currentRole !== Role.LOCATAIRE;
+  const canExport   = currentRole && currentRole !== Role.LOCATAIRE;
 
   // ── État ───────────────────────────────────────────────────────────────────
   const [utilisateurs, setUtilisateurs] = useState<Utilisateur[] | null>(null);
   const [loading,      setLoading]      = useState(true);
   const [error,        setError]        = useState<string | null>(null);
   const [globalFilter, setGlobalFilter] = useState('');
+
+  // Export
+  const [exportVisible, setExportVisible] = useState(false);
 
   // Modale création
   const [showCreate,  setShowCreate]  = useState(false);
@@ -244,6 +249,7 @@ export default function UtilisateursPage() {
       <PageHeader
         title="Utilisateurs"
         breadcrumb={[{ label: 'Dashboard', path: '/' }, { label: 'Utilisateurs' }]}
+        actions={canExport ? [{ label: 'Exporter', icon: 'pi-download', onClick: () => setExportVisible(true) }] : []}
         action={canCreate ? { label: 'Nouvel utilisateur', icon: 'pi-plus', onClick: openCreate } : undefined}
       />
 
@@ -470,6 +476,14 @@ export default function UtilisateursPage() {
           </div>
         </form>
       </Dialog>
+
+      {/* ── Modal : Export ────────────────────────────────────────────────── */}
+      <ExportModal
+        visible={exportVisible}
+        onHide={() => setExportVisible(false)}
+        entityLabel="Utilisateurs"
+        endpoint="utilisateurs"
+      />
 
       {/* ── Modal : Réinitialiser le mot de passe ──────────────────────────── */}
       <Dialog

@@ -32,6 +32,9 @@ export const exportApi = {
   occupations: (params: ExportParams) =>
     apiClient.get('/export/occupations', { params, ...blobConfig }),
 
+  utilisateurs: (params: ExportParams) =>
+    apiClient.get('/export/utilisateurs', { params, ...blobConfig }),
+
   // format: 'excel' uniquement — classeur multi-onglets
   complet: (params: Omit<ExportParams, 'format'>) =>
     apiClient.get('/export/complet', { params: { ...params, format: 'excel' }, ...blobConfig }),

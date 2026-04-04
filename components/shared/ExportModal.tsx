@@ -10,7 +10,7 @@ import ErrorMessage from './ErrorMessage';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type ExportEndpoint = 'paiements' | 'arrieres' | 'logements' | 'locataires' | 'batiments' | 'occupations' | 'complet';
+type ExportEndpoint = 'paiements' | 'arrieres' | 'logements' | 'locataires' | 'batiments' | 'occupations' | 'utilisateurs' | 'complet';
 
 interface Props {
   visible: boolean;
