@@ -47,8 +47,13 @@ export default function DataTableWrapper<T extends AnyRecord>({
   }
 
   // ── Données disponibles (liste potentiellement vide) ───────────────────────
+  // Cast nécessaire : DataTable a des surcharges discriminées sur `cellSelection`
+  // qui rendent le spread de tableProps ambigu pour le compilateur TypeScript.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const safeProps = tableProps as DataTableProps<any>;
+
   return (
-    <DataTable<T[]>
+    <DataTable
       value={data ?? []}
       emptyMessage={emptyMessage}
       paginator
@@ -61,7 +66,7 @@ export default function DataTableWrapper<T extends AnyRecord>({
       tableStyle={{ minWidth: '40rem' }}
       paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
       currentPageReportTemplate="{first} à {last} sur {totalRecords}"
-      {...tableProps}
+      {...safeProps}
     >
       {children}
     </DataTable>
