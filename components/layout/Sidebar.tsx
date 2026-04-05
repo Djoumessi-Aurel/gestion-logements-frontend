@@ -12,10 +12,12 @@ type NavItem = {
   path: string;
   icon: string;
   minRole: Role;
+  exactRole?: boolean; // si true : visible uniquement pour ce rôle exact
 };
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Dashboard',     path: '/',              icon: 'pi-home',        minRole: Role.ADMIN_LOGEMENT },
+  { label: 'Mon espace',    path: '/locataire',     icon: 'pi-home',        minRole: Role.LOCATAIRE, exactRole: true },
+  { label: 'Dashboard',     path: '/',              icon: 'pi-th-large',    minRole: Role.ADMIN_LOGEMENT },
   { label: 'Bâtiments',    path: '/batiments',     icon: 'pi-building',    minRole: Role.ADMIN_BATIMENT },
   { label: 'Logements',    path: '/logements',     icon: 'pi-warehouse',   minRole: Role.ADMIN_LOGEMENT },
   { label: 'Locataires',   path: '/locataires',    icon: 'pi-users',       minRole: Role.ADMIN_LOGEMENT },
@@ -32,8 +34,9 @@ const ROLE_ORDER: Record<Role, number> = {
   [Role.ADMIN_GLOBAL]:    3,
 };
 
-function hasAccess(userRole: Role, minRole: Role): boolean {
-  return ROLE_ORDER[userRole] >= ROLE_ORDER[minRole];
+function hasAccess(userRole: Role, item: NavItem): boolean {
+  if (item.exactRole) return userRole === item.minRole;
+  return ROLE_ORDER[userRole] >= ROLE_ORDER[item.minRole];
 }
 
 export default function Sidebar() {
@@ -43,11 +46,12 @@ export default function Sidebar() {
   const role = useAppSelector((s) => s.auth.user?.role);
 
   const visibleItems = role
-    ? NAV_ITEMS.filter((item) => hasAccess(role, item.minRole))
+    ? NAV_ITEMS.filter((item) => hasAccess(role, item))
     : [];
 
   function isActive(path: string) {
     if (path === '/') return pathname === '/';
+    if (path === '/locataire') return pathname === '/locataire';
     return pathname.startsWith(path);
   }
 
