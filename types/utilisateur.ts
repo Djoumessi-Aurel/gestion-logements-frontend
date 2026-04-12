@@ -11,6 +11,7 @@ export interface Utilisateur {
   username: string;
   role: Role;
   isActive: boolean;
+  lastLoginAt?: string | null;
   createdAt: string;
   updatedAt: string;
   batiments?: Batiment[];

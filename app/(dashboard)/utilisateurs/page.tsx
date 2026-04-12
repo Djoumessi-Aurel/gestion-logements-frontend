@@ -293,6 +293,8 @@ export default function UtilisateursPage() {
           body={(u: Utilisateur) => (
             <span className="font-mono text-sm text-gray-600">{u.username}</span>
           )}
+          sortable
+          sortField="username"
           style={{ minWidth: '130px' }}
         />
         <Column
@@ -302,6 +304,8 @@ export default function UtilisateursPage() {
               {roleLabels[u.role]}
             </span>
           )}
+          sortable
+          sortField="role"
           style={{ minWidth: '100px' }}
         />
         <Column
@@ -325,6 +329,16 @@ export default function UtilisateursPage() {
             </span>
           )}
           style={{ minWidth: '90px' }}
+        />
+        <Column
+          header="Dernière connexion"
+          body={(u: Utilisateur) => u.lastLoginAt
+            ? <span className="text-sm text-gray-600">{new Date(u.lastLoginAt).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'medium' })}</span>
+            : <span className="text-gray-400 text-sm">Jamais</span>
+          }
+          sortable
+          sortField="lastLoginAt"
+          style={{ minWidth: '150px' }}
         />
         <Column
           header="Actions"
