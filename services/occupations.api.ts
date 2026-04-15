@@ -3,6 +3,13 @@ import type { ApiResponse, ApiResponseList } from '@/types/api';
 import type { Occupation, CreateOccupationDto, UpdateOccupationDto, FinOccupationDto, OccupationDashboard } from '@/types/occupation';
 import type { Arriere } from '@/types/arriere';
 
+export interface SignedUrlResponse {
+  url: string;
+  fileName: string;
+  mimeType: string;
+  expiresIn: number;
+}
+
 export const occupationsApi = {
   // statut: 0 = en cours (dateFin IS NULL), 1 = terminées (dateFin IS NOT NULL), absent = toutes
   getAll: (statut?: 0 | 1) =>
@@ -38,8 +45,9 @@ export const occupationsApi = {
     });
   },
 
-  downloadContrat: (id: number) =>
-    apiClient.get(`/occupations/${id}/contrat`, { responseType: 'blob' }),
+  // Retourne une URL signée temporaire — plus de streaming blob
+  getContratUrl: (id: number) =>
+    apiClient.get<ApiResponse<SignedUrlResponse>>(`/occupations/${id}/contrat`),
 
   getDashboard: (id: number) =>
     apiClient.get<ApiResponse<OccupationDashboard>>(`/occupations/${id}/dashboard`),

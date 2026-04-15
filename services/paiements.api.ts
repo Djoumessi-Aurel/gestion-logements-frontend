@@ -1,6 +1,7 @@
 import apiClient from './apiClient';
 import type { ApiResponse, ApiResponsePaginated } from '@/types/api';
 import type { Paiement, CreatePaiementOption1Dto, CreatePaiementOption2Dto, UpdatePaiementDto } from '@/types/paiement';
+import type { SignedUrlResponse } from './occupations.api';
 
 export const paiementsApi = {
   getAll: (params?: { page?: number; limit?: number; includeRelations?: boolean }) =>
@@ -39,7 +40,7 @@ export const paiementsApi = {
     });
   },
 
-  // Téléchargement d'une preuve individuelle (streaming blob)
-  downloadPreuve: (id: number, fichierId: number) =>
-    apiClient.get(`/paiements/${id}/preuves/${fichierId}`, { responseType: 'blob' }),
+  // Retourne une URL signée temporaire — plus de streaming blob
+  getPreuveUrl: (id: number, fichierId: number) =>
+    apiClient.get<ApiResponse<SignedUrlResponse>>(`/paiements/${id}/preuves/${fichierId}`),
 };

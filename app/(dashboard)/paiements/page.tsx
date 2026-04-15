@@ -268,17 +268,17 @@ export default function PaiementsPage() {
     }
   }
 
-  // ── Téléchargement preuve ────────────────────────────────────────────────────
-  async function handleDownloadPreuve(paiementId: number, fichierId: number, nomOriginal: string) {
+  // ── Téléchargement preuve (URL signée) ───────────────────────────────────────
+  async function handleDownloadPreuve(paiementId: number, fichierId: number) {
     setDownloadingFichierId(fichierId);
     try {
-      const res = await paiementsApi.downloadPreuve(paiementId, fichierId);
-      const url  = URL.createObjectURL(new Blob([res.data]));
+      const res  = await paiementsApi.getPreuveUrl(paiementId, fichierId);
+      const { url, fileName } = res.data.data;
       const link = document.createElement('a');
       link.href     = url;
-      link.download = nomOriginal;
+      link.download = fileName;
+      link.target   = '_blank';
       link.click();
-      URL.revokeObjectURL(url);
     } catch (err) {
       toast.current?.show({
         severity: 'error', summary: 'Erreur',
@@ -602,7 +602,7 @@ export default function PaiementsPage() {
                       tooltip="Télécharger"
                       tooltipOptions={{ position: 'top' }}
                       disabled={downloadingFichierId !== null}
-                      onClick={() => handleDownloadPreuve(selectedPaiement!.id, f.id, f.nomOriginal)}
+                      onClick={() => handleDownloadPreuve(selectedPaiement!.id, f.id)}
                     />
                   </li>
                 ))}

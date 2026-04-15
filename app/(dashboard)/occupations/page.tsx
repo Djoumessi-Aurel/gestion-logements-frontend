@@ -333,20 +333,16 @@ export default function OccupationsPage() {
     }
   }
 
-  // ── Télécharger contrat ─────────────────────────────────────────────────────
+  // ── Télécharger contrat (URL signée) ─────────────────────────────────────────
   async function downloadContrat(occ: Occupation) {
     try {
-      const res         = await occupationsApi.downloadContrat(occ.id);
-      const disposition = res.headers['content-disposition'] as string | undefined;
-      const match       = disposition?.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-      const rawName     = match?.[1]?.replace(/['"]/g, '') ?? `contrat_occupation_${occ.id}`;
-      const filename    = decodeURIComponent(rawName);
-      const url  = URL.createObjectURL(new Blob([res.data]));
+      const res  = await occupationsApi.getContratUrl(occ.id);
+      const { url, fileName } = res.data.data;
       const link = document.createElement('a');
       link.href     = url;
-      link.download = filename;
+      link.download = fileName;
+      link.target   = '_blank';
       link.click();
-      URL.revokeObjectURL(url);
     } catch {
       toast.current?.show({
         severity: 'error', summary: 'Erreur',
