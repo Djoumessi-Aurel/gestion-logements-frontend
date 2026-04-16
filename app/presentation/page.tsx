@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useState } from 'react';
 
 // ─── Données ──────────────────────────────────────────────────────────────────
@@ -42,6 +41,12 @@ const FEATURES = [
     description:
       'Exportez paiements, arriérés, logements, locataires et plus encore. Classeur multi-onglets disponible pour une vue globale.',
   },
+  {
+    icon: 'pi-bell',
+    title: 'Alertes automatiques',
+    description:
+      'Une routine planifiée calcule automatiquement les arriérés et envoie des emails ciblés : rappels aux locataires concernés, rapports groupés aux administrateurs responsables.',
+  },
 ];
 
 const ROLES = [
@@ -61,7 +66,7 @@ const ROLES = [
     color: 'bg-[#3b82f6] text-white',
     icon: 'pi-building',
     perks: [
-      'CRUD logements sur ses bâtiments',
+      'CRUD\u00b9 logements sur ses bâtiments',
       'Gestion des occupations et paiements',
       'Attribution de logements aux admins',
       'Dashboard bâtiment et exports',
@@ -73,7 +78,7 @@ const ROLES = [
     icon: 'pi-home',
     perks: [
       'Gestion des logements attribués',
-      'CRUD locataires, occupations, paiements',
+      'CRUD\u00b9 locataires, occupations, paiements',
       'Création de comptes locataires',
       'Exports dans son périmètre',
     ],
@@ -125,14 +130,14 @@ function Navbar() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur border-b border-gray-100 shadow-sm">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/presentation" className="flex items-center gap-2.5">
+        <a href="/presentation" className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-[#1e3a8a] flex items-center justify-center shrink-0">
             <i className="pi pi-building text-white text-sm" />
           </div>
           <span className="font-bold text-[#1e293b] text-sm leading-tight">
             Gestion<br />Logements
           </span>
-        </Link>
+        </a>
 
         {/* Nav desktop */}
         <nav className="hidden md:flex items-center gap-6 text-sm text-gray-500">
@@ -143,12 +148,14 @@ function Navbar() {
 
         {/* CTA desktop */}
         <div className="hidden md:flex items-center gap-3">
-          <Link
-            href="/login"
+          <a
+            href="https://aureldjoumessi.com/"
+            target="_blank"
+            rel="noopener noreferrer"
             className="px-4 py-2 rounded-lg text-sm font-medium text-[#1e3a8a] border border-[#1e3a8a] hover:bg-[#dbeafe] transition-colors"
           >
-            Se connecter
-          </Link>
+            Me contacter
+          </a>
         </div>
 
         {/* Burger mobile */}
@@ -167,12 +174,14 @@ function Navbar() {
           <a href="#fonctionnalites" onClick={() => setOpen(false)} className="block text-sm text-gray-600 py-1">Fonctionnalités</a>
           <a href="#modules"         onClick={() => setOpen(false)} className="block text-sm text-gray-600 py-1">Modules</a>
           <a href="#roles"           onClick={() => setOpen(false)} className="block text-sm text-gray-600 py-1">Rôles</a>
-          <Link
-            href="/login"
+          <a
+            href="https://aureldjoumessi.com/"
+            target="_blank"
+            rel="noopener noreferrer"
             className="block w-full text-center px-4 py-2 rounded-lg text-sm font-medium bg-[#1e3a8a] text-white"
           >
-            Se connecter
-          </Link>
+            Me contacter
+          </a>
         </div>
       )}
     </header>
@@ -233,13 +242,15 @@ export default function PresentationPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/login"
+            <a
+              href="https://aureldjoumessi.com/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-white text-[#1e3a8a] font-semibold text-sm hover:bg-blue-50 transition-colors shadow-lg"
             >
-              <i className="pi pi-sign-in" />
-              Accéder à l&apos;application
-            </Link>
+              <i className="pi pi-envelope" />
+              Demander un accès
+            </a>
             <a
               href="#fonctionnalites"
               className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl border border-white/30 text-white font-semibold text-sm hover:bg-white/10 transition-colors"
@@ -425,7 +436,7 @@ export default function PresentationPage() {
                   </div>
                   <span className="font-bold text-sm">{r.title}</span>
                 </div>
-                <ul className="p-5 space-y-2.5">
+                <ul className="p-5! space-y-2.5">
                   {r.perks.map((perk) => (
                     <li key={perk} className="flex items-start gap-2 text-sm text-gray-600">
                       <i className="pi pi-check-circle text-[#166534] text-sm mt-0.5 shrink-0" />
@@ -436,6 +447,14 @@ export default function PresentationPage() {
               </div>
             ))}
           </div>
+
+          {/* Note de bas de section */}
+          <p className="mt-6 text-xs text-gray-400 text-center">
+            <sup>1</sup> CRUD : <span className="font-medium text-gray-500">C</span>réer,{' '}
+            <span className="font-medium text-gray-500">R</span>echercher &amp; consulter,{' '}
+            <span className="font-medium text-gray-500">U</span>pdate (modifier),{' '}
+            <span className="font-medium text-gray-500">D</span>élet<span className="font-medium text-gray-500">e</span> (supprimer) — désigne la gestion complète d&apos;une ressource.
+          </p>
         </div>
       </section>
 
@@ -446,21 +465,27 @@ export default function PresentationPage() {
         </div>
         <div className="max-w-2xl mx-auto relative z-10">
           <div className="w-14 h-14 rounded-2xl bg-white/15 flex items-center justify-center mx-auto mb-6">
-            <i className="pi pi-building text-white text-2xl" />
+            <i className="pi pi-envelope text-white text-2xl" />
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            Prêt à simplifier votre gestion locative ?
+            Intéressé par la solution ?
           </h2>
-          <p className="text-blue-200 mb-8 text-lg">
-            Accédez à l&apos;application avec vos identifiants et commencez dès maintenant.
+          <p className="text-blue-200 mb-3 text-lg">
+            L&apos;application est déployée en installation dédiée pour chaque client.
+            Contactez-moi pour discuter de vos besoins, obtenir un devis et connaître les modalités d&apos;accès.
           </p>
-          <Link
-            href="/login"
+          <p className="text-blue-300 mb-8 text-sm">
+            Tous mes contacts sont disponibles sur mon site web.
+          </p>
+          <a
+            href="https://aureldjoumessi.com/"
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-white text-[#1e3a8a] font-bold text-sm hover:bg-blue-50 transition-colors shadow-xl"
           >
-            <i className="pi pi-sign-in" />
-            Se connecter à l&apos;application
-          </Link>
+            <i className="pi pi-external-link" />
+            Me contacter — aureldjoumessi.com
+          </a>
         </div>
       </section>
 
@@ -484,9 +509,14 @@ export default function PresentationPage() {
               Aurel Djoumessi
             </a>
           </p>
-          <Link href="/login" className="hover:text-white transition-colors">
-            Se connecter →
-          </Link>
+          <a
+            href="https://aureldjoumessi.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-white transition-colors"
+          >
+            aureldjoumessi.com →
+          </a>
         </div>
       </footer>
     </div>
