@@ -5,6 +5,9 @@ import { decodeJwt } from 'jose';
 
 const PUBLIC_ROUTES = ['/login', '/forgot-password', '/reset-password'];
 
+// Routes publiques sans redirection (accessibles à tous, connecté ou non)
+const OPEN_ROUTES = ['/presentation'];
+
 // ─── Espace réservé aux LOCATAIRE ─────────────────────────────────────────────
 
 const LOCATAIRE_BASE = '/locataire';
@@ -33,6 +36,12 @@ export function proxy(request: NextRequest) {
   const isPublicRoute = PUBLIC_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(route + '?'),
   );
+
+  // Routes ouvertes : accessibles à tous sans redirection (authentifié ou non)
+  const isOpenRoute = OPEN_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(route + '/'),
+  );
+  if (isOpenRoute) return NextResponse.next();
 
   // ── Lecture des cookies (refresh_token est HttpOnly mais lisible ici) ────────
   const accessToken = request.cookies.get('access_token')?.value;
