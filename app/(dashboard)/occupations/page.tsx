@@ -110,9 +110,10 @@ export default function OccupationsPage() {
   const [selectedOcc,      setSelectedOcc]      = useState<Occupation | null>(null);
   const [arrieres,         setArrieres]         = useState<Arriere | null | 'loading'>('loading');
   const [contratFiles,     setContratFiles]     = useState<File[]>([]);
-  const [submitting,       setSubmitting]       = useState(false);
-  const [uploadingContrat, setUploadingContrat] = useState(false);
-  const [deletingId,       setDeletingId]       = useState<number | null>(null);
+  const [submitting,           setSubmitting]           = useState(false);
+  const [uploadingContrat,     setUploadingContrat]     = useState(false);
+  const [deletingId,           setDeletingId]           = useState<number | null>(null);
+  const [downloadingContratId, setDownloadingContratId] = useState<number | null>(null);
 
   // ── Formulaires ─────────────────────────────────────────────────────────────
   const createForm = useForm<CreateFormValues>({
@@ -335,6 +336,7 @@ export default function OccupationsPage() {
 
   // ── Télécharger contrat (URL signée) ─────────────────────────────────────────
   async function downloadContrat(occ: Occupation) {
+    setDownloadingContratId(occ.id);
     try {
       const res = await occupationsApi.getContratUrl(occ.id);
       const { url, fileName } = res.data.data;
@@ -344,6 +346,8 @@ export default function OccupationsPage() {
         severity: 'error', summary: 'Erreur',
         detail: 'Impossible de télécharger le contrat.', life: 4000,
       });
+    } finally {
+      setDownloadingContratId(null);
     }
   }
 
@@ -447,10 +451,11 @@ export default function OccupationsPage() {
         )}
         {occ.contratFichierId && (
           <Button
-            icon="pi pi-download"
+            icon={downloadingContratId === occ.id ? 'pi pi-spin pi-spinner' : 'pi pi-download'}
             rounded text severity="info"
             tooltip="Télécharger contrat"
             tooltipOptions={{ position: 'top' }}
+            disabled={downloadingContratId !== null}
             onClick={() => downloadContrat(occ)}
           />
         )}
