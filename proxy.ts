@@ -6,7 +6,12 @@ import { decodeJwt } from 'jose';
 const PUBLIC_ROUTES = ['/login', '/forgot-password', '/reset-password'];
 
 // Routes publiques sans redirection (accessibles à tous, connecté ou non)
-const OPEN_ROUTES = ['/presentation'];
+const OPEN_ROUTES = [
+  '/presentation',
+  '/sitemap.xml',
+  '/robots.txt',
+  '/offline',
+];
 
 // ─── Espace réservé aux LOCATAIRE ─────────────────────────────────────────────
 
@@ -103,6 +108,10 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon\\.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)).*)',
+    // Exclure :
+    //  - routes Next.js internes (_next/*)
+    //  - fichiers statiques avec extension (images, fonts, xml, txt, json…)
+    //  - fichiers service worker générés par next-pwa (sw.js, workbox-*, etc.)
+    '/((?!api|_next/static|_next/image|favicon\\.ico|sw\\.js|workbox-|worker-|fallback-|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|xml|txt|json|woff2?|ttf|otf)).*)',
   ],
 };

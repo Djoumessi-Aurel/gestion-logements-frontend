@@ -16,6 +16,9 @@ const withPWA = withPWAInit({
 const nextConfig: NextConfig = {
   reactCompiler: true,
   transpilePackages: ['primereact'],
+  // Turbopack utilisé en dev (next-pwa est désactivé en dev de toute façon)
+  // La prod utilise webpack via "next build --webpack" pour générer le SW
+  turbopack: {},
 };
 
 export default withPWA(nextConfig);
