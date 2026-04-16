@@ -10,6 +10,24 @@ export interface SignedUrlResponse {
   expiresIn: number;
 }
 
+/**
+ * Télécharge un fichier depuis une URL signée (potentiellement cross-origin)
+ * en passant par fetch() pour créer un blob URL local.
+ * L'attribut `download` ne fonctionne que sur les URLs same-origin —
+ * cette fonction contourne cette limitation.
+ */
+export async function downloadFromSignedUrl(url: string, fileName: string): Promise<void> {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Téléchargement échoué (${response.status})`);
+  const blob    = await response.blob();
+  const blobUrl = URL.createObjectURL(blob);
+  const link    = document.createElement('a');
+  link.href     = blobUrl;
+  link.download = fileName;
+  link.click();
+  URL.revokeObjectURL(blobUrl);
+}
+
 export const occupationsApi = {
   // statut: 0 = en cours (dateFin IS NULL), 1 = terminées (dateFin IS NOT NULL), absent = toutes
   getAll: (statut?: 0 | 1) =>
@@ -48,6 +66,8 @@ export const occupationsApi = {
   // Retourne une URL signée temporaire — plus de streaming blob
   getContratUrl: (id: number) =>
     apiClient.get<ApiResponse<SignedUrlResponse>>(`/occupations/${id}/contrat`),
+
+
 
   getDashboard: (id: number) =>
     apiClient.get<ApiResponse<OccupationDashboard>>(`/occupations/${id}/dashboard`),

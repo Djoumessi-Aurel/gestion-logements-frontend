@@ -17,6 +17,7 @@ import { AxiosError } from 'axios';
 import type { DataTablePageEvent } from 'primereact/datatable';
 
 import { paiementsApi } from '@/services/paiements.api';
+import { downloadFromSignedUrl } from '@/services/occupations.api';
 import { occupationsApi } from '@/services/occupations.api';
 import { logementsApi } from '@/services/logements.api';
 import type { Paiement } from '@/types/paiement';
@@ -272,13 +273,9 @@ export default function PaiementsPage() {
   async function handleDownloadPreuve(paiementId: number, fichierId: number) {
     setDownloadingFichierId(fichierId);
     try {
-      const res  = await paiementsApi.getPreuveUrl(paiementId, fichierId);
+      const res = await paiementsApi.getPreuveUrl(paiementId, fichierId);
       const { url, fileName } = res.data.data;
-      const link = document.createElement('a');
-      link.href     = url;
-      link.download = fileName;
-      link.target   = '_blank';
-      link.click();
+      await downloadFromSignedUrl(url, fileName);
     } catch (err) {
       toast.current?.show({
         severity: 'error', summary: 'Erreur',

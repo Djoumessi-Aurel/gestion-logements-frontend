@@ -15,7 +15,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError } from 'axios';
 
-import { occupationsApi } from '@/services/occupations.api';
+import { occupationsApi, downloadFromSignedUrl } from '@/services/occupations.api';
 import { logementsApi } from '@/services/logements.api';
 import { locatairesApi } from '@/services/locataires.api';
 import type { Occupation } from '@/types/occupation';
@@ -336,13 +336,9 @@ export default function OccupationsPage() {
   // ── Télécharger contrat (URL signée) ─────────────────────────────────────────
   async function downloadContrat(occ: Occupation) {
     try {
-      const res  = await occupationsApi.getContratUrl(occ.id);
+      const res = await occupationsApi.getContratUrl(occ.id);
       const { url, fileName } = res.data.data;
-      const link = document.createElement('a');
-      link.href     = url;
-      link.download = fileName;
-      link.target   = '_blank';
-      link.click();
+      await downloadFromSignedUrl(url, fileName);
     } catch {
       toast.current?.show({
         severity: 'error', summary: 'Erreur',
