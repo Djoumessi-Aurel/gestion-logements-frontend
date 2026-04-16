@@ -141,9 +141,9 @@ function Navbar() {
 
         {/* Nav desktop */}
         <nav className="hidden md:flex items-center gap-6 text-sm text-gray-500">
-          <a href="#fonctionnalites" className="hover:text-[#1e3a8a] transition-colors">Fonctionnalités</a>
-          <a href="#modules"         className="hover:text-[#1e3a8a] transition-colors">Modules</a>
-          <a href="#roles"           className="hover:text-[#1e3a8a] transition-colors">Rôles</a>
+          <a href="#fonctionnalites" className="text-[#0000fd] hover:text-[#1e3a8a] transition-colors">Fonctionnalités</a>
+          <a href="#modules"         className="text-[#0000fd] hover:text-[#1e3a8a] transition-colors">Modules</a>
+          <a href="#roles"           className="text-[#0000fd] hover:text-[#1e3a8a] transition-colors">Rôles</a>
         </nav>
 
         {/* CTA desktop */}
@@ -513,7 +513,7 @@ export default function PresentationPage() {
             href="https://aureldjoumessi.com/"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-white transition-colors"
+            className="text-[#3b82f6] hover:text-white transition-colors"
           >
             aureldjoumessi.com →
           </a>
