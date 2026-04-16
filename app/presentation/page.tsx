@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 // ─── Données ──────────────────────────────────────────────────────────────────
 
@@ -97,7 +97,7 @@ const ROLES = [
 ];
 
 const STATS = [
-  { value: '100 %',     label: 'Web — aucune installation',  icon: 'pi-globe'   },
+  { value: '100 %',     label: 'Web — accessible partout',  icon: 'pi-globe'   },
   { value: 'JWT',       label: 'Authentification sécurisée', icon: 'pi-lock'    },
   { value: 'RBAC',      label: "Contrôle d'accès par rôle",  icon: 'pi-sitemap' },
   { value: 'Excel & PDF', label: "Formats d'export",         icon: 'pi-file'    },
@@ -122,6 +122,28 @@ const PAYMENT_ITEMS = [
 ];
 
 // ─── Composants ───────────────────────────────────────────────────────────────
+
+function ScrollToTop() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 400);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <button
+      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      aria-label="Remonter en haut"
+      className="fixed bottom-6 right-6 z-50 w-11 h-11 rounded-full bg-[#1e3a8a] text-white shadow-lg hover:bg-[#1e40af] hover:shadow-xl transition-all duration-200 flex items-center justify-center"
+    >
+      <i className="pi pi-arrow-up text-sm" />
+    </button>
+  );
+}
 
 function Navbar() {
   const [open, setOpen] = useState(false);
@@ -218,6 +240,7 @@ export default function PresentationPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Navbar />
+      <ScrollToTop />
 
       {/* ── Hero ──────────────────────────────────────────────────────────────── */}
       <section className="pt-32 pb-20 px-4 bg-gradient-to-br from-[#1e3a8a] via-[#1e40af] to-[#3b82f6] text-white relative overflow-hidden">
