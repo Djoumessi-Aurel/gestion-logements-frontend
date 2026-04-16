@@ -451,10 +451,11 @@ export default function OccupationsPage() {
         )}
         {occ.contratFichierId && (
           <Button
-            icon={downloadingContratId === occ.id ? 'pi pi-spin pi-spinner' : 'pi pi-download'}
+            icon="pi pi-download"
             rounded text severity="info"
             tooltip="Télécharger contrat"
             tooltipOptions={{ position: 'top' }}
+            loading={downloadingContratId === occ.id}
             disabled={downloadingContratId !== null}
             onClick={() => downloadContrat(occ)}
           />
