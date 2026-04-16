@@ -181,9 +181,33 @@ function Navbar() {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Gestion de Logements',
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Web',
+  description:
+    "Application web de gestion locative : bâtiments, logements, locataires, paiements, arriérés, exports Excel et PDF.",
+  author: {
+    '@type': 'Person',
+    name: 'Aurel Djoumessi',
+    url: 'https://aureldjoumessi.com',
+  },
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'XAF',
+  },
+};
+
 export default function PresentationPage() {
   return (
     <div className="min-h-screen bg-white text-[#1e293b]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Navbar />
 
       {/* ── Hero ──────────────────────────────────────────────────────────────── */}
