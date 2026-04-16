@@ -25,7 +25,7 @@ import PageHeader from '@/components/shared/PageHeader';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import ErrorMessage from '@/components/shared/ErrorMessage';
 import { showConfirm } from '@/components/shared/ConfirmDialog';
-import { roleLabels, roleColors } from '../page';
+import { roleLabels, roleColors } from '@/utils/role';
 
 // ─── Utilitaires ──────────────────────────────────────────────────────────────
 

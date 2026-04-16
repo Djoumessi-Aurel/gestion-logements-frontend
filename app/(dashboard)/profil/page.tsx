@@ -12,7 +12,7 @@ import { AxiosError } from 'axios';
 
 import { authApi } from '@/services/auth.api';
 import { Role } from '@/types/enums';
-import { roleLabels, roleColors } from '@/app/(dashboard)/utilisateurs/page';
+import { roleLabels, roleColors } from '@/utils/role';
 
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
