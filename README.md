@@ -1,6 +1,6 @@
 # Gestion de Logements – Frontend
 
-Application web de gestion de logements à louer, développée avec Next.js 15 (App Router).
+Application web de gestion de logements à louer, développée avec Next.js 16 (App Router).
 
 ## Stack technique
 
