@@ -25,6 +25,20 @@ Le backend (branche `aurel-saas`) sert désormais plusieurs organisations client
 - En développement local (`localhost` / IP, pas de sous-domaine) : repli sur `NEXT_PUBLIC_DEV_TENANT_SLUG` (doit correspondre au `slug` d'une Organisation existante en base) — sinon aucun en-tête n'est envoyé.
 - Obligatoire côté backend pour `POST /auth/login` et `POST /auth/forgot-password` (routes non authentifiées) ; optionnel ailleurs (le JWT signé, qui porte `organisationId`, fait déjà foi — l'en-tête ne sert que de garde-fou de cohérence).
 
+### Accès à l'application par tenant
+
+URL d'un client (ex. "client1") : **`https://client1.<domaine-racine-du-frontend>`** — le premier label du hostname doit correspondre exactement (minuscules) au `slug` de son Organisation en base.
+
+**Aucun de ces prérequis n'est en place aujourd'hui** (déploiement actuel = domaine fixe `gestion-logements.aureldjoumessi.com`, pas de wildcard). Checklist avant de pouvoir basculer un client réel sur le backend `aurel-saas` :
+
+1. Domaine racine dédié au SaaS (ex. `monapp.com`) + **DNS wildcard** `*.monapp.com` pointant vers l'hébergement du frontend.
+2. Hébergeur du frontend configuré pour accepter ce wildcard (ex. Vercel : "Wildcard Domain", fonctionnalité payante — à vérifier selon l'hébergeur retenu).
+3. Backend : `SAAS_ROOT_DOMAIN=monapp.com` (autorise l'origine en CORS) + déploiement issu de `aurel-saas`.
+4. Frontend : `NEXT_PUBLIC_API_URL` → backend `aurel-saas`, et `NEXT_PUBLIC_MULTI_TENANT_BACKEND=true`.
+5. Organisation provisionnée en base : `npm run provision:org -- --slug client1 ...` (côté backend).
+
+Sans domaine wildcard dédié, alternative possible sans changer de domaine principal : sous-domaine à 4 labels type `client1.gestion-logements.aureldjoumessi.com` (`getTenantSlug()` ne lit que le premier label, donc ça fonctionne côté code) — mais il faut quand même configurer un wildcard DNS/hébergeur sur ce sous-domaine-là (point 1-2 ci-dessus, juste décalés d'un niveau).
+
 ## Couleurs principales (charte graphique)
 - Bleu principal : `#1e3a8a`
 - Bleu moyen : `#3b82f6`
