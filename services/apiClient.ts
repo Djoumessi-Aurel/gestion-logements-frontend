@@ -4,6 +4,7 @@ import { setCredentials, clearCredentials } from '@/store/authSlice';
 import { setSessionExpired } from '@/store/uiSlice';
 import { Role } from '@/types/enums';
 import { setAccessTokenCookie, clearAccessTokenCookie } from '@/utils/cookies';
+import { getTenantSlug } from '@/utils/tenant';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000';
 
@@ -12,12 +13,19 @@ const apiClient = axios.create({
   withCredentials: true, // nécessaire pour envoyer le cookie HttpOnly refresh_token
 });
 
-// ─── Intercepteur request : injecter le Bearer token ─────────────────────────
+// ─── Intercepteur request : injecter le Bearer token + le slug de l'organisation ──
+// X-Tenant-Slug est requis par le backend multi-tenant sur /auth/login et
+// /auth/forgot-password (routes non authentifiées) ; optionnel ailleurs (le JWT fait
+// déjà foi, l'en-tête ne sert que de garde-fou côté backend).
 
 apiClient.interceptors.request.use((config) => {
   const token = store.getState().auth.accessToken;
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+  }
+  const tenantSlug = getTenantSlug();
+  if (tenantSlug) {
+    config.headers['X-Tenant-Slug'] = tenantSlug;
   }
   return config;
 });

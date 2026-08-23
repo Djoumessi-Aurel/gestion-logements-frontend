@@ -5,7 +5,7 @@
 - **État global** : Redux Toolkit + redux-persist chiffré (CryptoJS)
 - **Styles** : TailwindCSS (utilitaires) + SCSS (cas complexes)
 - **Composants UI** : PrimeReact (composant par défaut pour tout) + PrimeIcons
-- **Client HTTP** : Axios avec intercepteurs JWT (refresh auto sur 401)
+- **Client HTTP** : Axios avec intercepteurs JWT (refresh auto sur 401) + en-tête `X-Tenant-Slug` (multi-tenance SaaS, voir section dédiée)
 - **Graphiques** : PrimeReact Charts ou recharts
 - **Validation formulaires** : react-hook-form + zod (ou yup)
 
@@ -15,6 +15,15 @@ NEXT_PUBLIC_API_URL=http://localhost:3000   ← à adapter selon l'environnement
 ```
 
 Documentation Swagger : `GET /api/docs` (utile pour debug)
+
+## Multi-tenance (SaaS)
+
+Le backend (branche `aurel-saas`) sert désormais plusieurs organisations clientes depuis un seul déploiement, identifiées par sous-domaine (`client1.monapp.com`). Quand activé, le frontend envoie l'en-tête `X-Tenant-Slug` sur **chaque** requête API, dans l'intercepteur request d'`apiClient.ts` (`services/apiClient.ts`) :
+
+- **Opt-in obligatoire** via `NEXT_PUBLIC_MULTI_TENANT_BACKEND=true` — à activer **uniquement** si `NEXT_PUBLIC_API_URL` pointe vers un backend issu de `aurel-saas` (ou toute branche dont le CORS `allowedHeaders` inclut `X-Tenant-Slug`). ⚠️ Sur un backend non multi-tenant (branche `main`, ex. déploiement actuel sur Render), ce CORS n'autorise que `Content-Type` et `Authorization` — envoyer `X-Tenant-Slug` (en-tête "non simple") ferait échouer le preflight CORS et **bloquerait toutes les requêtes côté navigateur**, pas juste être ignoré côté serveur. Ne jamais activer ce flag sans avoir vérifié le CORS du backend ciblé.
+- Slug déduit de `window.location.hostname` via `getTenantSlug()` (`utils/tenant.ts`) : premier label du sous-domaine (`client1.monapp.com` → `client1`). Ne pas se fier à la forme du hostname seule pour décider d'activer l'en-tête — un hostname de prod peut avoir un sous-domaine (ex: `gestion-logements.aureldjoumessi.com`) sans que le backend ciblé soit multi-tenant, d'où l'opt-in explicite ci-dessus.
+- En développement local (`localhost` / IP, pas de sous-domaine) : repli sur `NEXT_PUBLIC_DEV_TENANT_SLUG` (doit correspondre au `slug` d'une Organisation existante en base) — sinon aucun en-tête n'est envoyé.
+- Obligatoire côté backend pour `POST /auth/login` et `POST /auth/forgot-password` (routes non authentifiées) ; optionnel ailleurs (le JWT signé, qui porte `organisationId`, fait déjà foi — l'en-tête ne sert que de garde-fou de cohérence).
 
 ## Couleurs principales (charte graphique)
 - Bleu principal : `#1e3a8a`
@@ -687,6 +696,8 @@ GET /config   →   accès public, aucun token requis
 ```
 NEXT_PUBLIC_API_URL=http://localhost:3000
 NEXT_PUBLIC_CRYPTO_SECRET=...    ← clé de chiffrement redux-persist
+NEXT_PUBLIC_MULTI_TENANT_BACKEND=...  ← optionnel, "true" UNIQUEMENT si backend aurel-saas (voir section Multi-tenance — casse la prod sur un backend main)
+NEXT_PUBLIC_DEV_TENANT_SLUG=...  ← optionnel, multi-tenance en dev local (voir section dédiée)
 ```
 
 ---
@@ -752,6 +763,7 @@ F7.6
 
 ## Étapes complétées
 
+- Multi-tenance SaaS (adaptation frontend) ✓ — en-tête `X-Tenant-Slug` envoyé sur chaque requête quand `NEXT_PUBLIC_MULTI_TENANT_BACKEND=true` (`utils/tenant.ts` + `services/apiClient.ts`), slug déduit du sous-domaine ou de `NEXT_PUBLIC_DEV_TENANT_SLUG` en dev. Flag désactivé par défaut : le déploiement actuel sur Render (backend `main`, non multi-tenant) ne whitelist pas cet en-tête en CORS — l'activer sans backend `aurel-saas` en face casserait toutes les requêtes (preflight CORS rejeté par le navigateur). À activer seulement au moment de basculer `NEXT_PUBLIC_API_URL` vers un déploiement `aurel-saas`.
 - F7.5 : ExportModal intégré ✓
   - PageHeader étendu avec prop `actions?: ActionButton[]` (boutons secondaires outlined)
   - Bouton "Exporter" ajouté sur : `/paiements`, `/occupations`, `/logements`, `/locataires`, `/batiments`
