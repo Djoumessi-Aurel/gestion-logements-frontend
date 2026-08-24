@@ -92,7 +92,11 @@ export default function PaiementFormDialog({
   visible, onHide, occupations, logements, lockedOccupationId, toast, onSuccess,
 }: Props) {
   const [payOption,    setPayOption]    = useState<'option1' | 'option2'>('option1');
-  const [datePaiement, setDatePaiement] = useState('');
+  // Pré-rempli avec la date du jour côté client : si laissé tel quel, on envoie
+  // toujours explicitement cette date plutôt que de laisser le backend utiliser
+  // son propre "aujourd'hui" (qui peut différer de celui du client, ex: fuseaux
+  // horaires différents entre client et serveur).
+  const [datePaiement, setDatePaiement] = useState(toDateStr(new Date()));
   const [commentaire,  setCommentaire]  = useState('');
   const [submitting,   setSubmitting]   = useState(false);
 
@@ -115,7 +119,7 @@ export default function PaiementFormDialog({
   useEffect(() => {
     if (!visible) return;
     setPayOption('option1');
-    setDatePaiement('');
+    setDatePaiement(toDateStr(new Date()));
     setCommentaire('');
     opt1Form.reset({ occupationId: lockedOccupationId, nombreDeLoyers: 1 });
     opt2Form.reset({ occupationId: lockedOccupationId, montantPaye: undefined, finPeriode: '' });
