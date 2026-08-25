@@ -83,9 +83,11 @@ export default function Sidebar() {
       >
         {/* Logo / titre */}
         <div className="flex items-center gap-3 px-5 py-5 border-b border-white/10">
-          <div className="shrink-0 w-9 h-9 rounded-lg bg-white/15 flex items-center justify-center">
-            <i className="pi pi-building text-white text-lg" />
-          </div>
+          <img
+            src="/web-app-manifest-192x192.png"
+            alt="Gestion Logements"
+            className="shrink-0 w-9 h-9 rounded-lg"
+          />
           <span className="font-semibold text-base leading-tight">
             Gestion<br />Logements
           </span>

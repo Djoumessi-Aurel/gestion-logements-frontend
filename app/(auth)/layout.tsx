@@ -12,9 +12,11 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="w-full max-w-md flex-1 flex flex-col justify-center">
         {/* En-tête branding */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#1e3a8a] mb-4">
-            <i className="pi pi-building text-white text-2xl" />
-          </div>
+          <img
+            src="/web-app-manifest-192x192.png"
+            alt="Gestion de Logements"
+            className="inline-block w-14 h-14 rounded-2xl mb-4"
+          />
           <h1 className="text-2xl font-bold text-[#1e293b]">Gestion de Logements</h1>
           <p className="text-sm text-gray-500 mt-1">Plateforme de gestion locative</p>
         </div>

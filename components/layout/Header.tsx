@@ -52,7 +52,7 @@ export default function Header() {
 
       {/* Titre (desktop) */}
       <div className="hidden lg:flex items-center gap-2 text-[#1e293b] font-semibold text-base">
-        <i className="pi pi-building text-[#1e3a8a]" />
+        <img src="/web-app-manifest-192x192.png" alt="Gestion Logements" className="w-6 h-6 rounded-md" />
         <span>Gestion de Logements</span>
       </div>
 

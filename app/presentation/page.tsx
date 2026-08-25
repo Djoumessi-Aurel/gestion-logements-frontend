@@ -153,9 +153,11 @@ function Navbar() {
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
         <a href="/presentation" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-[#1e3a8a] flex items-center justify-center shrink-0">
-            <i className="pi pi-building text-white text-sm" />
-          </div>
+          <img
+            src="/web-app-manifest-192x192.png"
+            alt="Gestion Logements"
+            className="w-8 h-8 rounded-lg shrink-0"
+          />
           <span className="font-bold text-[#1e293b] text-sm leading-tight">
             Gestion<br />Logements
           </span>
@@ -516,9 +518,11 @@ export default function PresentationPage() {
       <footer className="bg-[#0f172a] text-gray-400 py-10 px-4">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-[#1e3a8a] flex items-center justify-center">
-              <i className="pi pi-building text-white text-xs" />
-            </div>
+            <img
+              src="/web-app-manifest-192x192.png"
+              alt="Gestion Logements"
+              className="w-7 h-7 rounded-lg"
+            />
             <span className="font-semibold text-white">Gestion Logements</span>
           </div>
           <p className="text-center">
