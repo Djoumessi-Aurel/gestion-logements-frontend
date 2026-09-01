@@ -20,7 +20,7 @@ Documentation Swagger : `GET /api/docs` (utile pour debug)
 
 Le backend (branche `aurel-saas`) sert désormais plusieurs organisations clientes depuis un seul déploiement, identifiées par sous-domaine (`client1.monapp.com`). Quand activé, le frontend envoie l'en-tête `X-Tenant-Slug` sur **chaque** requête API, dans l'intercepteur request d'`apiClient.ts` (`services/apiClient.ts`) :
 
-- **Opt-in obligatoire** via `NEXT_PUBLIC_MULTI_TENANT_BACKEND=true` — à activer **uniquement** si `NEXT_PUBLIC_API_URL` pointe vers un backend issu de `aurel-saas` (ou toute branche dont le CORS `allowedHeaders` inclut `X-Tenant-Slug`). ⚠️ Sur un backend non multi-tenant (branche `main`, ex. déploiement actuel sur Render), ce CORS n'autorise que `Content-Type` et `Authorization` — envoyer `X-Tenant-Slug` (en-tête "non simple") ferait échouer le preflight CORS et **bloquerait toutes les requêtes côté navigateur**, pas juste être ignoré côté serveur. Ne jamais activer ce flag sans avoir vérifié le CORS du backend ciblé.
+- **Opt-in obligatoire** via `NEXT_PUBLIC_MULTI_TENANT_BACKEND=true` — à activer **uniquement** si `NEXT_PUBLIC_API_URL` pointe vers un backend issu de `aurel-saas` (ou toute branche dont le CORS `allowedHeaders` inclut `X-Tenant-Slug`). ⚠️ Sur un backend non multi-tenant (branche `main`, c.-à-d. la pile classique), ce CORS n'autorise que `Content-Type` et `Authorization` — envoyer `X-Tenant-Slug` (en-tête "non simple") ferait échouer le preflight CORS et **bloquerait toutes les requêtes côté navigateur**, pas juste être ignoré côté serveur. Ne jamais activer ce flag sans avoir vérifié le CORS du backend ciblé.
 - Slug déduit de `window.location.hostname` via `getTenantSlug()` (`utils/tenant.ts`) : premier label du sous-domaine (`client1.monapp.com` → `client1`). Ne pas se fier à la forme du hostname seule pour décider d'activer l'en-tête — un hostname de prod peut avoir un sous-domaine (ex: `gestion-logements.aureldjoumessi.com`) sans que le backend ciblé soit multi-tenant, d'où l'opt-in explicite ci-dessus.
 - En développement local (`localhost` / IP, pas de sous-domaine) : repli sur `NEXT_PUBLIC_DEV_TENANT_SLUG` (doit correspondre au `slug` d'une Organisation existante en base) — sinon aucun en-tête n'est envoyé.
 - Obligatoire côté backend pour `POST /auth/login` et `POST /auth/forgot-password` (routes non authentifiées) ; optionnel ailleurs (le JWT signé, qui porte `organisationId`, fait déjà foi — l'en-tête ne sert que de garde-fou de cohérence).
@@ -29,7 +29,39 @@ Le backend (branche `aurel-saas`) sert désormais plusieurs organisations client
 
 URL d'un client (ex. "client1") : **`https://client1.<domaine-racine-du-frontend>`** — le premier label du hostname doit correspondre exactement (minuscules) au `slug` de son Organisation en base.
 
-**Aucun de ces prérequis n'est en place aujourd'hui** (déploiement actuel = domaine fixe `gestion-logements.aureldjoumessi.com`, pas de wildcard). Checklist avant de pouvoir basculer un client réel sur le backend `aurel-saas` :
+**✅ La bascule est en place.** Deux déploiements tournent en parallèle, chacun avec son backend :
+
+| | Pile classique | Pile SaaS |
+|---|---|---|
+| Frontend | `gestion-logements.aureldjoumessi.com` | `*.gestion-logements.aureldjoumessi.com` |
+| Backend | `gestion-logements-backend.onrender.com` (branche `main`) | `gestion-logements-saas.onrender.com` (branche `aurel-saas`) |
+| CORS `allowedHeaders` | `Content-Type, Authorization` | `Content-Type, Authorization, X-Tenant-Slug` |
+| `NEXT_PUBLIC_MULTI_TENANT_BACKEND` | non défini | `true` |
+
+Les deux piles sont étanches&nbsp;: l'avertissement CORS ci-dessus reste donc valable pour la
+pile classique, où le drapeau doit rester désactivé.
+
+C'est la variante «&nbsp;sous-domaine à 4 labels&nbsp;» décrite plus bas qui a été retenue,
+sans domaine racine dédié.
+
+**Vérifier l'état de la pile SaaS** sans identifiants, en deux commandes&nbsp;:
+
+```bash
+# 1. Le backend accepte-t-il l'en-tête ? (doit lister X-Tenant-Slug)
+curl -s -X OPTIONS https://gestion-logements-saas.onrender.com/auth/login \
+  -H "Origin: https://client1.gestion-logements.aureldjoumessi.com" \
+  -H "Access-Control-Request-Method: POST" \
+  -H "Access-Control-Request-Headers: x-tenant-slug" -D - -o /dev/null | grep -i allow-headers
+
+# 2. L'organisation est-elle provisionnée ?
+#    401 "Identifiants invalides"  → le tenant est résolu, l'organisation existe
+#    400 "Organisation introuvable" → le slug est inconnu en base
+curl -s -X POST https://gestion-logements-saas.onrender.com/auth/login \
+  -H "Content-Type: application/json" -H "X-Tenant-Slug: client1" \
+  -d '{"username":"x","password":"y"}'
+```
+
+Checklist d'origine, conservée pour ajouter un nouveau domaine racine ou refaire la bascule ailleurs :
 
 1. Domaine racine dédié au SaaS (ex. `monapp.com`) + **DNS wildcard** `*.monapp.com` pointant vers l'hébergement du frontend.
 2. Hébergeur du frontend configuré pour accepter ce wildcard (ex. Vercel : "Wildcard Domain", fonctionnalité payante — à vérifier selon l'hébergeur retenu).
@@ -37,7 +69,7 @@ URL d'un client (ex. "client1") : **`https://client1.<domaine-racine-du-frontend
 4. Frontend : `NEXT_PUBLIC_API_URL` → backend `aurel-saas`, et `NEXT_PUBLIC_MULTI_TENANT_BACKEND=true`.
 5. Organisation provisionnée en base : `npm run provision:org -- --slug client1 ...` (côté backend).
 
-Sans domaine wildcard dédié, alternative possible sans changer de domaine principal : sous-domaine à 4 labels type `client1.gestion-logements.aureldjoumessi.com` (`getTenantSlug()` ne lit que le premier label, donc ça fonctionne côté code) — mais il faut quand même configurer un wildcard DNS/hébergeur sur ce sous-domaine-là (point 1-2 ci-dessus, juste décalés d'un niveau).
+**C'est cette variante qui a été retenue en production**, sans domaine racine dédié : sous-domaine à 4 labels type `client1.gestion-logements.aureldjoumessi.com`. `getTenantSlug()` ne lisant que le premier label, le code fonctionne tel quel — le wildcard DNS et hébergeur est simplement configuré un niveau plus bas (points 1-2 décalés).
 
 ## Couleurs principales (charte graphique)
 - Bleu principal : `#1e3a8a`
@@ -869,7 +901,15 @@ cohérence visuelle fine et la vérification 375 / 768 / 1280 px page par page.
 - PWA + référencement ✓ — `@ducanh2912/next-pwa` (service worker généré au build,
   `next build --webpack`), page `/offline`, `robots.ts`, `sitemap.ts`, page publique
   `/presentation`.
-- Multi-tenance SaaS (adaptation frontend) ✓ — en-tête `X-Tenant-Slug` envoyé sur chaque requête quand `NEXT_PUBLIC_MULTI_TENANT_BACKEND=true` (`utils/tenant.ts` + `services/apiClient.ts`), slug déduit du sous-domaine ou de `NEXT_PUBLIC_DEV_TENANT_SLUG` en dev. Flag désactivé par défaut : le déploiement actuel sur Render (backend `main`, non multi-tenant) ne whitelist pas cet en-tête en CORS — l'activer sans backend `aurel-saas` en face casserait toutes les requêtes (preflight CORS rejeté par le navigateur). À activer seulement au moment de basculer `NEXT_PUBLIC_API_URL` vers un déploiement `aurel-saas`.
+- Multi-tenance SaaS ✓ — **en production**, sur une pile dédiée parallèle à la pile
+  classique (voir le tableau de la section « Accès à l'application par tenant »).
+  En-tête `X-Tenant-Slug` envoyé sur chaque requête quand
+  `NEXT_PUBLIC_MULTI_TENANT_BACKEND=true` (`utils/tenant.ts` + `services/apiClient.ts`),
+  slug déduit du premier label du sous-domaine ou de `NEXT_PUBLIC_DEV_TENANT_SLUG` en dev.
+  Le drapeau reste **désactivé sur la pile classique**, dont le backend (branche `main`)
+  ne whitelist pas cet en-tête en CORS : l'y activer casserait toutes les requêtes
+  (preflight rejeté par le navigateur). Les deux piles sont étanches, chacune avec son
+  backend et ses variables d'environnement.
 - F7.5 : ExportModal intégré ✓
   - PageHeader étendu avec prop `actions?: ActionButton[]` (boutons secondaires outlined)
   - Bouton "Exporter" ajouté sur : `/paiements`, `/occupations`, `/logements`, `/locataires`, `/batiments`
