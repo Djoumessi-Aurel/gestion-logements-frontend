@@ -82,13 +82,24 @@ app/
       page.tsx                ← Profil utilisateur + changement de mot de passe
     export/
       page.tsx
-middleware.ts                 ← Protection des routes (vérif JWT + rôle)
-store/                        ← Slices Redux (auth, ui, ...)
+  presentation/               ← Page publique de présentation (hors auth)
+    opengraph-image.tsx       ← Image de partage 1200×630 générée au build
+  offline/                    ← Fallback PWA hors-ligne
+  robots.ts  |  sitemap.ts    ← Route handlers SEO
+proxy.ts                      ← Protection des routes (vérif JWT + rôle)
+store/                        ← Slices Redux (auth, ui, config)
 services/                     ← Wrappers Axios par entité
-components/                   ← Composants réutilisables
-hooks/                        ← Hooks custom
+components/
+  layout/                     ← Sidebar, Header, SessionGuard, ConfigLoader
+  shared/                     ← Composants réutilisables
 types/                        ← Interfaces TypeScript partagées
+utils/                        ← Helpers partagés (date, format, error, role, ...)
 ```
+
+⚠️ Le fichier de protection des routes s'appelle **`proxy.ts`**, pas `middleware.ts` :
+c'est la convention Next.js 16. Ne pas le renommer.
+
+Il n'y a pas de dossier `hooks/` — aucun hook custom n'a été nécessaire à ce jour.
 
 ## Conventions de code
 - **Composants / Pages** : PascalCase (ex : `OccupationCard.tsx`)
@@ -221,8 +232,16 @@ export interface LocataireDashboard { locataireId: number; totalOccupations: num
 ### RBAC côté client
 - Décoder le JWT pour extraire le rôle (ou utiliser le champ `user.role` stocké en Redux)
 - Afficher **uniquement** les boutons/menus autorisés selon le rôle
-- Le middleware.ts vérifie la présence et la validité du JWT pour chaque route protégée
+- `proxy.ts` vérifie la présence du JWT et le rôle pour chaque route protégée
 - Ne pas faire confiance uniquement au frontend : le backend est la source de vérité
+- **Tester la hiérarchie des rôles uniquement via `hasMinRole(role, minRole)`**
+  (`utils/role.ts`), seul détenteur de l'ordre des rôles. Ne jamais réécrire de chaîne
+  `role === X || role === Y` : elles dérivent silencieusement du tableau RBAC ci-dessous.
+- Un rôle absent (store non encore réhydraté) n'a accès à rien : `hasMinRole` renvoie
+  `false`, ce qui masque par défaut plutôt que d'afficher un bouton avant de le retirer.
+- Le RBAC s'exprime le plus souvent en **booléen** (`const canEdit = hasMinRole(...)`),
+  car `PageHeader` attend `visible: boolean` et qu'un même droit pilote plusieurs
+  boutons. C'est la raison pour laquelle il n'existe pas de composant enveloppe.
 
 ### Tri et filtrage
 - Activer tri et filtrage sur **toutes** les listes de données (DataTable PrimeReact)
@@ -450,11 +469,21 @@ Accès : ADMIN_LOGEMENT+
 
 #### UC-OCC-07 : Télécharger contrat
 - Endpoint : `GET /occupations/:id/contrat`
-- Déclencher le téléchargement via streaming (utiliser `responseType: 'blob'`)
+- ⚠️ Le backend ne renvoie **pas** un flux mais une **URL signée temporaire**
+  (`{ url, fileName, mimeType, expiresIn }`). Utiliser `downloadFromSignedUrl()`
+  (`services/occupations.api.ts`), qui la récupère via `fetch` puis crée un blob URL
+  local — indispensable car l'attribut `download` d'un lien est ignoré en cross-origin.
 
 #### UC-OCC-08 : Voir arriérés d'une occupation
 - Endpoint : `GET /occupations/:id/arrieres`
 - Afficher si `data !== null` : période due, montant dû, nombre de loyers
+
+#### UC-OCC-09 : Dashboard occupation (`/occupations/[id]`)
+- Endpoint : `GET /occupations/:id/dashboard`
+- Afficher : statut (active/terminée), logement, locataire, loyer actuel, nombre et
+  montant total des paiements, dernier paiement, arriérés, historique des paiements
+- Chaque paiement de l'historique porte un booléen `enRetard` calculé par le backend
+- Accessible depuis le tableau de bord principal et la liste des occupations
 
 ---
 
@@ -497,9 +526,12 @@ Accès : ADMIN_LOGEMENT+
 - Erreur 422 : RG-07
 
 #### UC-PAI-05 : Upload preuves de paiement
-- FileUploader multiple : max 10 fichiers, max 5 Mo/fichier, MIME : PDF, images, Word
+- FileUploader multiple — limites et types MIME **fournis par `GET /config`**, jamais
+  codés en dur (voir la section « Module Config »)
 - Endpoint : `POST /paiements/:id/preuves` (champ `files`, array)
 - Remplacer toutes les preuves : `PATCH /paiements/:id/preuves`
+- Télécharger une preuve : `GET /paiements/:id/preuves/:fichierId` → URL signée,
+  même mécanisme que le contrat (UC-OCC-07)
 
 ---
 
@@ -565,6 +597,7 @@ Tous les exports retournent un fichier binaire (Blob) — utiliser `responseType
 | `/export/locataires`   | Locataires             | ADMIN_LOGEMENT |
 | `/export/batiments`    | Bâtiments              | ADMIN_BATIMENT |
 | `/export/occupations`  | Occupations            | ADMIN_LOGEMENT |
+| `/export/utilisateurs` | Utilisateurs           | ADMIN_LOGEMENT |
 | `/export/complet`      | Classeur multi-onglets | ADMIN_LOGEMENT |
 
 **Query params communs :** `format` (excel/pdf)*, `dateDebut`, `dateFin`, `batimentId`, `logementId`
@@ -656,7 +689,25 @@ GET /config   →   accès public, aucun token requis
 }
 ```
 
-**Règle d'implémentation :** stocker ces valeurs dans le Redux store (`uiSlice` ou slice dédié `configSlice`) dès le démarrage. Le composant `FileUploader` les lit depuis Redux pour sa validation côté client. Ne jamais hardcoder ces limites dans le frontend.
+**Règle d'implémentation :** stocker ces valeurs dans le Redux store (`configSlice`) dès le démarrage. Le composant `FileUploader` les lit depuis Redux pour sa validation côté client. Ne jamais hardcoder ces limites dans le frontend.
+
+**Implémentation en place :** `components/layout/ConfigLoader.tsx` appelle la route au
+montage du layout dashboard et alimente `configSlice`. Monté là plutôt qu'à la racine :
+seuls les écrans authentifiés utilisent `FileUploader`, et cela évite de réveiller
+l'API depuis la page publique `/presentation`. Il **retente trois fois** (2 s, 5 s,
+15 s) car l'API de production démarre à froid en une quarantaine de secondes.
+
+`configSlice` n'est **pas** persisté (absent de la whitelist redux-persist) : les
+limites sont rechargées à chaque démarrage, pour qu'un changement des variables
+`UPLOAD_*` côté backend soit pris en compte sans purger le storage du client.
+
+⚠️ **Aucune valeur de repli n'est autorisée dans `FileUploader`.** Tant que les limites
+sont inconnues, le composant affiche un état de chargement (ou l'erreur) au lieu d'une
+zone de dépôt. Motif : les valeurs codées en dur avaient déjà divergé de la réalité —
+le backend déployé accepte 5 Mo par contrat, 4 Mo et 5 fichiers par preuve, là où le
+frontend annonçait 10 Mo, 5 Mo et 10 fichiers. L'utilisateur sélectionnait donc des
+fichiers que le serveur refusait ensuite, et une liste MIME vide désactivait
+silencieusement tout filtrage de format.
 
 ---
 
@@ -693,16 +744,27 @@ GET /config   →   accès public, aucun token requis
 
 ---
 
-## Composants partagés à créer (Phase F5.7)
-- `PageHeader` : titre + breadcrumb + bouton d'action contextuel
+## Composants partagés (Phase F5.7)
+
+`components/shared/` :
+
+- `PageHeader` : titre + breadcrumb + bouton d'action principal (`action`) et boutons secondaires (`actions[]`), chacun masquable via `visible: boolean`
 - `DataTableWrapper` : PrimeReact DataTable avec tri/filtre/pagination préconfigurés
 - `StatusBadge` : badge coloré (Occupé/Libre, À jour/Arriéré, Actif/Inactif)
-- `ConfirmDialog` : confirmation avant suppression
+- `ConfirmDialog` : `showConfirm()` impératif + `ConfirmDialogProvider` monté une fois dans le layout
 - `LoadingSpinner` / `SkeletonLoader`
-- `ErrorMessage` : affichage erreurs API
-- `FileUploader` : upload avec prévisualisation + validation MIME/taille (côté client avant envoi)
-- `ExportModal` : choix format (Excel/PDF) + période + périmètre + bouton télécharger
-- `RoleGuard` : composant React qui affiche ses enfants uniquement si le rôle est autorisé
+- `ErrorMessage` : affichage erreurs API + bouton Réessayer
+- `FileUploader` : upload avec prévisualisation + validation MIME/taille lue depuis `configSlice`
+- `ExportModal` : choix format (Excel/PDF) + périmètre + bouton télécharger
+- `PaiementFormDialog` : formulaire paiement Option 1 / Option 2 avec calcul temps réel
+- `Logo` : logo applicatif via `next/image` — **seul point d'usage de l'image de marque**
+
+`components/layout/` : `Sidebar`, `Header`, `SessionGuard`, `ConfigLoader`.
+
+> Il n'existe volontairement **pas** de composant `RoleGuard`. Le RBAC client s'exprime
+> en booléen (`const canEdit = hasMinRole(role, Role.ADMIN_BATIMENT)`) parce que
+> `PageHeader` attend `visible: boolean` et qu'un même droit pilote plusieurs boutons —
+> ce qu'un composant enveloppant des enfants ne peut pas exprimer.
 
 ---
 
@@ -710,6 +772,10 @@ GET /config   →   accès public, aucun token requis
 ```
 NEXT_PUBLIC_API_URL=http://localhost:3000
 NEXT_PUBLIC_CRYPTO_SECRET=...    ← clé de chiffrement redux-persist
+NEXT_PUBLIC_SITE_URL=...         ← URL publique du frontend. Sert de metadataBase (URLs
+                                   absolues og:image / og:url) + sitemap.xml + robots.txt.
+                                   Obligatoire en production : sans elle, les aperçus de
+                                   partage pointent vers localhost.
 NEXT_PUBLIC_MULTI_TENANT_BACKEND=...  ← optionnel, "true" UNIQUEMENT si backend aurel-saas (voir section Multi-tenance — casse la prod sur un backend main)
 NEXT_PUBLIC_DEV_TENANT_SLUG=...  ← optionnel, multi-tenance en dev local (voir section dédiée)
 ```
@@ -731,7 +797,7 @@ NEXT_PUBLIC_DEV_TENANT_SLUG=...  ← optionnel, multi-tenance en dev local (voir
   - Gérer la rotation du cookie `refresh_token` (cookie HttpOnly, path `/auth`)
 - F5.3 : Services API frontend typés (un fichier par entité dans `services/`)
   - `auth.api.ts`, `users.api.ts`, `batiments.api.ts`, `logements.api.ts`, `locataires.api.ts`, `occupations.api.ts`, `paiements.api.ts`, `dashboard.api.ts`, `export.api.ts`
-- F5.4 : `middleware.ts` – protection des routes + vérification rôle JWT
+- F5.4 : `proxy.ts` (ex-`middleware.ts`, convention Next.js 16) – protection des routes + vérification rôle JWT
   - Routes publiques : `/login`, `/forgot-password`, `/reset-password`
   - LOCATAIRE → redirect `/locataire`, autres rôles → dashboard
 - F5.5 : Layouts (racine, `(auth)`, `(dashboard)` avec sidebar + header + footer + notification session expirée)
@@ -742,7 +808,7 @@ NEXT_PUBLIC_DEV_TENANT_SLUG=...  ← optionnel, multi-tenance en dev local (voir
   - Mot de passe oublié (`/forgot-password`) : UC-AUTH-02
   - Réinitialisation (`/reset-password`) : UC-AUTH-03
   - Changement mot de passe (dans `/profil`) : UC-AUTH-04
-- F5.7 : Composants partagés (PageHeader, DataTableWrapper, StatusBadge, ConfirmDialog, LoadingSpinner, ErrorMessage, FileUploader, ExportModal, RoleGuard)
+- F5.7 : Composants partagés (PageHeader, DataTableWrapper, StatusBadge, ConfirmDialog, LoadingSpinner, ErrorMessage, FileUploader, ExportModal, Logo)
 - F5.8 : Types TypeScript partagés dans `types/` (toutes les interfaces des entités)
 
 ### Phase 6 – Pages métier (CRUD)
@@ -773,10 +839,36 @@ NEXT_PUBLIC_DEV_TENANT_SLUG=...  ← optionnel, multi-tenance en dev local (voir
 ---
 
 ## Étape en cours
-F7.6
+F7.6 — responsive & polish UI. Les breakpoints sont en place partout ; reste la
+cohérence visuelle fine et la vérification 375 / 768 / 1280 px page par page.
 
 ## Étapes complétées
 
+- Qualité du code — passe de consolidation ✓
+  - **Helpers centralisés dans `utils/`** : 51 définitions dupliquées à l'identique dans
+    16 fichiers (`formatMontant`, `formatDate`, `toDateStr`, `extractError`, `addPeriode`,
+    `formatSize`, `generatePassword`, `rolesForAdmin`…) remplacées par `utils/date.ts`,
+    `utils/format.ts`, `utils/error.ts`, `utils/password.ts` et `utils/role.ts`.
+    `extractError` adopte partout la variante qui lit `errors[0].message` avant `message` :
+    seule `/profil` le faisait, les autres pages affichaient le message générique des 400.
+    `labelPeriode` / `labelPeriodeCourt` restent distincts (forme courte pour les colonnes
+    de DataTable).
+  - **`RoleGuard` supprimé, `hasMinRole` introduit** — voir la note dans « Composants
+    partagés ». Élimine trois définitions incompatibles de l'ordre des rôles (RoleGuard,
+    Sidebar, page Export) et 17 chaînes hiérarchiques écrites à la main. Corrige au passage
+    l'affichage fugace des boutons d'écriture sur `/locataires` avant réhydratation du store.
+  - **`GET /config` réellement appelé** (`ConfigLoader`) — voir « Module Config ».
+  - **`npm run lint` propre** : 123 avertissements → 0. `public/**` ignoré (bundles
+    next-pwa minifiés = 110 des 123), directives `eslint-disable` mortes retirées,
+    3 `exhaustive-deps` réels corrigés par `useCallback`, convention `^_` formalisée.
+  - Composant `Logo` (`next/image`) remplaçant 5 `<img>` du même PNG de 62 Ko affiché
+    entre 24 et 56 px.
+- Métadonnées Open Graph ✓ — `metadataBase` dans `app/layout.tsx` + image de partage
+  1200×630 générée par `app/presentation/opengraph-image.tsx` (`next/og`). Sans `og:image`,
+  WhatsApp n'affiche aucune carte de prévisualisation, seulement le nom de domaine.
+- PWA + référencement ✓ — `@ducanh2912/next-pwa` (service worker généré au build,
+  `next build --webpack`), page `/offline`, `robots.ts`, `sitemap.ts`, page publique
+  `/presentation`.
 - Multi-tenance SaaS (adaptation frontend) ✓ — en-tête `X-Tenant-Slug` envoyé sur chaque requête quand `NEXT_PUBLIC_MULTI_TENANT_BACKEND=true` (`utils/tenant.ts` + `services/apiClient.ts`), slug déduit du sous-domaine ou de `NEXT_PUBLIC_DEV_TENANT_SLUG` en dev. Flag désactivé par défaut : le déploiement actuel sur Render (backend `main`, non multi-tenant) ne whitelist pas cet en-tête en CORS — l'activer sans backend `aurel-saas` en face casserait toutes les requêtes (preflight CORS rejeté par le navigateur). À activer seulement au moment de basculer `NEXT_PUBLIC_API_URL` vers un déploiement `aurel-saas`.
 - F7.5 : ExportModal intégré ✓
   - PageHeader étendu avec prop `actions?: ActionButton[]` (boutons secondaires outlined)
@@ -810,7 +902,7 @@ F7.6
   - `/login` : react-hook-form + zod, setAccessTokenCookie au succès, redirect par rôle, erreurs 401/429
   - `/forgot-password` : message générique toujours affiché (ne révèle pas l'existence du compte), erreur 429
   - `/reset-password` : lit `?token=` via useSearchParams (Suspense), confirmation mot de passe, erreur 400/429
-- F5.7 : Composants partagés ✓ (PageHeader, DataTableWrapper, StatusBadge, ConfirmDialog, LoadingSpinner, ErrorMessage, FileUploader, ExportModal, RoleGuard)
+- F5.7 : Composants partagés ✓ (PageHeader, DataTableWrapper, StatusBadge, ConfirmDialog, LoadingSpinner, ErrorMessage, FileUploader, ExportModal, PaiementFormDialog, Logo)
 - F5.8 : Types TypeScript partagés dans `types/` ✓
 - F6.1 : Pages Bâtiments ✓ (liste CRUD + dashboard `/batiments/[id]`)
 - F6.2 : Pages Logements ✓
