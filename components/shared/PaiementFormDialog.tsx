@@ -13,12 +13,13 @@ import { Toast } from 'primereact/toast';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AxiosError } from 'axios';
 
 import type { Occupation } from '@/types/occupation';
 import type { Logement, Loyer } from '@/types/logement';
-import { PeriodeType } from '@/types/enums';
 import { paiementsApi } from '@/services/paiements.api';
+import { formatMontant } from '@/utils/format';
+import { formatDate, toDateStr, addPeriode } from '@/utils/date';
+import { extractError } from '@/utils/error';
 
 // ─── Schémas (champs obligatoires uniquement) ──────────────────────────────────
 
@@ -36,35 +37,7 @@ const opt2Schema = z.object({
 type Opt1Values = z.infer<typeof opt1Schema>;
 type Opt2Values = z.infer<typeof opt2Schema>;
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function addPeriode(date: Date, nombre: number, type: PeriodeType): Date {
-  const d = new Date(date);
-  if (type === PeriodeType.JOUR)    d.setDate(d.getDate() + nombre);
-  if (type === PeriodeType.SEMAINE) d.setDate(d.getDate() + nombre * 7);
-  if (type === PeriodeType.MOIS)    d.setMonth(d.getMonth() + nombre);
-  if (type === PeriodeType.ANNEE)   d.setFullYear(d.getFullYear() + nombre);
-  return d;
-}
-
-function toDateStr(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
-
-function formatDate(val: string): string {
-  return new Date(val).toLocaleDateString('fr-FR');
-}
-
-function formatMontant(val: number): string {
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency', currency: 'XAF', maximumFractionDigits: 0,
-  }).format(val);
-}
-
-function extractError(err: unknown, fallback: string): string {
-  if (err instanceof AxiosError) return err.response?.data?.message ?? fallback;
-  return fallback;
-}
+// ─── Constantes ───────────────────────────────────────────────────────────────
 
 const TOGGLE_OPTIONS = [
   { label: 'Par nombre de loyers', value: 'option1' },

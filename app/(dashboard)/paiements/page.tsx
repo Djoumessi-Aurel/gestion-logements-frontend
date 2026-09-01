@@ -13,7 +13,6 @@ import { Toast } from 'primereact/toast';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AxiosError } from 'axios';
 import type { DataTablePageEvent } from 'primereact/datatable';
 
 import { paiementsApi } from '@/services/paiements.api';
@@ -32,6 +31,9 @@ import { showConfirm } from '@/components/shared/ConfirmDialog';
 import FileUploader from '@/components/shared/FileUploader';
 import ExportModal from '@/components/shared/ExportModal';
 import PaiementFormDialog from '@/components/shared/PaiementFormDialog';
+import { formatMontant, formatSize, mimeIcon } from '@/utils/format';
+import { formatDate, toDateStr } from '@/utils/date';
+import { extractError } from '@/utils/error';
 
 // ─── Schéma édition ───────────────────────────────────────────────────────────
 
@@ -44,38 +46,7 @@ const editSchema = z.object({
 
 type EditFormValues = z.infer<typeof editSchema>;
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function toDateStr(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
-
-function formatDate(val: string): string {
-  return new Date(val).toLocaleDateString('fr-FR');
-}
-
-function formatMontant(val: number): string {
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency', currency: 'XAF', maximumFractionDigits: 0,
-  }).format(val);
-}
-
-function extractError(err: unknown, fallback: string): string {
-  if (err instanceof AxiosError) return err.response?.data?.message ?? fallback;
-  return fallback;
-}
-
-function formatSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} o`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} Ko`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`;
-}
-
-function mimeIcon(mimeType: string): string {
-  if (mimeType === 'application/pdf') return 'pi pi-file-pdf';
-  if (mimeType.startsWith('image/'))  return 'pi pi-image';
-  return 'pi pi-file';
-}
+// ─── Constantes ───────────────────────────────────────────────────────────────
 
 const PREUVES_OPTIONS = [
   { label: 'Ajouter',       value: 'add'     },

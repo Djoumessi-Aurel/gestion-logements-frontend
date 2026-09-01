@@ -11,7 +11,6 @@ import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { AxiosError } from 'axios';
 
 import { locatairesApi } from '@/services/locataires.api';
 import { occupationsApi } from '@/services/occupations.api';
@@ -27,6 +26,8 @@ import ExportModal from '@/components/shared/ExportModal';
 import DataTableWrapper from '@/components/shared/DataTableWrapper';
 import StatusBadge from '@/components/shared/StatusBadge';
 import { showConfirm } from '@/components/shared/ConfirmDialog';
+import { formatDate, isDatePassee } from '@/utils/date';
+import { extractError } from '@/utils/error';
 
 // ─── Schémas ──────────────────────────────────────────────────────────────────
 
@@ -48,21 +49,6 @@ const editSchema = z.object({
 
 type CreateFormValues = z.infer<typeof createSchema>;
 type EditFormValues   = z.infer<typeof editSchema>;
-
-// ─── Utilitaires ──────────────────────────────────────────────────────────────
-
-function formatDate(val: string): string {
-  return new Date(val).toLocaleDateString('fr-FR');
-}
-
-function isDatePast(dateStr: string): boolean {
-  return new Date(dateStr) < new Date(new Date().toDateString());
-}
-
-function extractError(err: unknown, fallback: string): string {
-  if (err instanceof AxiosError) return err.response?.data?.message ?? fallback;
-  return fallback;
-}
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -241,7 +227,7 @@ export default function LocatairesPage() {
   function dernierJourBody(loc: Locataire) {
     const occ = occMap.get(loc.id);
     if (!occ) return <span className="text-gray-400 text-sm">—</span>;
-    const late = isDatePast(occ.dateDernierJourCouvert);
+    const late = isDatePassee(occ.dateDernierJourCouvert);
     return (
       <span className={`text-sm font-medium ${late ? 'text-red-600' : 'text-green-700'}`}>
         {formatDate(occ.dateDernierJourCouvert)}

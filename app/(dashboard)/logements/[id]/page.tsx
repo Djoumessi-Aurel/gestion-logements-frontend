@@ -26,6 +26,9 @@ import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import ErrorMessage from '@/components/shared/ErrorMessage';
 import StatusBadge from '@/components/shared/StatusBadge';
 import DataTableWrapper from '@/components/shared/DataTableWrapper';
+import { formatMontant, labelPeriode } from '@/utils/format';
+import { formatDate, toDateStr } from '@/utils/date';
+import { extractError } from '@/utils/error';
 
 // ─── Schéma ajout loyer ───────────────────────────────────────────────────────
 
@@ -47,37 +50,7 @@ const PERIODE_OPTIONS = [
   { label: 'Année(s)',   value: PeriodeType.ANNEE },
 ];
 
-// ─── Utilitaires ──────────────────────────────────────────────────────────────
-
-function formatMontant(val: number): string {
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency', currency: 'XAF', maximumFractionDigits: 0,
-  }).format(val);
-}
-
-function formatDate(val: string): string {
-  return new Date(val).toLocaleDateString('fr-FR');
-}
-
-function labelPeriode(nombre: number, type: PeriodeType): string {
-  const labels: Record<PeriodeType, string> = {
-    [PeriodeType.JOUR]:    'jour(s)',
-    [PeriodeType.SEMAINE]: 'semaine(s)',
-    [PeriodeType.MOIS]:    'mois',
-    [PeriodeType.ANNEE]:   'an(s)',
-  };
-  return `${nombre} ${labels[type]}`;
-}
-
-function extractError(err: unknown, fallback: string): string {
-  if (err instanceof AxiosError) return err.response?.data?.message ?? fallback;
-  return fallback;
-}
-
-// Formatage local pour éviter le décalage UTC lors de la sélection de date
-function toDateStr(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
+// ─── Sous-composants ──────────────────────────────────────────────────────────
 
 function KpiCard({ label, value, color }: { label: string; value: string | number; color?: string }) {
   return (

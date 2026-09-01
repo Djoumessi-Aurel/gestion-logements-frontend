@@ -11,7 +11,6 @@ import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { AxiosError } from 'axios';
 
 import { batimentsApi } from '@/services/batiments.api';
 import type { Batiment, CreateBatimentDto } from '@/types/batiment';
@@ -23,6 +22,7 @@ import DataTableWrapper from '@/components/shared/DataTableWrapper';
 import RoleGuard from '@/components/shared/RoleGuard';
 import { showConfirm } from '@/components/shared/ConfirmDialog';
 import { useAppSelector } from '@/store/hooks';
+import { extractError } from '@/utils/error';
 
 // ─── Schéma de validation ─────────────────────────────────────────────────────
 
@@ -33,16 +33,6 @@ const schema = z.object({
 });
 
 type FormValues = z.infer<typeof schema>;
-
-// ─── Utilitaires ──────────────────────────────────────────────────────────────
-
-function extractError(err: unknown, fallback: string): string {
-  if (err instanceof AxiosError) {
-    const data = err.response?.data;
-    return data?.message ?? fallback;
-  }
-  return fallback;
-}
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 

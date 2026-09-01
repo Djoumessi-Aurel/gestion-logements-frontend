@@ -14,7 +14,6 @@ import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { AxiosError } from 'axios';
 
 import { logementsApi } from '@/services/logements.api';
 import { batimentsApi } from '@/services/batiments.api';
@@ -32,6 +31,9 @@ import DataTableWrapper from '@/components/shared/DataTableWrapper';
 import StatusBadge from '@/components/shared/StatusBadge';
 import { showConfirm } from '@/components/shared/ConfirmDialog';
 import ExportModal from '@/components/shared/ExportModal';
+import { formatMontant, labelPeriodeCourt } from '@/utils/format';
+import { formatDate, toDateStr } from '@/utils/date';
+import { extractError } from '@/utils/error';
 
 // ─── Schémas ──────────────────────────────────────────────────────────────────
 
@@ -67,39 +69,6 @@ const PERIODE_OPTIONS = [
   { label: 'Mois',       value: PeriodeType.MOIS },
   { label: 'Année(s)',   value: PeriodeType.ANNEE },
 ];
-
-// ─── Utilitaires ──────────────────────────────────────────────────────────────
-
-
-function formatMontant(val: number): string {
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency', currency: 'XAF', maximumFractionDigits: 0,
-  }).format(val);
-}
-
-function formatDate(val: string): string {
-  return new Date(val).toLocaleDateString('fr-FR');
-}
-
-function labelPeriode(nombre: number, type: PeriodeType): string {
-  const labels: Record<PeriodeType, string> = {
-    [PeriodeType.JOUR]:    'j',
-    [PeriodeType.SEMAINE]: 'sem',
-    [PeriodeType.MOIS]:    'mois',
-    [PeriodeType.ANNEE]:   'an',
-  };
-  return `${nombre} ${labels[type]}`;
-}
-
-function extractError(err: unknown, fallback: string): string {
-  if (err instanceof AxiosError) return err.response?.data?.message ?? fallback;
-  return fallback;
-}
-
-// Formatage local pour éviter le décalage UTC lors de la sélection de date
-function toDateStr(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -432,7 +401,7 @@ export default function LogementsPage() {
                 <span className="text-sm font-medium">
                   {formatMontant(l.loyerActuel.montant)}
                   <span className="text-gray-400 ml-1">
-                    / {labelPeriode(l.loyerActuel.periodeNombre, l.loyerActuel.periodeType)}
+                    / {labelPeriodeCourt(l.loyerActuel.periodeNombre, l.loyerActuel.periodeType)}
                   </span>
                 </span>
               );

@@ -17,27 +17,8 @@ import PageHeader from '@/components/shared/PageHeader';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import ErrorMessage from '@/components/shared/ErrorMessage';
 import DataTableWrapper from '@/components/shared/DataTableWrapper';
-
-// ─── Utilitaires ──────────────────────────────────────────────────────────────
-
-function formatMontant(val: number): string {
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency', currency: 'XAF', maximumFractionDigits: 0,
-  }).format(val);
-}
-
-function formatDate(val: string): string {
-  return new Date(val).toLocaleDateString('fr-FR');
-}
-
-/** Retourne true si le dernier jour couvert est dépassé (arriéré). */
-function isArriereDate(dateDernierJourCouvert: string): boolean {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const lastDay = new Date(dateDernierJourCouvert);
-  lastDay.setHours(0, 0, 0, 0);
-  return lastDay < today;
-}
+import { formatMontant } from '@/utils/format';
+import { formatDate, isDatePassee } from '@/utils/date';
 
 // ─── Sous-composants ──────────────────────────────────────────────────────────
 
@@ -192,7 +173,7 @@ export default function DashboardPage() {
           <Column
             header="Statut"
             body={(occ: Occupation) => {
-              const retard = isArriereDate(occ.dateDernierJourCouvert);
+              const retard = isDatePassee(occ.dateDernierJourCouvert);
               return (
                 <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${
                   retard
@@ -239,7 +220,7 @@ export default function DashboardPage() {
           <Column
             header="Dernier jour couvert"
             body={(occ: Occupation) => {
-              const retard = isArriereDate(occ.dateDernierJourCouvert);
+              const retard = isDatePassee(occ.dateDernierJourCouvert);
               return (
                 <span className={`text-sm font-medium ${retard ? 'text-[#991b1b]' : 'text-[#166534]'}`}>
                   {formatDate(occ.dateDernierJourCouvert)}

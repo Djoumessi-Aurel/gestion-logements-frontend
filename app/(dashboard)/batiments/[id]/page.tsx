@@ -19,12 +19,9 @@ import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import ErrorMessage from '@/components/shared/ErrorMessage';
 import StatusBadge from '@/components/shared/StatusBadge';
 import DataTableWrapper from '@/components/shared/DataTableWrapper';
+import { formatMontant } from '@/utils/format';
 
-// ─── Utilitaires ──────────────────────────────────────────────────────────────
-
-function formatMontant(val: number): string {
-  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XAF', maximumFractionDigits: 0 }).format(val);
-}
+// ─── Sous-composants ──────────────────────────────────────────────────────────
 
 function KpiCard({ label, value, sub, color }: { label: string; value: string | number; sub?: string; color?: string }) {
   return (

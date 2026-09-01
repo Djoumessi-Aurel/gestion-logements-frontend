@@ -11,7 +11,6 @@ import { Toast } from 'primereact/toast';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AxiosError } from 'axios';
 
 import { usersApi } from '@/services/users.api';
 import type { Utilisateur } from '@/types/utilisateur';
@@ -23,36 +22,9 @@ import DataTableWrapper from '@/components/shared/DataTableWrapper';
 import { showConfirm } from '@/components/shared/ConfirmDialog';
 import ExportModal from '@/components/shared/ExportModal';
 
-// ─── Utilitaires ──────────────────────────────────────────────────────────────
-
-import { roleLabels, roleColors } from '@/utils/role';
-
-function generatePassword(): string {
-  const upper   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  const lower   = 'abcdefghijklmnopqrstuvwxyz';
-  const digits  = '0123456789';
-  const special = '@#$!%*?';
-  const all     = upper + lower + digits + special;
-  const mandatory = [
-    upper[Math.floor(Math.random() * upper.length)],
-    lower[Math.floor(Math.random() * lower.length)],
-    digits[Math.floor(Math.random() * digits.length)],
-    special[Math.floor(Math.random() * special.length)],
-  ];
-  const rest = Array.from({ length: 8 }, () => all[Math.floor(Math.random() * all.length)]);
-  return [...mandatory, ...rest].sort(() => Math.random() - 0.5).join('');
-}
-
-function extractError(err: unknown, fallback: string): string {
-  if (err instanceof AxiosError) return err.response?.data?.message ?? fallback;
-  return fallback;
-}
-
-function rolesForAdmin(role: Role | undefined): Role[] {
-  if (role === Role.ADMIN_GLOBAL)   return [Role.LOCATAIRE, Role.ADMIN_LOGEMENT, Role.ADMIN_BATIMENT, Role.ADMIN_GLOBAL];
-  if (role === Role.ADMIN_BATIMENT) return [Role.LOCATAIRE, Role.ADMIN_LOGEMENT];
-  return [Role.LOCATAIRE];
-}
+import { roleLabels, roleColors, rolesForAdmin } from '@/utils/role';
+import { generatePassword } from '@/utils/password';
+import { extractError } from '@/utils/error';
 
 // ─── Schéma ───────────────────────────────────────────────────────────────────
 

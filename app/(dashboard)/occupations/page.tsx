@@ -13,7 +13,6 @@ import { Toast } from 'primereact/toast';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AxiosError } from 'axios';
 
 import { occupationsApi, downloadFromSignedUrl } from '@/services/occupations.api';
 import { logementsApi } from '@/services/logements.api';
@@ -32,6 +31,9 @@ import { showConfirm } from '@/components/shared/ConfirmDialog';
 import FileUploader from '@/components/shared/FileUploader';
 import ExportModal from '@/components/shared/ExportModal';
 import PaiementFormDialog from '@/components/shared/PaiementFormDialog';
+import { formatMontant } from '@/utils/format';
+import { formatDate, toDateStr } from '@/utils/date';
+import { extractError } from '@/utils/error';
 
 // ─── Schémas ──────────────────────────────────────────────────────────────────
 
@@ -61,27 +63,6 @@ const TAB_OPTIONS = [
   { label: 'Terminées', value: 'terminated' },
   { label: 'Toutes',    value: 'all'        },
 ];
-
-// ─── Utilitaires ──────────────────────────────────────────────────────────────
-
-function formatDate(val: string): string {
-  return new Date(val).toLocaleDateString('fr-FR');
-}
-
-function formatMontant(val: number): string {
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency', currency: 'XAF', maximumFractionDigits: 0,
-  }).format(val);
-}
-
-function extractError(err: unknown, fallback: string): string {
-  if (err instanceof AxiosError) return err.response?.data?.message ?? fallback;
-  return fallback;
-}
-
-function toDateStr(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 

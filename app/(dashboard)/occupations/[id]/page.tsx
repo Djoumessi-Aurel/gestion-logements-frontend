@@ -8,34 +8,13 @@ import { Button } from 'primereact/button';
 import { occupationsApi } from '@/services/occupations.api';
 import type { OccupationDashboard, OccupationDashboardPaiement } from '@/types/occupation';
 import type { Arriere } from '@/types/arriere';
-import { PeriodeType } from '@/types/enums';
 
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import ErrorMessage from '@/components/shared/ErrorMessage';
 import DataTableWrapper from '@/components/shared/DataTableWrapper';
-
-// ─── Utilitaires ──────────────────────────────────────────────────────────────
-
-function formatMontant(val: number): string {
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency', currency: 'XAF', maximumFractionDigits: 0,
-  }).format(val);
-}
-
-function formatDate(val: string): string {
-  return new Date(val).toLocaleDateString('fr-FR');
-}
-
-function labelPeriode(nombre: number, type: PeriodeType): string {
-  const labels: Record<PeriodeType, string> = {
-    [PeriodeType.JOUR]:    'jour(s)',
-    [PeriodeType.SEMAINE]: 'semaine(s)',
-    [PeriodeType.MOIS]:    'mois',
-    [PeriodeType.ANNEE]:   'an(s)',
-  };
-  return `${nombre} ${labels[type]}`;
-}
+import { formatMontant, labelPeriode } from '@/utils/format';
+import { formatDate } from '@/utils/date';
 
 // ─── Sous-composants ──────────────────────────────────────────────────────────
 

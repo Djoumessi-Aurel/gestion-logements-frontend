@@ -11,18 +11,8 @@ import type { Arriere } from '@/types/arriere';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import ErrorMessage from '@/components/shared/ErrorMessage';
-
-// ─── Utilitaires ──────────────────────────────────────────────────────────────
-
-function formatMontant(val: number): string {
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency', currency: 'XAF', maximumFractionDigits: 0,
-  }).format(val);
-}
-
-function formatDate(val: string): string {
-  return new Date(val).toLocaleDateString('fr-FR');
-}
+import { formatMontant } from '@/utils/format';
+import { formatDate } from '@/utils/date';
 
 // ─── Sous-composants ──────────────────────────────────────────────────────────
 

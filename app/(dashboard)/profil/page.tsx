@@ -8,7 +8,6 @@ import { Toast } from 'primereact/toast';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AxiosError } from 'axios';
 
 import { authApi } from '@/services/auth.api';
 import { Role } from '@/types/enums';
@@ -17,6 +16,8 @@ import { roleLabels, roleColors } from '@/utils/role';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import ErrorMessage from '@/components/shared/ErrorMessage';
+import { formatDate } from '@/utils/date';
+import { extractError } from '@/utils/error';
 
 // ─── Schéma ───────────────────────────────────────────────────────────────────
 
@@ -48,19 +49,6 @@ interface ProfileData {
 }
 
 // ─── Utilitaires ──────────────────────────────────────────────────────────────
-
-function formatDate(val: string): string {
-  return new Date(val).toLocaleDateString('fr-FR');
-}
-
-function extractError(err: unknown, fallback: string): string {
-  if (err instanceof AxiosError) {
-    const data = err.response?.data;
-    if (data?.errors?.length) return data.errors[0].message;
-    return data?.message ?? fallback;
-  }
-  return fallback;
-}
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 

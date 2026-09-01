@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react';
 import { Button } from 'primereact/button';
 import { useAppSelector } from '@/store/hooks';
+import { formatSize, mimeLabel } from '@/utils/format';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -20,24 +21,6 @@ interface Props {
 }
 
 // ─── Utilitaires ──────────────────────────────────────────────────────────────
-
-function formatSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} o`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} Ko`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`;
-}
-
-function mimeLabel(mime: string): string {
-  const MAP: Record<string, string> = {
-    'application/pdf': 'PDF',
-    'image/jpeg': 'JPG',
-    'image/png': 'PNG',
-    'image/webp': 'WebP',
-    'application/msword': 'DOC',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'DOCX',
-  };
-  return MAP[mime] ?? mime;
-}
 
 // ─── Composant ────────────────────────────────────────────────────────────────
 
