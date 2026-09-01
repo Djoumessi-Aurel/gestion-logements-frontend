@@ -44,5 +44,10 @@ public/workbox-*.js
 public/workbox-*.js.map
 public/worker-*.js
 public/worker-*.js.map
+# ⚠️ Motif distinct : "worker-*" ne couvre pas un nom commençant par "swe-".
+# Sans cette ligne, swe-worker-<hash>.js se retrouve suivi par git, et un
+# changement de version de next-pwa laisse traîner l'ancien hash dans le dépôt.
+public/swe-worker-*.js
+public/swe-worker-*.js.map
 public/fallback-*.js
 public/fallback-*.js.map
