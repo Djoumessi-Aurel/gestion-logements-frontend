@@ -4,7 +4,7 @@ Application web de gestion locative : bâtiments, logements, locataires, paiemen
 Développée par [Aurel Djoumessi](https://aureldjoumessi.com).
 
 > Guide destiné aux **développeurs**. Pour l'utilisation fonctionnelle de l'application,
-> voir le guide utilisateur remis aux clients.
+> voir [`docs/guide-utilisateur.html`](docs/guide-utilisateur.html) — le guide remis aux clients.
 
 ---
 
@@ -231,6 +231,30 @@ au lieu du fichier entier, sur chaque page.
 ---
 
 ## Documentation complète
+
+### Guide utilisateur (clients)
+
+[`docs/guide-utilisateur.html`](docs/guide-utilisateur.html) — document autonome de
+16 chapitres couvrant l'ensemble des fonctions, destiné à être remis aux clients. Il
+s'ouvre directement dans un navigateur, n'a aucune dépendance hors les polices Google,
+et s'imprime en PDF via `Ctrl + P`.
+
+**Ce fichier est la source de vérité du guide.** La version publiée en ligne en est un
+rendu&nbsp;: pour la mettre à jour, on retire le squelette HTML (`doctype`, `html`,
+`head`, `body`) et on republie le reste à la même URL. Ne jamais maintenir deux copies
+du contenu.
+
+Deux règles à respecter en le modifiant :
+
+- **Ne jamais y chiffrer les limites d'upload.** Elles sont configurables côté serveur
+  (`UPLOAD_*`) et le guide renvoie volontairement à ce qui est affiché dans la zone de
+  dépôt.
+- **Toute couleur passe par un jeton CSS**, jamais par une valeur littérale hors du bloc
+  `@media print`. Le bandeau de titre a ses propres jetons (`--hero-*`) parce que le bleu
+  de marque s'éclaircit en thème sombre pour rester lisible en texte, alors que l'en-tête
+  l'utilise comme fond.
+
+### Documentation technique
 
 `CLAUDE.md` à la racine contient :
 

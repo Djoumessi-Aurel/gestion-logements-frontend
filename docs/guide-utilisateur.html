@@ -1,0 +1,2184 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Guide d'utilisation de l'application Gestion de Logements, destiné aux clients.">
+
+<!--
+  Guide utilisateur — document autonome, ouvrable directement dans un navigateur.
+
+  Ce fichier est la SOURCE DE VÉRITÉ du guide. La version publiée en ligne en est
+  un rendu : pour la mettre à jour, on retire le squelette (doctype/html/head/body)
+  et on republie le reste à la même URL. Ne pas maintenir deux copies du contenu.
+
+  Aucune dépendance hors les polices Google. Impression : Ctrl + P (feuille de
+  style @media print dédiée).
+-->
+
+<title>Manuel Gestion de Logements</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap">
+
+<style>
+/* ─────────────────────────────────────────────────────────────
+   Jetons — palette claire complète sur :root nu
+   ───────────────────────────────────────────────────────────── */
+:root {
+  --ink:        #16202e;
+  --ink-2:      #47566b;
+  --ink-3:      #6f7d92;
+  --ground:     #f5f7fa;
+  --surface:    #ffffff;
+  --surface-2:  #eef2f8;
+  --line:       #dce3ed;
+  --line-soft:  #e8edf4;
+
+  --brand:      #1e3a8a;
+  --brand-2:    #3b82f6;
+  --brand-wash: #dbeafe;
+  --brand-ink:  #1e3a8a;
+
+  /* Bandeau de titre — jetons distincts de --brand : ici la couleur sert de FOND
+     et doit rester sombre dans les deux thèmes, alors que --brand s'éclaircit en
+     mode sombre pour rester lisible en tant que texte. */
+  --hero-bg:   #1e3a8a;
+  --hero-ink:  #ffffff;
+  --hero-lede: #d7e3fb;
+  --hero-dim:  #b9cdf7;
+  --hero-rule: rgba(255, 255, 255, .18);
+
+  --code-bg-on-tint: rgba(20, 20, 20, .07);
+
+  --ok:      #166534;  --ok-bg:   #dcfce7;  --ok-line:   #bbf0cb;
+  --warn:    #92400e;  --warn-bg: #fef3c7;  --warn-line: #f6dd9a;
+  --bad:     #991b1b;  --bad-bg:  #fee2e2;  --bad-line:  #f8c4c4;
+
+  --shadow: 0 1px 2px rgba(22, 32, 46, .05), 0 8px 24px -16px rgba(22, 32, 46, .25);
+
+  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --sans:  "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:  "IBM Plex Mono", ui-monospace, "SF Mono", Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink:        #e4ebf5;
+    --ink-2:      #a7b5c8;
+    --ink-3:      #7b8a9e;
+    --ground:     #0d1219;
+    --surface:    #141b25;
+    --surface-2:  #1b2430;
+    --line:       #29323f;
+    --line-soft:  #212a36;
+
+    --brand:      #9dbcff;
+    --brand-2:    #6ea0ff;
+    --brand-wash: #16233c;
+    --brand-ink:  #b8cdff;
+
+    --hero-bg:   #101a2e;
+    --hero-ink:  #eef3fc;
+    --hero-lede: #b9c9e6;
+    --hero-dim:  #8fa5c9;
+    --hero-rule: rgba(255, 255, 255, .13);
+
+    --code-bg-on-tint: rgba(255, 255, 255, .10);
+
+    --ok:      #8fe6ab;  --ok-bg:   #12301f;  --ok-line:   #1d4d31;
+    --warn:    #fbd167;  --warn-bg: #33270b;  --warn-line: #574119;
+    --bad:     #fba5a5;  --bad-bg:  #381717;  --bad-line:  #5c2626;
+
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 30px -18px rgba(0, 0, 0, .8);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ink:        #e4ebf5;
+  --ink-2:      #a7b5c8;
+  --ink-3:      #7b8a9e;
+  --ground:     #0d1219;
+  --surface:    #141b25;
+  --surface-2:  #1b2430;
+  --line:       #29323f;
+  --line-soft:  #212a36;
+
+  --brand:      #9dbcff;
+  --brand-2:    #6ea0ff;
+  --brand-wash: #16233c;
+  --brand-ink:  #b8cdff;
+
+    --hero-bg:   #101a2e;
+    --hero-ink:  #eef3fc;
+    --hero-lede: #b9c9e6;
+    --hero-dim:  #8fa5c9;
+    --hero-rule: rgba(255, 255, 255, .13);
+
+    --code-bg-on-tint: rgba(255, 255, 255, .10);
+
+  --ok:      #8fe6ab;  --ok-bg:   #12301f;  --ok-line:   #1d4d31;
+  --warn:    #fbd167;  --warn-bg: #33270b;  --warn-line: #574119;
+  --bad:     #fba5a5;  --bad-bg:  #381717;  --bad-line:  #5c2626;
+
+  --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 30px -18px rgba(0, 0, 0, .8);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Base
+   ───────────────────────────────────────────────────────────── */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.65;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--brand-2); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+a:hover { color: var(--brand); }
+
+:focus-visible {
+  outline: 2px solid var(--brand-2);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+html { scroll-behavior: smooth; scroll-padding-top: 1.5rem; }
+
+/* ─────────────────────────────────────────────────────────────
+   En-tête
+   ───────────────────────────────────────────────────────────── */
+.masthead {
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+  padding: 3.25rem 1.5rem 2.75rem;
+  border-bottom: 3px solid var(--brand-2);
+}
+.masthead-inner { max-width: 1180px; margin: 0 auto; }
+
+.masthead .eyebrow {
+  font-family: var(--mono);
+  font-size: .72rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--hero-dim);
+  margin: 0 0 .9rem;
+}
+.masthead h1 {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 3.1rem);
+  line-height: 1.08;
+  letter-spacing: -.015em;
+  margin: 0 0 .85rem;
+  text-wrap: balance;
+  color: var(--hero-ink);
+}
+.masthead p.lede {
+  margin: 0;
+  max-width: 62ch;
+  font-size: 1.06rem;
+  color: var(--hero-lede);
+}
+.masthead .meta {
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--hero-rule);
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem 2rem;
+  font-family: var(--mono);
+  font-size: .78rem;
+  color: var(--hero-dim);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Ossature
+   ───────────────────────────────────────────────────────────── */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 1.5rem 5rem;
+  display: grid;
+  grid-template-columns: 258px minmax(0, 1fr);
+  gap: 3.5rem;
+  align-items: start;
+}
+@media (max-width: 960px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 0; }
+}
+
+/* ── Sommaire ── */
+.toc {
+  position: sticky;
+  top: 0;
+  max-height: 100vh;
+  overflow-y: auto;
+  padding: 2.5rem 0 2rem;
+}
+.toc h2 {
+  font-family: var(--mono);
+  font-size: .7rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0 0 1rem;
+  font-weight: 500;
+}
+.toc ol { list-style: none; margin: 0; padding: 0; }
+.toc li { margin: 0; }
+.toc a {
+  display: grid;
+  grid-template-columns: 1.9rem 1fr;
+  gap: .35rem;
+  padding: .34rem .5rem .34rem 0;
+  font-size: .875rem;
+  line-height: 1.35;
+  color: var(--ink-2);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  padding-left: .75rem;
+}
+.toc a .num {
+  font-family: var(--mono);
+  font-size: .74rem;
+  color: var(--ink-3);
+  padding-top: .1rem;
+}
+.toc a:hover { color: var(--ink); background: var(--surface-2); }
+.toc a.active {
+  color: var(--brand-ink);
+  border-left-color: var(--brand-2);
+  font-weight: 600;
+  background: var(--brand-wash);
+}
+.toc a.active .num { color: var(--brand-ink); }
+
+.toc-mobile { display: none; }
+@media (max-width: 960px) {
+  .toc { display: none; }
+  .toc-mobile {
+    display: block;
+    margin: 1.75rem 0 .5rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+  }
+  .toc-mobile summary {
+    cursor: pointer;
+    padding: .9rem 1.1rem;
+    font-weight: 600;
+    font-size: .92rem;
+  }
+  .toc-mobile .toc { display: block; position: static; max-height: none; padding: 0 .6rem 1rem; }
+  .toc-mobile .toc h2 { display: none; }
+}
+
+/* ── Contenu ── */
+.content { padding: 2.5rem 0 0; min-width: 0; }
+.content > section { scroll-margin-top: 1.5rem; }
+
+section.chapter { margin-bottom: 4rem; }
+
+.chapter > h2 {
+  font-family: var(--serif);
+  font-size: clamp(1.55rem, 3.2vw, 2.05rem);
+  line-height: 1.15;
+  letter-spacing: -.012em;
+  font-weight: 700;
+  margin: 0 0 .35rem;
+  text-wrap: balance;
+  padding-top: 1.75rem;
+  border-top: 2px solid var(--line);
+}
+.chapter > h2 .num {
+  font-family: var(--mono);
+  font-size: .78rem;
+  font-weight: 500;
+  letter-spacing: .1em;
+  color: var(--brand-2);
+  display: block;
+  margin-bottom: .55rem;
+}
+.chapter > .intro {
+  color: var(--ink-2);
+  font-size: 1.03rem;
+  max-width: 68ch;
+  margin: 0 0 1.75rem;
+}
+
+h3 {
+  font-family: var(--serif);
+  font-size: 1.24rem;
+  font-weight: 600;
+  line-height: 1.25;
+  margin: 2.4rem 0 .6rem;
+  text-wrap: balance;
+}
+h4 {
+  font-family: var(--sans);
+  font-size: .95rem;
+  font-weight: 600;
+  margin: 1.6rem 0 .5rem;
+  color: var(--ink);
+}
+
+p, ul, ol { max-width: 68ch; }
+p { margin: 0 0 1rem; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.35rem; }
+li { margin: 0 0 .4rem; }
+li > ul, li > ol { margin-top: .4rem; }
+
+strong { font-weight: 600; }
+code {
+  font-family: var(--mono);
+  font-size: .855em;
+  background: var(--surface-2);
+  border: 1px solid var(--line-soft);
+  padding: .08em .38em;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+/* ── Chip de rôles ── */
+.who {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .45rem;
+  margin: 0 0 1.4rem;
+  padding: .6rem .8rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  max-width: 68ch;
+}
+.who-label {
+  font-family: var(--mono);
+  font-size: .68rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-right: .3rem;
+}
+.chip {
+  font-size: .78rem;
+  font-weight: 500;
+  padding: .16rem .55rem;
+  border-radius: 999px;
+  background: var(--brand-wash);
+  color: var(--brand-ink);
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.chip.off {
+  background: transparent;
+  color: var(--ink-3);
+  border-color: var(--line);
+  text-decoration: line-through;
+}
+
+/* ── Encarts ── */
+.note {
+  max-width: 68ch;
+  margin: 1.4rem 0;
+  padding: .95rem 1.1rem;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--brand-2);
+  background: var(--surface);
+  font-size: .95rem;
+}
+.note > :last-child { margin-bottom: 0; }
+.note .note-title {
+  font-family: var(--mono);
+  font-size: .68rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  display: block;
+  margin-bottom: .4rem;
+}
+.note.warn   { border-left-color: var(--warn); background: var(--warn-bg); border-color: var(--warn-line); color: var(--warn); }
+.note.warn .note-title { color: var(--warn); }
+.note.warn code { background: var(--code-bg-on-tint); border-color: transparent; color: inherit; }
+.note.tip    { border-left-color: var(--ok); background: var(--ok-bg); border-color: var(--ok-line); color: var(--ok); }
+.note.tip .note-title { color: var(--ok); }
+.note.tip code { background: var(--code-bg-on-tint); border-color: transparent; color: inherit; }
+
+/* ── Message d'erreur applicatif ── */
+.errbox {
+  max-width: 68ch;
+  margin: 1rem 0 1.4rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface);
+}
+.errbox .msg {
+  font-family: var(--mono);
+  font-size: .86rem;
+  padding: .7rem .9rem;
+  background: var(--bad-bg);
+  color: var(--bad);
+  border-bottom: 1px solid var(--bad-line);
+}
+.errbox .why { padding: .8rem .9rem; font-size: .93rem; color: var(--ink-2); }
+.errbox .why > :last-child { margin-bottom: 0; }
+
+/* ── Étapes ── */
+ol.steps { counter-reset: s; list-style: none; padding-left: 0; max-width: 68ch; }
+ol.steps > li {
+  counter-increment: s;
+  position: relative;
+  padding-left: 2.4rem;
+  margin-bottom: .85rem;
+}
+ol.steps > li::before {
+  content: counter(s);
+  position: absolute;
+  left: 0;
+  top: .08rem;
+  width: 1.6rem;
+  height: 1.6rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--brand-wash);
+  color: var(--brand-ink);
+  font-family: var(--mono);
+  font-size: .76rem;
+  font-weight: 500;
+}
+
+/* ── Tableaux ── */
+.table-wrap {
+  overflow-x: auto;
+  margin: 1.3rem 0 1.6rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+th, td {
+  text-align: left;
+  padding: .62rem .85rem;
+  border-bottom: 1px solid var(--line-soft);
+  vertical-align: top;
+}
+thead th {
+  background: var(--surface-2);
+  font-size: .74rem;
+  font-family: var(--mono);
+  font-weight: 500;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+tbody tr:last-child td { border-bottom: none; }
+td.c, th.c { text-align: center; }
+.yes { color: var(--ok); font-weight: 600; }
+.no  { color: var(--ink-3); }
+
+/* ── Badges (miroir de l'application) ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  font-size: .76rem;
+  font-weight: 600;
+  padding: .14rem .55rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.badge.ok   { background: var(--ok-bg);   color: var(--ok); }
+.badge.bad  { background: var(--bad-bg);  color: var(--bad); }
+.badge.info { background: var(--brand-wash); color: var(--brand-ink); }
+.badge.mute { background: var(--surface-2); color: var(--ink-3); }
+
+/* ── Chaîne des données ── */
+.chain {
+  display: flex;
+  align-items: stretch;
+  gap: .5rem;
+  flex-wrap: wrap;
+  margin: 1.5rem 0 1.75rem;
+  padding: 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.chain .node {
+  flex: 1 1 150px;
+  min-width: 140px;
+  padding: .8rem .85rem;
+  border-radius: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--line-soft);
+}
+.chain .node .n-name {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1rem;
+  display: block;
+  margin-bottom: .2rem;
+}
+.chain .node .n-desc { font-size: .8rem; color: var(--ink-2); line-height: 1.45; }
+.chain .arrow {
+  align-self: center;
+  color: var(--brand-2);
+  font-size: 1.1rem;
+  flex: 0 0 auto;
+}
+@media (max-width: 700px) {
+  .chain { flex-direction: column; }
+  .chain .arrow { transform: rotate(90deg); align-self: flex-start; margin-left: 1rem; }
+}
+
+/* ── Exemple chiffré ── */
+.example {
+  max-width: 68ch;
+  margin: 1.4rem 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  overflow: hidden;
+}
+.example .ex-head {
+  padding: .6rem .95rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: .7rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.example .ex-body { padding: .95rem; }
+.example .ex-body > :last-child { margin-bottom: 0; }
+.example dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: .35rem 1.1rem; font-size: .93rem; }
+.example dt { color: var(--ink-2); }
+.example dd { margin: 0; font-weight: 600; }
+
+/* ── Pied ── */
+.colophon {
+  border-top: 2px solid var(--line);
+  margin-top: 1rem;
+  padding-top: 1.75rem;
+  color: var(--ink-3);
+  font-size: .88rem;
+}
+
+/* ── Impression ── */
+@media print {
+  :root {
+    --ground: #fff; --surface: #fff; --surface-2: #f4f6f9;
+    --ink: #111; --ink-2: #333; --ink-3: #666;
+  }
+  .toc, .toc-mobile, .masthead .meta { display: none !important; }
+  .shell { display: block; padding: 0; max-width: none; }
+  .masthead { background: #fff; color: #111; border-bottom: 2px solid #111; padding: 0 0 1.5rem; }
+  .masthead h1, .masthead .eyebrow, .masthead p.lede { color: #111; }
+  .content { padding: 1.5rem 0 0; }
+  section.chapter { page-break-inside: auto; margin-bottom: 2rem; }
+  .chapter > h2 { page-break-after: avoid; }
+  h3, h4 { page-break-after: avoid; }
+  .note, .errbox, .example, .table-wrap, .chain, .who { page-break-inside: avoid; }
+  a { color: #111; text-decoration: none; }
+  body { font-size: 11pt; }
+}
+</style>
+</head>
+<body>
+<header class="masthead">
+  <div class="masthead-inner">
+    <p class="eyebrow">Guide d’utilisation</p>
+    <h1>Gestion de Logements</h1>
+    <p class="lede">
+      Tout ce qu’il faut savoir pour piloter vos bâtiments, vos logements, vos locataires
+      et vos loyers au quotidien. Aucune connaissance technique n’est requise.
+    </p>
+    <div class="meta">
+      <span>Lecture&nbsp;: 30&nbsp;min</span>
+      <span>Consultable section par section</span>
+      <span>Imprimable en PDF&nbsp;: Ctrl&nbsp;+&nbsp;P</span>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+
+  <nav class="toc" id="toc" aria-label="Sommaire">
+    <h2>Sommaire</h2>
+    <ol>
+      <li><a href="#acces"><span class="num">01</span><span>Accéder à l’application</span></a></li>
+      <li><a href="#compte"><span class="num">02</span><span>Votre compte</span></a></li>
+      <li><a href="#roles"><span class="num">03</span><span>Les rôles et leurs droits</span></a></li>
+      <li><a href="#modele"><span class="num">04</span><span>Comment l’application organise vos données</span></a></li>
+      <li><a href="#interface"><span class="num">05</span><span>Se repérer dans l’interface</span></a></li>
+      <li><a href="#dashboard"><span class="num">06</span><span>Le tableau de bord</span></a></li>
+      <li><a href="#batiments"><span class="num">07</span><span>Les bâtiments</span></a></li>
+      <li><a href="#logements"><span class="num">08</span><span>Les logements et leurs loyers</span></a></li>
+      <li><a href="#locataires"><span class="num">09</span><span>Les locataires</span></a></li>
+      <li><a href="#occupations"><span class="num">10</span><span>Les occupations</span></a></li>
+      <li><a href="#paiements"><span class="num">11</span><span>Les paiements</span></a></li>
+      <li><a href="#utilisateurs"><span class="num">12</span><span>Les utilisateurs</span></a></li>
+      <li><a href="#exports"><span class="num">13</span><span>Les exports</span></a></li>
+      <li><a href="#locataire-espace"><span class="num">14</span><span>L’espace locataire</span></a></li>
+      <li><a href="#regles"><span class="num">15</span><span>Pourquoi l’application refuse&nbsp;?</span></a></li>
+      <li><a href="#faq"><span class="num">16</span><span>Questions fréquentes</span></a></li>
+    </ol>
+  </nav>
+
+  <details class="toc-mobile">
+    <summary>Sommaire</summary>
+    <nav class="toc" aria-label="Sommaire (mobile)">
+      <ol>
+        <li><a href="#acces"><span class="num">01</span><span>Accéder à l’application</span></a></li>
+        <li><a href="#compte"><span class="num">02</span><span>Votre compte</span></a></li>
+        <li><a href="#roles"><span class="num">03</span><span>Les rôles et leurs droits</span></a></li>
+        <li><a href="#modele"><span class="num">04</span><span>Comment l’application organise vos données</span></a></li>
+        <li><a href="#interface"><span class="num">05</span><span>Se repérer dans l’interface</span></a></li>
+        <li><a href="#dashboard"><span class="num">06</span><span>Le tableau de bord</span></a></li>
+        <li><a href="#batiments"><span class="num">07</span><span>Les bâtiments</span></a></li>
+        <li><a href="#logements"><span class="num">08</span><span>Les logements et leurs loyers</span></a></li>
+        <li><a href="#locataires"><span class="num">09</span><span>Les locataires</span></a></li>
+        <li><a href="#occupations"><span class="num">10</span><span>Les occupations</span></a></li>
+        <li><a href="#paiements"><span class="num">11</span><span>Les paiements</span></a></li>
+        <li><a href="#utilisateurs"><span class="num">12</span><span>Les utilisateurs</span></a></li>
+        <li><a href="#exports"><span class="num">13</span><span>Les exports</span></a></li>
+        <li><a href="#locataire-espace"><span class="num">14</span><span>L’espace locataire</span></a></li>
+        <li><a href="#regles"><span class="num">15</span><span>Pourquoi l’application refuse&nbsp;?</span></a></li>
+        <li><a href="#faq"><span class="num">16</span><span>Questions fréquentes</span></a></li>
+      </ol>
+    </nav>
+  </details>
+
+  <main class="content">
+
+    <!-- ══════════════ 01 ══════════════ -->
+    <section class="chapter" id="acces">
+      <h2><span class="num">Chapitre 01</span>Accéder à l’application</h2>
+      <p class="intro">
+        L’application est un site web. Il n’y a rien à installer pour commencer&nbsp;:
+        une adresse, un navigateur, et vous êtes chez vous.
+      </p>
+
+      <h3>L’adresse</h3>
+      <p>
+        Votre administrateur vous communique une adresse web personnelle à votre
+        organisation. Ouvrez-la dans votre navigateur, puis ajoutez-la à vos favoris —
+        vous y reviendrez tous les jours.
+      </p>
+
+      <h3>Navigateurs recommandés</h3>
+      <p>
+        Chrome, Edge, Firefox ou Safari, dans une version récente. L’application
+        fonctionne sur ordinateur, tablette et téléphone&nbsp;: la mise en page s’adapte
+        automatiquement à la taille de l’écran.
+      </p>
+
+      <h3>Installer l’application sur votre appareil</h3>
+      <p>
+        Vous pouvez l’épingler comme une véritable application, avec son icône, sans
+        barre d’adresse&nbsp;:
+      </p>
+      <ul>
+        <li><strong>Sur Android (Chrome)</strong> — menu <code>⋮</code>, puis
+          «&nbsp;Installer l’application&nbsp;» ou «&nbsp;Ajouter à l’écran d’accueil&nbsp;».</li>
+        <li><strong>Sur iPhone/iPad (Safari)</strong> — bouton Partager, puis
+          «&nbsp;Sur l’écran d’accueil&nbsp;».</li>
+        <li><strong>Sur ordinateur (Chrome ou Edge)</strong> — icône d’installation
+          à droite de la barre d’adresse.</li>
+      </ul>
+
+      <div class="note">
+        <span class="note-title">Connexion internet</span>
+        <p>
+          L’application a besoin d’internet pour fonctionner&nbsp;: vos données sont sur
+          un serveur, pas sur votre appareil. Si la connexion est coupée, un écran
+          «&nbsp;Vous êtes hors ligne&nbsp;» s’affiche. Rétablissez la connexion, puis
+          réessayez&nbsp;: rien n’est perdu.
+        </p>
+      </div>
+    </section>
+
+    <!-- ══════════════ 02 ══════════════ -->
+    <section class="chapter" id="compte">
+      <h2><span class="num">Chapitre 02</span>Votre compte</h2>
+      <p class="intro">
+        Vous ne créez pas votre compte vous-même. C’est un administrateur qui le crée et
+        vous transmet vos identifiants.
+      </p>
+
+      <h3>Se connecter</h3>
+      <ol class="steps">
+        <li>Saisissez votre <strong>nom d’utilisateur</strong> (et non votre adresse e-mail).</li>
+        <li>Saisissez votre <strong>mot de passe</strong>. L’icône en forme d’œil permet de
+          l’afficher pour vérifier votre saisie.</li>
+        <li>Cliquez sur <strong>Se connecter</strong>.</li>
+      </ol>
+      <p>
+        Selon votre rôle, vous arrivez soit sur le tableau de bord de gestion, soit sur
+        votre espace personnel de locataire.
+      </p>
+
+      <div class="errbox">
+        <div class="msg">Identifiants invalides ou compte désactivé.</div>
+        <div class="why">
+          <p>
+            Deux causes possibles&nbsp;: une faute de frappe, ou un compte désactivé par un
+            administrateur. Vérifiez la casse (majuscules et minuscules comptent) puis,
+            si le problème persiste, contactez votre administrateur.
+          </p>
+        </div>
+      </div>
+
+      <div class="errbox">
+        <div class="msg">Trop de tentatives de connexion. Réessayez dans 1 minute.</div>
+        <div class="why">
+          <p>
+            Une protection contre les tentatives automatisées limite le nombre d’essais.
+            Patientez une minute&nbsp;: l’accès se rouvre tout seul, il n’y a rien à faire.
+          </p>
+        </div>
+      </div>
+
+      <h3>Mot de passe oublié</h3>
+      <ol class="steps">
+        <li>Sur l’écran de connexion, cliquez sur <strong>Mot de passe oublié&nbsp;?</strong></li>
+        <li>Renseignez votre <strong>nom d’utilisateur</strong> et votre <strong>adresse e-mail</strong>.</li>
+        <li>Consultez votre boîte mail et suivez le lien reçu.</li>
+        <li>Choisissez un nouveau mot de passe (8&nbsp;caractères minimum), saisissez-le
+          deux fois, validez.</li>
+      </ol>
+
+      <div class="note">
+        <span class="note-title">Message identique dans tous les cas</span>
+        <p>
+          L’écran affiche toujours «&nbsp;Si ce compte existe, un email a été envoyé&nbsp;»,
+          même si le compte n’existe pas. C’est volontaire&nbsp;: cela empêche un tiers de
+          découvrir quels comptes existent. Si vous ne recevez rien, vérifiez vos
+          indésirables, puis que le nom d’utilisateur et l’e-mail correspondent bien à
+          ceux enregistrés.
+        </p>
+      </div>
+
+      <div class="note warn">
+        <span class="note-title">Le lien expire</span>
+        <p>
+          Le lien de réinitialisation a une durée de validité limitée et ne sert
+          qu’une fois. S’il affiche «&nbsp;Lien invalide ou expiré&nbsp;», refaites
+          simplement une demande.
+        </p>
+      </div>
+
+      <h3>Changer son mot de passe</h3>
+      <p>
+        Accessible à tous, y compris aux locataires. Depuis le menu
+        <strong>Mon profil</strong> (en bas de la barre latérale, ou via le bouton rond
+        portant votre initiale en haut à droite)&nbsp;:
+      </p>
+      <ol class="steps">
+        <li>Saisissez votre mot de passe <strong>actuel</strong>.</li>
+        <li>Saisissez le <strong>nouveau</strong> (8&nbsp;caractères minimum), puis confirmez-le.</li>
+        <li>Validez.</li>
+      </ol>
+      <div class="note tip">
+        <span class="note-title">À faire dès la première connexion</span>
+        <p>
+          Le mot de passe fourni par votre administrateur est généré automatiquement et
+          il l’a vu. Changez-le dès votre première connexion&nbsp;: vous serez alors seul
+          à le connaître.
+        </p>
+      </div>
+
+      <h3>Votre profil</h3>
+      <p>
+        La page <strong>Mon profil</strong> affiche vos informations&nbsp;: nom, prénom,
+        nom d’utilisateur, téléphone, e-mail, rôle et date d’inscription. Ces
+        informations sont modifiables par un administrateur, pas par vous-même.
+      </p>
+
+      <h3>Se déconnecter</h3>
+      <p>
+        Bouton <strong>Déconnexion</strong>, en haut à droite. Pensez-y systématiquement
+        sur un poste partagé.
+      </p>
+
+      <h3>Session expirée</h3>
+      <p>
+        Après une longue période d’inactivité, un message
+        «&nbsp;Session expirée&nbsp;» apparaît et vous êtes ramené à l’écran de connexion.
+        C’est normal et c’est une sécurité. Reconnectez-vous&nbsp;; aucune donnée
+        enregistrée n’est perdue.
+      </p>
+      <div class="note warn">
+        <span class="note-title">Attention aux formulaires en cours</span>
+        <p>
+          Un formulaire ouvert mais non validé au moment de l’expiration est perdu.
+          Validez vos saisies au fur et à mesure plutôt que de laisser une fenêtre
+          ouverte longtemps.
+        </p>
+      </div>
+    </section>
+
+    <!-- ══════════════ 03 ══════════════ -->
+    <section class="chapter" id="roles">
+      <h2><span class="num">Chapitre 03</span>Les rôles et leurs droits</h2>
+      <p class="intro">
+        Chaque compte porte un rôle. Le rôle détermine ce que vous voyez et ce que vous
+        pouvez faire. Vous ne verrez tout simplement pas les boutons qui ne vous sont pas
+        destinés — l’interface s’adapte, elle ne vous met pas devant des portes fermées.
+      </p>
+
+      <h3>Les quatre rôles</h3>
+
+      <h4>Locataire</h4>
+      <p>
+        Consultation seule, et uniquement de sa propre situation&nbsp;: son logement, ses
+        paiements, ses éventuels arriérés, son contrat de bail. Aucun accès à la gestion.
+      </p>
+
+      <h4>Admin Logement</h4>
+      <p>
+        Gère au quotidien les <strong>logements qui lui sont attribués</strong>&nbsp;: les
+        locataires, les occupations, les paiements. Il ne crée ni ne modifie les
+        logements eux-mêmes, et ne voit pas les bâtiments.
+      </p>
+
+      <h4>Admin Bâtiment</h4>
+      <p>
+        Tout ce que fait l’Admin Logement, plus la gestion des <strong>logements de ses
+        propres bâtiments</strong>&nbsp;: les créer, les modifier, faire évoluer les loyers.
+        Il peut aussi créer des comptes Admin Logement et leur attribuer des logements.
+      </p>
+
+      <h4>Admin Global</h4>
+      <p>
+        Accès complet et sans restriction de périmètre&nbsp;: création et suppression des
+        bâtiments, gestion de tous les utilisateurs, attribution des bâtiments aux
+        Admin Bâtiment.
+      </p>
+
+      <h3>Qui peut faire quoi</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Action</th>
+              <th class="c">Locataire</th>
+              <th class="c">Admin Logement</th>
+              <th class="c">Admin Bâtiment</th>
+              <th class="c">Admin Global</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Consulter les bâtiments</td><td class="c no">—</td><td class="c no">—</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+            <tr><td>Créer ou supprimer un bâtiment</td><td class="c no">—</td><td class="c no">—</td><td class="c no">—</td><td class="c yes">✓</td></tr>
+            <tr><td>Consulter les logements</td><td class="c no">—</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+            <tr><td>Créer ou modifier un logement</td><td class="c no">—</td><td class="c no">—</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+            <tr><td>Gérer les locataires</td><td class="c no">—</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+            <tr><td>Gérer les occupations</td><td class="c no">—</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+            <tr><td>Enregistrer les paiements</td><td class="c no">—</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+            <tr><td>Créer des utilisateurs</td><td class="c no">—</td><td class="c yes">limité</td><td class="c yes">limité</td><td class="c yes">✓</td></tr>
+            <tr><td>Attribuer un logement à un admin</td><td class="c no">—</td><td class="c no">—</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+            <tr><td>Attribuer un bâtiment à un admin</td><td class="c no">—</td><td class="c no">—</td><td class="c no">—</td><td class="c yes">✓</td></tr>
+            <tr><td>Exporter les données</td><td class="c no">—</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        <span class="note-title">Notion de périmètre</span>
+        <p>
+          Au-delà du rôle, chaque administrateur ne voit que <strong>son périmètre</strong>.
+          Un Admin Bâtiment ne voit que les logements de ses bâtiments&nbsp;; un Admin
+          Logement, que les logements qui lui ont été attribués nommément. Deux personnes
+          au même rôle peuvent donc voir des listes totalement différentes.
+        </p>
+      </div>
+    </section>
+
+    <!-- ══════════════ 04 ══════════════ -->
+    <section class="chapter" id="modele">
+      <h2><span class="num">Chapitre 04</span>Comment l’application organise vos données</h2>
+      <p class="intro">
+        C’est le chapitre le plus important du guide. Une fois cette logique comprise,
+        tout le reste devient évident — et la plupart des messages d’erreur s’expliquent
+        d’eux-mêmes.
+      </p>
+
+      <h3>La chaîne</h3>
+      <div class="chain">
+        <div class="node">
+          <span class="n-name">Bâtiment</span>
+          <span class="n-desc">Un immeuble, une concession, un ensemble. Nom et adresse.</span>
+        </div>
+        <div class="arrow" aria-hidden="true">→</div>
+        <div class="node">
+          <span class="n-name">Logement</span>
+          <span class="n-desc">Une unité louable dans ce bâtiment, avec son historique de loyers.</span>
+        </div>
+        <div class="arrow" aria-hidden="true">→</div>
+        <div class="node">
+          <span class="n-name">Occupation</span>
+          <span class="n-desc">Un locataire occupe ce logement, du jour J jusqu’à son départ.</span>
+        </div>
+        <div class="arrow" aria-hidden="true">→</div>
+        <div class="node">
+          <span class="n-name">Paiement</span>
+          <span class="n-desc">Une somme versée, qui couvre une période précise.</span>
+        </div>
+      </div>
+
+      <p>
+        Chaque niveau s’appuie sur le précédent. On ne peut pas créer un logement sans
+        bâtiment, ni une occupation sans logement <em>et</em> sans locataire, ni un
+        paiement sans occupation. C’est aussi pour cela qu’on ne peut pas supprimer un
+        maillon dont dépendent les suivants.
+      </p>
+
+      <h3>Le locataire, une fiche à part</h3>
+      <p>
+        Le <strong>locataire</strong> est une fiche indépendante&nbsp;: nom, prénom,
+        téléphone, e-mail. Il existe dans l’application avant même d’occuper quoi que ce
+        soit, et il y reste après son départ. C’est ce qui permet de conserver son
+        historique complet, et de le réinstaller plus tard dans un autre logement.
+      </p>
+      <p>
+        Un locataire est dit <span class="badge ok">Libre</span> lorsqu’il n’occupe aucun
+        logement actuellement.
+      </p>
+
+      <h3>Le loyer et sa périodicité</h3>
+      <p>
+        Un loyer, ce n’est pas seulement un montant&nbsp;: c’est un <strong>montant pour
+        une durée</strong>. Vous définissez donc deux choses&nbsp;:
+      </p>
+      <ul>
+        <li>le <strong>montant</strong>, en francs CFA&nbsp;;</li>
+        <li>la <strong>périodicité</strong> — un nombre et une unité&nbsp;:
+          <code>1 mois</code>, <code>3 mois</code>, <code>2 semaines</code>,
+          <code>1 année</code>… </li>
+      </ul>
+      <p>
+        Un logement conserve <strong>tout l’historique</strong> de ses loyers. Quand le
+        prix change, vous n’écrasez pas l’ancien&nbsp;: vous ajoutez un nouveau loyer avec
+        sa date de début. Les paiements passés restent ainsi calculés au tarif qui avait
+        cours à l’époque.
+      </p>
+
+      <h3>La date du dernier jour couvert</h3>
+      <p>
+        C’est la notion centrale de l’application, et la seule qui demande un instant
+        d’attention. Elle répond à une question unique&nbsp;:
+        <strong>jusqu’à quelle date ce locataire a-t-il payé&nbsp;?</strong>
+      </p>
+      <ul>
+        <li>À la création d’une occupation, elle vaut <strong>la veille de la date de
+          début</strong>&nbsp;: le locataire entre dans les lieux sans avoir encore rien payé.</li>
+        <li><strong>Chaque paiement la fait avancer</strong> d’autant de temps que la somme
+          versée couvre.</li>
+        <li>Si cette date est <strong>dépassée</strong>, le locataire est en
+          <span class="badge bad">Arriéré</span>. Sinon, il est
+          <span class="badge ok">À jour</span>.</li>
+      </ul>
+
+      <div class="example">
+        <div class="ex-head">Exemple — Appartement B3, loyer de 120 000 F CFA par mois</div>
+        <div class="ex-body">
+          <dl>
+            <dt>Début de l’occupation</dt><dd>1<sup>er</sup> mars 2026</dd>
+            <dt>Dernier jour couvert, à la création</dt><dd>28 février 2026</dd>
+          </dl>
+          <p style="margin-top:.9rem">
+            Le locataire verse <strong>360 000 F CFA</strong>, soit 3 loyers. La période
+            couverte va du 1<sup>er</sup> mars au 31 mai. Le dernier jour couvert devient
+            le <strong>31 mai 2026</strong>.
+          </p>
+          <p>
+            Au 15 avril, il est <span class="badge ok">À jour</span>. Au 12 juin, sans
+            nouveau versement, il passe <span class="badge bad">Arriéré</span> — et
+            l’application calcule seule ce qu’il doit.
+          </p>
+        </div>
+      </div>
+
+      <div class="note tip">
+        <span class="note-title">À retenir</span>
+        <p>
+          Le prochain paiement d’un locataire commence <strong>toujours</strong> le
+          lendemain de son dernier jour couvert. Vous n’avez jamais à saisir cette date&nbsp;:
+          l’application la calcule et l’affiche en lecture seule. Il n’y a donc aucun
+          risque de trou ni de chevauchement dans les périodes.
+        </p>
+      </div>
+
+      <h3>L’arriéré</h3>
+      <p>
+        Un arriéré n’est pas saisi&nbsp;: il est <strong>déduit</strong>. L’application
+        compare le dernier jour couvert à la date du jour et en tire la période due, le
+        nombre de loyers dus et le montant correspondant. Vous n’avez aucun calcul à faire
+        ni aucun tableau à tenir à jour.
+      </p>
+    </section>
+
+    <!-- ══════════════ 05 ══════════════ -->
+    <section class="chapter" id="interface">
+      <h2><span class="num">Chapitre 05</span>Se repérer dans l’interface</h2>
+      <p class="intro">
+        Toutes les pages suivent la même structure. Une fois l’une d’elles maîtrisée,
+        les autres se manipulent sans réapprentissage.
+      </p>
+
+      <h3>La barre latérale</h3>
+      <p>
+        À gauche&nbsp;: la navigation entre les grandes sections. Elle ne contient que
+        les entrées auxquelles votre rôle donne accès. Tout en bas, l’accès à
+        <strong>Mon profil</strong>.
+      </p>
+      <p>
+        Sur téléphone et tablette, elle est masquée&nbsp;: ouvrez-la avec le bouton
+        <code>☰</code> en haut à gauche, refermez-la en touchant l’extérieur.
+      </p>
+
+      <h3>La barre du haut</h3>
+      <p>
+        Elle affiche votre nom d’utilisateur, une pastille indiquant votre rôle, un bouton
+        rond avec votre initiale menant à votre profil, et le bouton de déconnexion.
+      </p>
+
+      <h3>Les tableaux</h3>
+      <p>Toutes les listes se manipulent de la même façon&nbsp;:</p>
+      <ul>
+        <li><strong>Trier</strong> — cliquez sur un en-tête de colonne. Un second clic
+          inverse l’ordre, un troisième revient au tri d’origine.</li>
+        <li><strong>Filtrer</strong> — saisissez du texte dans la zone de recherche pour
+          ne garder que les lignes correspondantes.</li>
+        <li><strong>Paginer</strong> — les boutons en bas de tableau font défiler les
+          pages&nbsp;; un menu permet d’afficher 10, 25 ou 50&nbsp;lignes à la fois.</li>
+      </ul>
+
+      <h3>Les boutons d’action</h3>
+      <p>
+        En bout de ligne, de petites icônes déclenchent les actions disponibles. Survolez-en
+        une pour afficher son libellé.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Icône</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td>Loupe ou graphique</td><td>Ouvrir la fiche détaillée</td></tr>
+            <tr><td>Crayon</td><td>Modifier</td></tr>
+            <tr><td>Corbeille</td><td>Supprimer</td></tr>
+            <tr><td>Silhouette avec «&nbsp;+&nbsp;»</td><td>Installer un locataire dans ce logement</td></tr>
+            <tr><td>Portefeuille</td><td>Enregistrer un paiement</td></tr>
+            <tr><td>Document</td><td>Contrat de bail ou preuves de paiement</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Confirmations et notifications</h3>
+      <p>
+        Toute suppression demande une confirmation explicite&nbsp;: rien n’est jamais
+        supprimé sur un simple clic. Après chaque action, un message apparaît quelques
+        secondes en haut à droite — vert en cas de succès, rouge en cas d’échec, avec la
+        raison précise.
+      </p>
+
+      <div class="note">
+        <span class="note-title">Lisez les messages rouges</span>
+        <p>
+          Ils ne disent jamais simplement «&nbsp;erreur&nbsp;»&nbsp;: ils indiquent ce qui
+          bloque. Le <a href="#regles">chapitre&nbsp;15</a> reprend chacun d’eux en détail.
+        </p>
+      </div>
+    </section>
+
+    <!-- ══════════════ 06 ══════════════ -->
+    <section class="chapter" id="dashboard">
+      <h2><span class="num">Chapitre 06</span>Le tableau de bord</h2>
+      <p class="who">
+        <span class="who-label">Accès</span>
+        <span class="chip off">Locataire</span>
+        <span class="chip">Admin Logement</span>
+        <span class="chip">Admin Bâtiment</span>
+        <span class="chip">Admin Global</span>
+      </p>
+      <p class="intro">
+        C’est la page d’accueil des gestionnaires. Elle répond en un coup d’œil à la seule
+        question qui compte le matin&nbsp;: <em>qui dois-je relancer aujourd’hui&nbsp;?</em>
+      </p>
+
+      <h3>Les indicateurs</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Indicateur</th><th>Signification</th></tr></thead>
+          <tbody>
+            <tr><td>Bâtiments</td><td>Nombre de bâtiments de votre périmètre (Admin Bâtiment et Global).</td></tr>
+            <tr><td>Logements</td><td>Nombre total de logements gérés.</td></tr>
+            <tr><td>Occupés</td><td>Logements avec une occupation en cours, et taux d’occupation.</td></tr>
+            <tr><td>Vacants</td><td>Logements libres, donc sans revenu.</td></tr>
+            <tr><td>Occupations actives</td><td>Baux en cours, tous logements confondus.</td></tr>
+            <tr><td>Arriérés (occ. actives)</td><td>Sommes dues par les locataires <strong>actuellement en place</strong> — le montant réellement recouvrable.</td></tr>
+            <tr><td>Arriérés (total)</td><td>Toutes les sommes dues, y compris par d’anciens locataires partis sans solder.</td></tr>
+            <tr><td>Total perçu</td><td>Cumul de tous les paiements enregistrés.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note tip">
+        <span class="note-title">Distinguez les deux montants d’arriérés</span>
+        <p>
+          L’écart entre «&nbsp;arriérés total&nbsp;» et «&nbsp;arriérés des occupations
+          actives&nbsp;» représente les impayés laissés par des locataires déjà partis.
+          C’est le montant à confier au recouvrement plutôt qu’à la relance courante.
+        </p>
+      </div>
+
+      <h3>La liste des logements occupés</h3>
+      <p>
+        Sous les indicateurs, toutes les occupations en cours sont listées
+        <strong>triées du plus en retard au plus à jour</strong>. Les premières lignes sont
+        donc votre file de relance du jour.
+      </p>
+      <p>
+        Chaque ligne porte un statut <span class="badge bad">Arriéré</span> ou
+        <span class="badge ok">À jour</span>, le nom du logement, le locataire et le
+        dernier jour couvert. Le nom du logement mène à sa fiche&nbsp;; l’icône de fin de
+        ligne, au détail de l’occupation.
+      </p>
+      <p>
+        Le bouton <strong>Actualiser</strong>, en haut à droite, recharge les chiffres —
+        utile si un collègue saisit des paiements en même temps que vous.
+      </p>
+    </section>
+
+    <!-- ══════════════ 07 ══════════════ -->
+    <section class="chapter" id="batiments">
+      <h2><span class="num">Chapitre 07</span>Les bâtiments</h2>
+      <p class="who">
+        <span class="who-label">Accès</span>
+        <span class="chip off">Locataire</span>
+        <span class="chip off">Admin Logement</span>
+        <span class="chip">Admin Bâtiment</span>
+        <span class="chip">Admin Global</span>
+      </p>
+      <p class="intro">
+        Le bâtiment est le contenant le plus large&nbsp;: un immeuble, une concession, un
+        ensemble de studios. C’est par lui qu’on commence quand on met en place
+        l’application.
+      </p>
+
+      <h3>Créer un bâtiment</h3>
+      <p class="who">
+        <span class="who-label">Réservé à</span>
+        <span class="chip">Admin Global</span>
+      </p>
+      <ol class="steps">
+        <li>Menu <strong>Bâtiments</strong>, bouton <strong>Nouveau bâtiment</strong>.</li>
+        <li>Renseignez le <strong>nom</strong> et l’<strong>adresse</strong> (obligatoires),
+          et une <strong>description</strong> si utile.</li>
+        <li>Validez.</li>
+      </ol>
+      <div class="note tip">
+        <span class="note-title">Choisissez des noms parlants</span>
+        <p>
+          «&nbsp;Résidence Akwa&nbsp;» ou «&nbsp;Immeuble Bonapriso&nbsp;» valent mieux que
+          «&nbsp;Bâtiment&nbsp;1&nbsp;». Ces noms apparaîtront dans toutes les listes, tous
+          les exports et tous les rapports.
+        </p>
+      </div>
+
+      <h3>Modifier un bâtiment</h3>
+      <p>
+        Icône crayon en bout de ligne. Nom, adresse et description sont modifiables à tout
+        moment&nbsp;; les logements rattachés ne sont pas affectés.
+      </p>
+
+      <h3>Supprimer un bâtiment</h3>
+      <p class="who">
+        <span class="who-label">Réservé à</span>
+        <span class="chip">Admin Global</span>
+      </p>
+      <div class="errbox">
+        <div class="msg">Impossible de supprimer : des logements sont rattachés à ce bâtiment.</div>
+        <div class="why">
+          <p>
+            Un bâtiment ne peut disparaître tant qu’il contient des logements — cela
+            effacerait leur historique. Supprimez d’abord les logements, ou conservez le
+            bâtiment&nbsp;: le garder ne coûte rien.
+          </p>
+        </div>
+      </div>
+
+      <h3>La fiche d’un bâtiment</h3>
+      <p>
+        Cliquez sur un bâtiment pour ouvrir son tableau de bord&nbsp;: nombre de logements,
+        occupés et vacants, occupations actives, arriérés et total perçu — les mêmes
+        indicateurs que le tableau de bord général, restreints à ce bâtiment. La liste de
+        ses logements suit, avec leur statut.
+      </p>
+      <p>
+        C’est la vue à utiliser pour comparer la performance de vos immeubles entre eux.
+      </p>
+    </section>
+
+    <!-- ══════════════ 08 ══════════════ -->
+    <section class="chapter" id="logements">
+      <h2><span class="num">Chapitre 08</span>Les logements et leurs loyers</h2>
+      <p class="who">
+        <span class="who-label">Consultation</span>
+        <span class="chip off">Locataire</span>
+        <span class="chip">Admin Logement</span>
+        <span class="chip">Admin Bâtiment</span>
+        <span class="chip">Admin Global</span>
+      </p>
+      <p class="intro">
+        Le logement est l’unité que vous louez&nbsp;: un appartement, un studio, une
+        chambre, une boutique.
+      </p>
+
+      <h3>La liste</h3>
+      <p>
+        Chaque ligne indique le logement, son bâtiment, son loyer actuel, son statut
+        <span class="badge bad">Occupé</span> ou <span class="badge ok">Libre</span>, le
+        locataire en place le cas échéant, et son dernier jour couvert.
+      </p>
+
+      <h3>Créer un logement</h3>
+      <p class="who">
+        <span class="who-label">Réservé à</span>
+        <span class="chip">Admin Bâtiment</span>
+        <span class="chip">Admin Global</span>
+      </p>
+      <ol class="steps">
+        <li>Bouton <strong>Nouveau logement</strong>.</li>
+        <li>Choisissez le <strong>bâtiment</strong> et donnez un <strong>nom</strong>
+          au logement.</li>
+        <li>Renseignez son <strong>premier loyer</strong>&nbsp;: le montant, puis la
+          périodicité (nombre + unité). Exemple&nbsp;: <code>75 000</code> pour
+          <code>1 mois</code>.</li>
+        <li>Indiquez éventuellement la <strong>date de début</strong> de ce loyer.</li>
+        <li>Validez.</li>
+      </ol>
+      <div class="note">
+        <span class="note-title">Logement et loyer sont créés ensemble</span>
+        <p>
+          Un logement sans loyer serait inutilisable&nbsp;: aucun paiement ne pourrait y
+          être calculé. C’est pourquoi le premier loyer fait partie du formulaire de
+          création.
+        </p>
+      </div>
+
+      <h3>Modifier un logement</h3>
+      <p>
+        Seuls le <strong>nom</strong> et la <strong>description</strong> se modifient ici.
+        Le loyer ne se modifie jamais&nbsp;: il s’ajoute (voir ci-dessous). Le bâtiment de
+        rattachement ne change pas non plus&nbsp;; un logement ne déménage pas.
+      </p>
+
+      <h3>Faire évoluer un loyer</h3>
+      <p class="who">
+        <span class="who-label">Réservé à</span>
+        <span class="chip">Admin Bâtiment</span>
+        <span class="chip">Admin Global</span>
+      </p>
+      <p>
+        Pour augmenter ou baisser un loyer, ouvrez la fiche du logement, onglet
+        <strong>Loyers</strong>, puis <strong>Ajouter un loyer</strong>. Renseignez le
+        nouveau montant, sa périodicité, et surtout sa <strong>date de début</strong>.
+      </p>
+      <p>
+        L’ancien loyer n’est pas effacé&nbsp;: il reste dans l’historique. Le loyer
+        applicable à un instant donné est le plus récent dont la date de début est déjà
+        passée.
+      </p>
+      <div class="errbox">
+        <div class="msg">Un loyer avec cette date de début existe déjà pour ce logement.</div>
+        <div class="why">
+          <p>
+            Deux loyers ne peuvent pas commencer le même jour&nbsp;: l’application ne
+            saurait lequel appliquer. Choisissez une autre date de début.
+          </p>
+        </div>
+      </div>
+
+      <h3>La fiche d’un logement</h3>
+      <p>Elle s’organise en trois onglets.</p>
+      <ul>
+        <li><strong>Tableau de bord</strong> — statut d’occupation, loyer actuel, locataire
+          en place, ses arriérés éventuels, et les cumuls du logement (total perçu, total
+          des arriérés, nombre d’occupations depuis l’origine).</li>
+        <li><strong>Loyers</strong> — l’historique complet, du plus ancien au plus récent.</li>
+        <li><strong>Occupations</strong> — tous les locataires qui s’y sont succédé.</li>
+      </ul>
+      <div class="note">
+        <span class="note-title">Chargement à la demande</span>
+        <p>
+          Les onglets Loyers et Occupations ne se chargent qu’au premier clic. C’est voulu&nbsp;:
+          la fiche s’ouvre plus vite. Un court instant d’attente au premier affichage est normal.
+        </p>
+      </div>
+
+      <h3>Installer un locataire depuis la liste</h3>
+      <p>
+        Sur un logement libre, l’icône représentant une silhouette avec un «&nbsp;+&nbsp;»
+        ouvre directement la création d’occupation, logement déjà pré-rempli. C’est le
+        raccourci le plus rapide pour une nouvelle entrée dans les lieux.
+      </p>
+
+      <h3>Supprimer un logement</h3>
+      <div class="errbox">
+        <div class="msg">Impossible de supprimer : une occupation est liée à ce logement.</div>
+        <div class="why">
+          <p>
+            Dès qu’un logement a été occupé, ne serait-ce qu’une fois par le passé, il ne
+            peut plus être supprimé&nbsp;: cela détruirait l’historique des paiements
+            correspondants. Un logement qui n’est plus loué se laisse simplement vacant.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ 09 ══════════════ -->
+    <section class="chapter" id="locataires">
+      <h2><span class="num">Chapitre 09</span>Les locataires</h2>
+      <p class="who">
+        <span class="who-label">Accès</span>
+        <span class="chip off">Locataire</span>
+        <span class="chip">Admin Logement</span>
+        <span class="chip">Admin Bâtiment</span>
+        <span class="chip">Admin Global</span>
+      </p>
+      <p class="intro">
+        La fiche locataire regroupe l’identité d’une personne et, avec le temps, tout son
+        historique&nbsp;: où elle a habité, ce qu’elle a payé, sa ponctualité.
+      </p>
+
+      <h3>Créer un locataire</h3>
+      <ol class="steps">
+        <li>Menu <strong>Locataires</strong>, bouton <strong>Nouveau locataire</strong>.</li>
+        <li>Renseignez <strong>nom</strong>, <strong>prénom</strong> et
+          <strong>téléphone</strong> (obligatoires), et l’<strong>e-mail</strong> si vous
+          l’avez.</li>
+        <li>Facultatif&nbsp;: rattachez un <strong>compte utilisateur</strong> pour lui
+          donner accès à son espace personnel.</li>
+        <li>Validez.</li>
+      </ol>
+
+      <div class="note">
+        <span class="note-title">Fiche locataire et compte utilisateur sont deux choses distinctes</span>
+        <p>
+          La <strong>fiche locataire</strong> sert à votre gestion&nbsp;; elle existe
+          toujours. Le <strong>compte utilisateur</strong> lui permet de se connecter pour
+          consulter sa situation&nbsp;; il est facultatif. Pour rattacher un compte, il faut
+          l’avoir créé au préalable avec le rôle Locataire
+          (<a href="#utilisateurs">chapitre&nbsp;12</a>).
+        </p>
+      </div>
+
+      <div class="note tip">
+        <span class="note-title">Le téléphone est votre meilleur identifiant</span>
+        <p>
+          Saisissez-le complet et à jour dès la création. C’est par lui que vous relancerez,
+          et c’est lui qui figure dans les exports.
+        </p>
+      </div>
+
+      <h3>La liste</h3>
+      <p>
+        Elle affiche nom, prénom, téléphone, e-mail, le statut
+        <span class="badge ok">Libre</span> ou non, le logement occupé le cas échéant, et
+        le dernier jour couvert — <strong>en rouge s’il est dépassé</strong>. Un filtre
+        permet de retrouver quelqu’un par n’importe lequel de ces champs.
+      </p>
+
+      <h3>La fiche d’un locataire</h3>
+      <p>Elle rassemble trois familles d’informations.</p>
+
+      <h4>Ses arriérés</h4>
+      <p>
+        Soit un badge <span class="badge ok">À jour</span>, soit le détail de ce qui est
+        dû&nbsp;: période concernée, nombre de loyers et montant.
+      </p>
+
+      <h4>Sa solvabilité</h4>
+      <p>
+        Le montant total qu’il a versé depuis toujours, et le montant total de ses
+        arriérés. Deux chiffres qui se lisent ensemble&nbsp;: un locataire ayant beaucoup
+        payé et peu d’arriérés est un bon payeur, même s’il a du retard ce mois-ci.
+      </p>
+
+      <h4>Son assiduité</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Indicateur</th><th>Lecture</th></tr></thead>
+          <tbody>
+            <tr><td>Nombre de paiements</td><td>Combien de fois il a payé depuis l’origine.</td></tr>
+            <tr><td>Paiements à temps</td><td>Versés au plus tard à la date attendue.</td></tr>
+            <tr><td>Paiements en retard</td><td>Versés après cette date.</td></tr>
+            <tr><td>Taux de ponctualité</td><td>Part des paiements effectués à temps. Le chiffre à regarder avant un renouvellement de bail.</td></tr>
+            <tr><td>Retard moyen</td><td>Nombre de jours de retard moyen. Deux jours n’ont pas la même portée que trente.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Supprimer un locataire</h3>
+      <div class="errbox">
+        <div class="msg">Impossible de supprimer : une occupation est liée à ce locataire.</div>
+        <div class="why">
+          <p>
+            Dès qu’un locataire a occupé un logement, sa fiche devient un élément
+            d’historique et ne peut plus être supprimée. Seule une fiche créée par erreur,
+            jamais rattachée à une occupation, peut l’être.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ 10 ══════════════ -->
+    <section class="chapter" id="occupations">
+      <h2><span class="num">Chapitre 10</span>Les occupations</h2>
+      <p class="who">
+        <span class="who-label">Accès</span>
+        <span class="chip off">Locataire</span>
+        <span class="chip">Admin Logement</span>
+        <span class="chip">Admin Bâtiment</span>
+        <span class="chip">Admin Global</span>
+      </p>
+      <p class="intro">
+        Une occupation, c’est le bail&nbsp;: elle relie un locataire à un logement sur une
+        période. C’est elle qui porte les paiements et les arriérés.
+      </p>
+
+      <h3>Les trois vues</h3>
+      <p>
+        En haut de la liste, trois onglets&nbsp;:
+        <strong>En cours</strong> (affiché par défaut, ce sont vos baux actifs),
+        <strong>Terminées</strong> (les locataires partis) et
+        <strong>Toutes</strong>. Chaque vue ne se charge qu’au premier clic, puis reste
+        immédiatement disponible.
+      </p>
+
+      <h3>Créer une occupation</h3>
+      <ol class="steps">
+        <li>Bouton <strong>Nouvelle occupation</strong>, ou l’icône silhouette&nbsp;+
+          depuis la liste des logements.</li>
+        <li>Choisissez le <strong>logement</strong> — seuls les logements libres sont
+          proposés.</li>
+        <li>Choisissez le <strong>locataire</strong>.</li>
+        <li>Indiquez la <strong>date de début</strong>, c’est-à-dire le jour d’entrée
+          dans les lieux.</li>
+        <li>Validez.</li>
+      </ol>
+      <div class="note">
+        <span class="note-title">Ce qui se passe à la validation</span>
+        <p>
+          Le logement passe <span class="badge bad">Occupé</span>, le locataire cesse d’être
+          <span class="badge ok">Libre</span>, et le dernier jour couvert est fixé à la
+          veille de la date de début. Le compteur des loyers dus démarre.
+        </p>
+      </div>
+      <div class="errbox">
+        <div class="msg">Ce logement est déjà occupé.</div>
+        <div class="why">
+          <p>
+            Un logement ne peut avoir qu’une seule occupation en cours. Si l’ancien
+            locataire est parti, mettez d’abord fin à son occupation, puis créez la
+            nouvelle.
+          </p>
+        </div>
+      </div>
+
+      <h3>Modifier une occupation</h3>
+      <p>
+        Tant qu’<strong>aucun paiement</strong> n’a été enregistré, la date de début et le
+        locataire restent modifiables — de quoi corriger une erreur de saisie.
+      </p>
+      <div class="errbox">
+        <div class="msg">Impossible de modifier : des paiements existent ou l’occupation est terminée.</div>
+        <div class="why">
+          <p>
+            Dès le premier paiement, l’occupation est figée&nbsp;: décaler sa date de début
+            fausserait toutes les périodes déjà réglées. Si une correction est réellement
+            nécessaire, supprimez les paiements concernés en commençant par le plus récent,
+            corrigez, puis ressaisissez-les.
+          </p>
+        </div>
+      </div>
+
+      <h3>Mettre fin à une occupation</h3>
+      <p>
+        Quand un locataire quitte les lieux, utilisez <strong>Mettre fin</strong> et
+        indiquez la <strong>date de départ</strong>. L’occupation bascule dans
+        <span class="badge mute">Terminé</span>, le logement redevient
+        <span class="badge ok">Libre</span> et le locataire redevient disponible.
+      </p>
+      <div class="note warn">
+        <span class="note-title">Ne supprimez pas une occupation terminée</span>
+        <p>
+          Terminer une occupation et la supprimer sont deux choses différentes. Terminer
+          conserve l’historique — c’est ce qu’il faut faire dans la quasi-totalité des cas.
+          Supprimer efface, et n’est justifié que pour une occupation créée par erreur.
+        </p>
+      </div>
+      <div class="note">
+        <span class="note-title">Un départ ne solde pas les dettes</span>
+        <p>
+          Les arriérés d’un locataire parti restent comptabilisés dans les
+          «&nbsp;arriérés total&nbsp;» du tableau de bord. Ils disparaissent seulement des
+          «&nbsp;arriérés des occupations actives&nbsp;».
+        </p>
+      </div>
+
+      <h3>Le contrat de bail</h3>
+      <p>
+        Chaque occupation peut porter un contrat numérisé. Ouvrez l’action
+        <strong>Contrat</strong>, déposez le fichier, validez.
+      </p>
+      <ul>
+        <li>Un seul contrat par occupation. En déposer un nouveau remplace l’ancien.</li>
+        <li>Les formats acceptés et la taille maximale sont indiqués dans la zone de dépôt.
+          Ils sont fixés par votre administrateur&nbsp;: fiez-vous à ce qui est affiché à
+          l’écran plutôt qu’à une valeur mémorisée.</li>
+        <li>Le locataire rattaché à un compte peut télécharger son contrat depuis son
+          espace personnel.</li>
+      </ul>
+      <div class="note tip">
+        <span class="note-title">Prenez l’habitude de déposer le contrat</span>
+        <p>
+          Une photo nette du contrat signé, prise au téléphone, suffit. Le jour où un
+          désaccord survient, le document est à portée de clic plutôt qu’au fond d’une
+          armoire.
+        </p>
+      </div>
+
+      <h3>Consulter les arriérés</h3>
+      <p>
+        L’action <strong>Arriérés</strong> affiche, pour une occupation donnée&nbsp;: la
+        période due, le montant et le nombre de loyers. Si rien n’est dû, un badge
+        <span class="badge ok">À jour</span> s’affiche.
+      </p>
+
+      <h3>La fiche d’une occupation</h3>
+      <p>
+        Elle réunit tout&nbsp;: statut, logement, locataire, loyer applicable, nombre et
+        montant total des paiements, dernier paiement reçu, arriérés, et l’historique
+        complet des versements. Chaque ligne d’historique indique si le paiement a été
+        effectué <strong>en retard</strong>.
+      </p>
+      <p>
+        C’est la page à ouvrir avant d’appeler un locataire&nbsp;: elle contient l’intégralité
+        de l’argumentaire.
+      </p>
+    </section>
+
+    <!-- ══════════════ 11 ══════════════ -->
+    <section class="chapter" id="paiements">
+      <h2><span class="num">Chapitre 11</span>Les paiements</h2>
+      <p class="who">
+        <span class="who-label">Accès</span>
+        <span class="chip off">Locataire</span>
+        <span class="chip">Admin Logement</span>
+        <span class="chip">Admin Bâtiment</span>
+        <span class="chip">Admin Global</span>
+      </p>
+      <p class="intro">
+        C’est l’opération la plus fréquente de votre quotidien. Elle est conçue pour tenir
+        en quelques secondes, sans aucun calcul de votre part.
+      </p>
+
+      <h3>Où enregistrer un paiement</h3>
+      <ul>
+        <li>Depuis <strong>Paiements</strong> → <strong>Nouveau paiement</strong>, en
+          choisissant l’occupation dans une liste déroulante.</li>
+        <li>Depuis <strong>Occupations</strong>, icône portefeuille sur la ligne concernée —
+          l’occupation est alors déjà sélectionnée. <strong>C’est la voie la plus sûre</strong>,
+          elle évite toute erreur de destinataire.</li>
+      </ul>
+
+      <h3>Deux façons de saisir</h3>
+      <p>
+        Le formulaire propose deux modes, à basculer en haut de la fenêtre. Dans les deux
+        cas, le <strong>début de période</strong> est calculé et affiché en lecture seule&nbsp;:
+        c’est toujours le lendemain du dernier jour couvert.
+      </p>
+
+      <h4>Option 1 — Par nombre de loyers <span class="badge info">le plus courant</span></h4>
+      <p>
+        Utilisez-la quand le locataire règle un nombre entier de loyers&nbsp;: un mois,
+        trois mois, un an.
+      </p>
+      <ol class="steps">
+        <li>Indiquez le <strong>nombre de loyers</strong> réglés.</li>
+        <li>L’application affiche immédiatement, <strong>avant validation</strong>, la fin
+          de période et le montant correspondant.</li>
+        <li>Vérifiez que le montant annoncé correspond à la somme reçue, puis validez.</li>
+      </ol>
+      <div class="example">
+        <div class="ex-head">Calcul automatique affiché à l’écran</div>
+        <div class="ex-body">
+          <dl>
+            <dt>Début de période</dt><dd>01/06/2026</dd>
+            <dt>Nombre de loyers</dt><dd>× 3</dd>
+            <dt>Fin de période calculée</dt><dd>31/08/2026</dd>
+            <dt>Montant</dt><dd>360 000 F CFA</dd>
+          </dl>
+          <p style="margin-top:.85rem">
+            Soit 3 × 120 000 F CFA, pour un loyer mensuel.
+          </p>
+        </div>
+      </div>
+
+      <h4>Option 2 — Montant libre</h4>
+      <p>
+        Utilisez-la pour un paiement partiel, un arrangement particulier ou un
+        arrondi&nbsp;: le locataire verse une somme qui ne correspond pas à un nombre
+        entier de loyers.
+      </p>
+      <ol class="steps">
+        <li>Saisissez le <strong>montant payé</strong>.</li>
+        <li>Saisissez la <strong>fin de période</strong> que ce montant couvre —
+          c’est vous qui décidez, en accord avec le locataire.</li>
+        <li>Validez.</li>
+      </ol>
+      <div class="note warn">
+        <span class="note-title">La fin de période ne peut pas précéder le début</span>
+        <p>
+          L’application refuse une date de fin antérieure au début de période&nbsp;: cela
+          reviendrait à couvrir une durée négative. Vérifiez la date saisie.
+        </p>
+      </div>
+
+      <h4>Champs communs aux deux options</h4>
+      <ul>
+        <li><strong>Date de paiement</strong> — pré-remplie à la date du jour. Modifiez-la
+          si vous saisissez un versement reçu antérieurement&nbsp;: c’est elle qui détermine
+          si le paiement est comptabilisé comme ponctuel ou en retard dans les statistiques
+          d’assiduité.</li>
+        <li><strong>Commentaire</strong> — facultatif. Précieux pour noter un mode de
+          règlement, un arrangement ou le nom d’un tiers payeur.</li>
+      </ul>
+
+      <div class="note tip">
+        <span class="note-title">Saisissez au fil de l’eau</span>
+        <p>
+          Enregistrez chaque versement au moment où vous le recevez. Les arriérés, les
+          statistiques de ponctualité et le tableau de bord se recalculent seuls&nbsp;;
+          leur justesse dépend uniquement de la fraîcheur de vos saisies.
+        </p>
+      </div>
+
+      <h3>La liste des paiements</h3>
+      <p>
+        Elle affiche l’occupation, le locataire, le logement, la période couverte, le
+        montant, la date de paiement et le nombre de loyers. Elle se parcourt page par
+        page&nbsp;; un champ de recherche filtre la page affichée par logement ou par
+        locataire.
+      </p>
+
+      <h3>Modifier ou supprimer un paiement</h3>
+      <p>
+        C’est possible, mais <strong>uniquement pour le dernier paiement d’une
+        occupation</strong>.
+      </p>
+      <div class="errbox">
+        <div class="msg">Seul le dernier paiement d’une occupation peut être modifié ou supprimé.</div>
+        <div class="why">
+          <p>
+            Les périodes s’enchaînent bout à bout&nbsp;: modifier un paiement du milieu
+            créerait un trou ou un chevauchement dans tous les suivants. Pour corriger une
+            erreur ancienne, supprimez les paiements du plus récent vers le plus ancien
+            jusqu’à celui qui pose problème, corrigez-le, puis ressaisissez les autres.
+          </p>
+        </div>
+      </div>
+      <div class="note warn">
+        <span class="note-title">Occupation terminée, paiements figés</span>
+        <p>
+          Aucun paiement rattaché à une occupation terminée n’est modifiable ni
+          supprimable&nbsp;: les boutons correspondants n’apparaissent tout simplement pas.
+          Vérifiez vos saisies <em>avant</em> de clore une occupation.
+        </p>
+      </div>
+
+      <h3>Les preuves de paiement</h3>
+      <p>
+        À chaque paiement, vous pouvez joindre des justificatifs&nbsp;: reçu, capture d’un
+        transfert mobile, photo d’un bordereau. L’action <strong>Preuves</strong> propose
+        deux modes&nbsp;:
+      </p>
+      <ul>
+        <li><strong>Ajouter</strong> — les nouveaux fichiers s’ajoutent aux existants.</li>
+        <li><strong>Remplacer</strong> — les nouveaux fichiers se substituent à tous les
+          précédents.</li>
+      </ul>
+      <p>
+        Le nombre maximal de fichiers, leur taille et les formats acceptés sont affichés
+        dans la zone de dépôt.
+      </p>
+      <div class="note tip">
+        <span class="note-title">Les preuves restent toujours modifiables</span>
+        <p>
+          Contrairement au paiement lui-même, les preuves peuvent être ajoutées ou
+          remplacées à tout moment, y compris sur un paiement ancien. Un justificatif
+          retrouvé plus tard peut donc toujours être rattaché à sa ligne.
+        </p>
+      </div>
+    </section>
+
+    <!-- ══════════════ 12 ══════════════ -->
+    <section class="chapter" id="utilisateurs">
+      <h2><span class="num">Chapitre 12</span>Les utilisateurs</h2>
+      <p class="who">
+        <span class="who-label">Accès</span>
+        <span class="chip off">Locataire</span>
+        <span class="chip">Admin Logement</span>
+        <span class="chip">Admin Bâtiment</span>
+        <span class="chip">Admin Global</span>
+      </p>
+      <p class="intro">
+        Un utilisateur, c’est un compte de connexion. À distinguer du locataire, qui est
+        une fiche de gestion.
+      </p>
+
+      <h3>Créer un utilisateur</h3>
+      <ol class="steps">
+        <li>Menu <strong>Utilisateurs</strong>, bouton <strong>Nouvel utilisateur</strong>.</li>
+        <li>Renseignez nom, prénom, téléphone, e-mail éventuel et
+          <strong>nom d’utilisateur</strong> (l’identifiant de connexion, 3&nbsp;caractères
+          minimum).</li>
+        <li>Choisissez le <strong>rôle</strong>.</li>
+        <li>Un <strong>mot de passe est généré automatiquement</strong> et affiché à
+          l’écran. <strong>Notez-le maintenant.</strong></li>
+        <li>Validez, puis transmettez les identifiants à la personne concernée.</li>
+      </ol>
+
+      <div class="note warn">
+        <span class="note-title">Le mot de passe ne s’affiche qu’une fois</span>
+        <p>
+          Il est visible uniquement dans cette fenêtre. Une fois celle-ci fermée, plus
+          personne ne peut le retrouver — pas même vous. Si vous l’avez perdu, utilisez la
+          réinitialisation décrite plus bas&nbsp;: elle en génère un nouveau.
+        </p>
+      </div>
+
+      <h4>Quels rôles pouvez-vous attribuer&nbsp;?</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Votre rôle</th><th>Rôles que vous pouvez créer</th></tr></thead>
+          <tbody>
+            <tr><td>Admin Logement</td><td>Locataire</td></tr>
+            <tr><td>Admin Bâtiment</td><td>Locataire, Admin Logement</td></tr>
+            <tr><td>Admin Global</td><td>Tous les rôles</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="errbox">
+        <div class="msg">Ce nom d’utilisateur est déjà pris.</div>
+        <div class="why">
+          <p>
+            Les noms d’utilisateur sont uniques. Choisissez-en un autre — en ajoutant une
+            initiale ou un chiffre, par exemple.
+          </p>
+        </div>
+      </div>
+
+      <h3>Désactiver et réactiver un compte</h3>
+      <p>
+        <strong>Un utilisateur ne se supprime jamais.</strong> Le bouton n’existe pas, et
+        c’est délibéré&nbsp;: supprimer un compte reviendrait à effacer la trace de qui a
+        saisi quoi.
+      </p>
+      <p>
+        Pour retirer l’accès à quelqu’un, <strong>désactivez</strong> son compte&nbsp;:
+        il ne peut plus se connecter, mais tout son historique reste intact. Un compte
+        désactivé se réactive de la même manière.
+      </p>
+      <div class="note tip">
+        <span class="note-title">Le bon réflexe au départ d’un collaborateur</span>
+        <p>
+          Désactivez son compte le jour même. C’est immédiat, réversible, et cela ne
+          détruit rien.
+        </p>
+      </div>
+
+      <h3>Réinitialiser un mot de passe</h3>
+      <p>
+        Si un utilisateur a perdu son mot de passe et ne parvient pas à utiliser la
+        procédure d’oubli, un administrateur peut lui en générer un nouveau. Comme à la
+        création, il s’affiche une seule fois&nbsp;: notez-le et transmettez-le. Invitez
+        la personne à le changer dès sa connexion.
+      </p>
+
+      <h3>Attribuer des périmètres</h3>
+      <p>
+        Créer un compte administrateur ne suffit pas&nbsp;: encore faut-il lui dire
+        <em>sur quoi</em> il travaille. Cela se fait depuis sa fiche.
+      </p>
+      <ul>
+        <li><strong>Attribuer un bâtiment</strong> à un Admin Bâtiment — réservé à
+          l’Admin Global.</li>
+        <li><strong>Attribuer un logement</strong> à un Admin Logement — accessible aux
+          Admin Bâtiment (pour leurs propres bâtiments) et à l’Admin Global.</li>
+      </ul>
+      <div class="note warn">
+        <span class="note-title">Sans attribution, un administrateur ne voit rien</span>
+        <p>
+          C’est la cause la plus fréquente de l’appel «&nbsp;je me connecte mais mes listes
+          sont vides&nbsp;». Le compte fonctionne parfaitement&nbsp;: il n’a simplement pas
+          encore de périmètre. Ouvrez sa fiche et attribuez-lui ses bâtiments ou ses
+          logements.
+        </p>
+      </div>
+
+      <h3>Modifier un utilisateur</h3>
+      <p>
+        Depuis sa fiche&nbsp;: nom, prénom, téléphone, e-mail et rôle. Un changement de
+        rôle peut être refusé si des données dépendent du rôle actuel — retirez d’abord
+        les attributions concernées.
+      </p>
+    </section>
+
+    <!-- ══════════════ 13 ══════════════ -->
+    <section class="chapter" id="exports">
+      <h2><span class="num">Chapitre 13</span>Les exports</h2>
+      <p class="who">
+        <span class="who-label">Accès</span>
+        <span class="chip off">Locataire</span>
+        <span class="chip">Admin Logement</span>
+        <span class="chip">Admin Bâtiment</span>
+        <span class="chip">Admin Global</span>
+      </p>
+      <p class="intro">
+        Pour vos réunions, votre comptabilité ou vos archives, toutes les données se
+        récupèrent en Excel ou en PDF.
+      </p>
+
+      <h3>Deux chemins</h3>
+      <ul>
+        <li>Depuis une liste — le bouton <strong>Exporter</strong> en haut de page
+          exporte l’entité affichée.</li>
+        <li>Depuis le menu <strong>Export</strong> — une page qui rassemble tous les
+          rapports disponibles pour votre rôle.</li>
+      </ul>
+
+      <h3>Les rapports</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Rapport</th><th>Contenu</th></tr></thead>
+          <tbody>
+            <tr><td>Paiements</td><td>Historique de tous les paiements enregistrés.</td></tr>
+            <tr><td>Arriérés</td><td>Sommes dues, par occupation. Le rapport de relance.</td></tr>
+            <tr><td>Logements</td><td>Fiche complète de chaque logement.</td></tr>
+            <tr><td>Locataires</td><td>Liste avec statut et solvabilité.</td></tr>
+            <tr><td>Occupations</td><td>Baux passés et en cours.</td></tr>
+            <tr><td>Utilisateurs</td><td>Comptes de votre périmètre, avec rôle et statut.</td></tr>
+            <tr><td>Bâtiments</td><td>Liste avec statistiques. Réservé aux Admin Bâtiment et Global.</td></tr>
+            <tr><td>Classeur complet</td><td>Toutes les données réunies dans un seul fichier Excel multi-onglets.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Choisir le format</h3>
+      <ul>
+        <li><strong>Excel</strong> — pour retravailler les chiffres, filtrer, faire des
+          totaux.</li>
+        <li><strong>PDF</strong> — pour imprimer, archiver ou transmettre sans risque de
+          modification.</li>
+      </ul>
+      <p>
+        Le classeur complet n’existe qu’en Excel&nbsp;: sa vocation est précisément d’être
+        exploité.
+      </p>
+
+      <h3>Le téléchargement</h3>
+      <p>
+        Cliquez sur <strong>Télécharger</strong>&nbsp;: le fichier arrive dans le dossier
+        de téléchargements de votre navigateur, nommé d’après le rapport et la date du
+        jour. Un export volumineux peut demander quelques secondes.
+      </p>
+      <div class="note">
+        <span class="note-title">Les exports respectent votre périmètre</span>
+        <p>
+          Un export ne contient que les données que vous êtes habilité à voir. Deux
+          administrateurs exportant le même rapport n’obtiendront pas le même fichier.
+        </p>
+      </div>
+    </section>
+
+    <!-- ══════════════ 14 ══════════════ -->
+    <section class="chapter" id="locataire-espace">
+      <h2><span class="num">Chapitre 14</span>L’espace locataire</h2>
+      <p class="who">
+        <span class="who-label">Réservé à</span>
+        <span class="chip">Locataire</span>
+      </p>
+      <p class="intro">
+        Les locataires disposant d’un compte accèdent à un espace personnel, en
+        consultation seule. Rien n’y est modifiable&nbsp;: c’est une vitrine sur leur
+        propre situation.
+      </p>
+
+      <h3>Ce qu’il contient</h3>
+      <ul>
+        <li>Ses <strong>informations personnelles</strong> et son statut.</li>
+        <li>Son <strong>occupation en cours</strong>&nbsp;: logement, loyer applicable,
+          date d’entrée.</li>
+        <li>Sa <strong>situation</strong>&nbsp;: soit un badge
+          <span class="badge ok">À jour</span>, soit un badge
+          <span class="badge bad">Arriéré</span> avec le montant dû et la période concernée.</li>
+        <li>L’<strong>historique de ses paiements</strong>, chaque ligne indiquant si le
+          versement a été effectué en retard.</li>
+        <li>Le <strong>téléchargement de son contrat</strong> de bail, s’il a été déposé.</li>
+      </ul>
+
+      <div class="note tip">
+        <span class="note-title">Un outil de relance qui travaille pour vous</span>
+        <p>
+          Donner un compte à vos locataires réduit les appels&nbsp;: chacun consulte lui-même
+          ce qu’il doit, sans passer par vous, et le montant affiché ne se discute pas
+          puisqu’il vient du même système que vos propres chiffres.
+        </p>
+      </div>
+
+      <p>
+        Un locataire ne voit jamais les autres locataires, ni les autres logements, ni
+        aucun chiffre global. Sa navigation se limite à son espace et à son profil.
+      </p>
+    </section>
+
+    <!-- ══════════════ 15 ══════════════ -->
+    <section class="chapter" id="regles">
+      <h2><span class="num">Chapitre 15</span>Pourquoi l’application refuse&nbsp;?</h2>
+      <p class="intro">
+        Un refus n’est jamais un dysfonctionnement&nbsp;: c’est une protection. Voici les
+        messages que vous pouvez rencontrer et la conduite à tenir.
+      </p>
+
+      <h3>Suppressions bloquées</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Message</th><th>Raison</th><th>Que faire</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Une occupation est liée à ce locataire</td>
+              <td>Ce locataire a un historique.</td>
+              <td>Conservez la fiche. Elle ne gêne rien.</td>
+            </tr>
+            <tr>
+              <td>Une occupation est liée à ce logement</td>
+              <td>Ce logement a déjà été loué.</td>
+              <td>Laissez-le vacant plutôt que de le supprimer.</td>
+            </tr>
+            <tr>
+              <td>Des logements sont rattachés à ce bâtiment</td>
+              <td>Le bâtiment n’est pas vide.</td>
+              <td>Supprimez d’abord les logements, ou gardez le bâtiment.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Ces trois règles ont la même finalité&nbsp;: <strong>aucune donnée historique ne
+        peut être détruite par accident</strong>.
+      </p>
+
+      <h3>Modifications bloquées</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Message</th><th>Raison</th><th>Que faire</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Ce logement est déjà occupé</td>
+              <td>Une occupation en cours existe.</td>
+              <td>Mettez fin à l’occupation précédente.</td>
+            </tr>
+            <tr>
+              <td>Des paiements existent ou l’occupation est terminée</td>
+              <td>Modifier fausserait les périodes déjà réglées.</td>
+              <td>Supprimez les paiements du plus récent au plus ancien, corrigez, ressaisissez.</td>
+            </tr>
+            <tr>
+              <td>Seul le dernier paiement peut être modifié</td>
+              <td>Les périodes s’enchaînent bout à bout.</td>
+              <td>Remontez la chaîne depuis le paiement le plus récent.</td>
+            </tr>
+            <tr>
+              <td>Un loyer avec cette date de début existe déjà</td>
+              <td>Deux loyers ne peuvent pas démarrer le même jour.</td>
+              <td>Choisissez une autre date de début.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Accès refusés</h3>
+      <div class="errbox">
+        <div class="msg">Accès refusé.</div>
+        <div class="why">
+          <p>
+            L’élément demandé n’appartient pas à votre périmètre, ou votre rôle ne
+            l’autorise pas. Si vous pensez devoir y accéder, demandez à un Admin Global de
+            vérifier vos attributions.
+          </p>
+        </div>
+      </div>
+
+      <div class="errbox">
+        <div class="msg">Ressource introuvable.</div>
+        <div class="why">
+          <p>
+            L’élément a été supprimé entre-temps, ou le lien utilisé est périmé. Revenez à
+            la liste et actualisez.
+          </p>
+        </div>
+      </div>
+
+      <h3>Erreurs de saisie</h3>
+      <p>
+        Lorsqu’un champ est mal renseigné, le message apparaît <strong>directement sous le
+        champ concerné</strong> et le formulaire n’est pas envoyé. Corrigez, puis validez à
+        nouveau&nbsp;: rien n’est perdu.
+      </p>
+
+      <h3>Trop de requêtes</h3>
+      <p>
+        Un message «&nbsp;Trop de requêtes, veuillez patienter&nbsp;» signale une protection
+        contre la surcharge. Patientez une minute&nbsp;; l’accès se rétablit seul.
+      </p>
+    </section>
+
+    <!-- ══════════════ 16 ══════════════ -->
+    <section class="chapter" id="faq">
+      <h2><span class="num">Chapitre 16</span>Questions fréquentes</h2>
+
+      <h3>Un locataire a payé une somme qui ne tombe pas juste. Comment faire&nbsp;?</h3>
+      <p>
+        Utilisez l’<strong>Option 2 — Montant libre</strong> du formulaire de paiement.
+        Saisissez la somme reçue et la date jusqu’à laquelle vous considérez la période
+        couverte.
+      </p>
+
+      <h3>J’ai augmenté le loyer. Faut-il modifier les paiements passés&nbsp;?</h3>
+      <p>
+        Non, surtout pas. Ajoutez simplement un nouveau loyer avec sa date de début&nbsp;:
+        les paiements antérieurs restent calculés à l’ancien tarif, ce qui est exact.
+      </p>
+
+      <h3>Je me suis trompé de locataire en enregistrant un paiement.</h3>
+      <p>
+        Si c’est le dernier paiement de cette occupation, supprimez-le et ressaisissez-le
+        au bon endroit. Sinon, supprimez d’abord les paiements plus récents, corrigez, puis
+        ressaisissez-les dans l’ordre.
+      </p>
+
+      <h3>Un locataire est parti sans payer. Que faire&nbsp;?</h3>
+      <p>
+        Mettez fin à son occupation à la date réelle de départ. Sa dette reste enregistrée
+        et continue d’apparaître dans les «&nbsp;arriérés total&nbsp;» ainsi que sur sa fiche.
+        Le logement redevient disponible immédiatement.
+      </p>
+
+      <h3>Le même locataire revient dans un autre logement.</h3>
+      <p>
+        Ne recréez pas sa fiche&nbsp;: créez une nouvelle occupation avec la fiche
+        existante. Vous conserverez ainsi tout son historique et ses statistiques
+        d’assiduité.
+      </p>
+
+      <h3>Mes listes sont vides alors que je suis bien connecté.</h3>
+      <p>
+        Votre compte n’a probablement pas encore de périmètre attribué. Demandez à un
+        Admin Global de vous attribuer vos bâtiments, ou à votre Admin Bâtiment de vous
+        attribuer vos logements.
+      </p>
+
+      <h3>Puis-je utiliser l’application sur mon téléphone&nbsp;?</h3>
+      <p>
+        Oui, l’intégralité des fonctions est disponible. Vous pouvez même l’installer comme
+        une application (<a href="#acces">chapitre&nbsp;01</a>). C’est particulièrement
+        pratique pour enregistrer un paiement sur place, au moment où vous l’encaissez.
+      </p>
+
+      <h3>Plusieurs personnes peuvent-elles travailler en même temps&nbsp;?</h3>
+      <p>
+        Oui. Les données sont partagées en temps réel. Utilisez le bouton
+        <strong>Actualiser</strong> du tableau de bord pour voir les saisies de vos
+        collègues.
+      </p>
+
+      <h3>Comment obtenir ce guide en PDF&nbsp;?</h3>
+      <p>
+        Faites <code>Ctrl</code>&nbsp;+&nbsp;<code>P</code> (ou <code>⌘</code>&nbsp;+&nbsp;<code>P</code>
+        sur Mac) et choisissez «&nbsp;Enregistrer au format PDF&nbsp;». La mise en page est
+        prévue pour l’impression.
+      </p>
+
+      <h3>Qui contacter en cas de problème&nbsp;?</h3>
+      <p>
+        Pour une question d’usage ou de droits d’accès&nbsp;: votre Admin Global. Pour un
+        dysfonctionnement technique&nbsp;: le responsable de l’application, en précisant
+        la page concernée, l’action tentée et le message affiché.
+      </p>
+
+      <div class="colophon">
+        <p>
+          Guide d’utilisation de <strong>Gestion de Logements</strong>. Certains écrans
+          peuvent varier légèrement selon votre rôle et les options activées pour votre
+          organisation.
+        </p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll('#toc a'));
+  var map = {};
+  links.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+
+  var sections = Array.prototype.slice.call(document.querySelectorAll('main.content > section[id]'));
+  if (!sections.length || !('IntersectionObserver' in window)) return;
+
+  var visible = {};
+
+  function refresh() {
+    var current = null;
+    for (var i = 0; i < sections.length; i++) {
+      if (visible[sections[i].id]) { current = sections[i].id; break; }
+    }
+    links.forEach(function (a) { a.classList.remove('active'); });
+    if (current && map[current]) {
+      map[current].classList.add('active');
+      map[current].setAttribute('aria-current', 'true');
+    }
+  }
+
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) { visible[e.target.id] = e.isIntersecting; });
+    refresh();
+  }, { rootMargin: '0px 0px -70% 0px', threshold: 0 });
+
+  sections.forEach(function (s) { io.observe(s); });
+})();
+</script>
+</body>
+</html>
