@@ -366,7 +366,7 @@ export default function UtilisateurDetailPage() {
                 {errors.role && <p className="text-xs text-[#991b1b] mt-0.5">{errors.role.message}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nom d'utilisateur</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nom d&apos;utilisateur</label>
                 <input
                   readOnly
                   value={user.username}
@@ -575,7 +575,7 @@ export default function UtilisateurDetailPage() {
               />
             </div>
             <p className="text-xs text-gray-400 mt-1">
-              Communiquez ce mot de passe à l'utilisateur.
+              Communiquez ce mot de passe à l&apos;utilisateur.
             </p>
           </div>
 

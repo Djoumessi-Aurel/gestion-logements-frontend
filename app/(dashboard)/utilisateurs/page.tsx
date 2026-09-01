@@ -367,7 +367,7 @@ export default function UtilisateursPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nom d'utilisateur *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Nom d&apos;utilisateur *</label>
             <Controller name="username" control={control} render={({ field }) => (
               <InputText {...field} className={`w-full ${errors.username ? 'p-invalid' : ''}`} />
             )} />
@@ -428,7 +428,7 @@ export default function UtilisateursPage() {
               />
             </div>
             <p className="text-xs text-gray-400 mt-1">
-              Communiquez ce mot de passe à l'utilisateur après création.
+              Communiquez ce mot de passe à l&apos;utilisateur après création.
             </p>
           </div>
 
@@ -501,7 +501,7 @@ export default function UtilisateursPage() {
                 />
               </div>
               <p className="text-xs text-gray-400 mt-1">
-                Communiquez ce mot de passe à l'utilisateur.
+                Communiquez ce mot de passe à l&apos;utilisateur.
               </p>
             </div>
 

@@ -80,9 +80,6 @@ export default function LocataireDashboardPage() {
   }
 
   const { solvabilite, assiduité: assiduite, listeArrieres } = dashboard;
-  const tauxOccupation = dashboard.totalOccupations > 0
-    ? Math.round((dashboard.nbOccupationsActives / dashboard.totalOccupations) * 100)
-    : 0;
 
   return (
     <div className="space-y-6">
@@ -156,10 +153,6 @@ export default function LocataireDashboardPage() {
             value={String(dashboard.nbOccupationsActives)}
             color={dashboard.nbOccupationsActives > 0 ? 'text-[#1e3a8a]' : 'text-gray-400'}
           />
-          {/* <KpiCard
-            label="Taux d'occupation"
-            value={`${tauxOccupation} %`}
-          /> */}
         </div>
       </div>
 

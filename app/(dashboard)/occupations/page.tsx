@@ -783,7 +783,7 @@ export default function OccupationsPage() {
           {selectedOcc?.contratFichierId && (
             <div className="mb-4 p-3 bg-[#fef3c7] border border-yellow-300 rounded-lg text-sm text-[#92400e] flex items-center gap-2">
               <i className="pi pi-info-circle" />
-              Un contrat existe déjà. L'uploader remplacera l'ancien.
+              Un contrat existe déjà. L&apos;uploader remplacera l&apos;ancien.
             </div>
           )}
           <FileUploader

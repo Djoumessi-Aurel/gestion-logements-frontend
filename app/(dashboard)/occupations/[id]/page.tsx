@@ -149,7 +149,7 @@ export default function OccupationDashboardPage() {
                 {formatMontant(dernierPaiement.montantPaye)}
                 <span className="text-gray-400 font-normal"> le {formatDate(dernierPaiement.datePaiement)}</span>
               </p>
-              <p className="text-xs text-gray-400">Couvre jusqu'au {formatDate(dernierPaiement.finPeriode)}</p>
+              <p className="text-xs text-gray-400">Couvre jusqu&apos;au {formatDate(dernierPaiement.finPeriode)}</p>
             </div>
           )}
         </div>
