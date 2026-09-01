@@ -28,6 +28,7 @@ import StatusBadge from '@/components/shared/StatusBadge';
 import { showConfirm } from '@/components/shared/ConfirmDialog';
 import { formatDate, isDatePassee } from '@/utils/date';
 import { extractError } from '@/utils/error';
+import { hasMinRole } from '@/utils/role';
 
 // ─── Schémas ──────────────────────────────────────────────────────────────────
 
@@ -204,7 +205,7 @@ export default function LocatairesPage() {
   }
 
   // ── RBAC ───────────────────────────────────────────────────────────────────
-  const canWrite  = role !== Role.LOCATAIRE;
+  const canWrite  = hasMinRole(role, Role.ADMIN_LOGEMENT);
   const canExport = canWrite;
 
   const [exportVisible, setExportVisible] = useState(false);

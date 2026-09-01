@@ -29,6 +29,7 @@ import DataTableWrapper from '@/components/shared/DataTableWrapper';
 import { formatMontant, labelPeriode } from '@/utils/format';
 import { formatDate, toDateStr } from '@/utils/date';
 import { extractError } from '@/utils/error';
+import { hasMinRole } from '@/utils/role';
 
 // ─── Schéma ajout loyer ───────────────────────────────────────────────────────
 
@@ -200,7 +201,7 @@ export default function LogementDetailPage() {
     nbreTotalPaiementsLocataireActuel, montantTotalPayeLocataireActuel,
   } = dashboard;
 
-  const canAddLoyer = role === Role.ADMIN_BATIMENT || role === Role.ADMIN_GLOBAL;
+  const canAddLoyer = hasMinRole(role, Role.ADMIN_BATIMENT);
 
   // ── Rendu ──────────────────────────────────────────────────────────────────
   return (

@@ -19,10 +19,10 @@ import { Role } from '@/types/enums';
 import PageHeader from '@/components/shared/PageHeader';
 import ExportModal from '@/components/shared/ExportModal';
 import DataTableWrapper from '@/components/shared/DataTableWrapper';
-import RoleGuard from '@/components/shared/RoleGuard';
 import { showConfirm } from '@/components/shared/ConfirmDialog';
 import { useAppSelector } from '@/store/hooks';
 import { extractError } from '@/utils/error';
+import { hasMinRole } from '@/utils/role';
 
 // ─── Schéma de validation ─────────────────────────────────────────────────────
 
@@ -142,8 +142,8 @@ export default function BatimentsPage() {
   }
 
   // ── Colonnes DataTable ─────────────────────────────────────────────────────
-  const canEdit   = role === Role.ADMIN_BATIMENT || role === Role.ADMIN_GLOBAL;
-  const canDelete = role === Role.ADMIN_GLOBAL;
+  const canEdit   = hasMinRole(role, Role.ADMIN_BATIMENT);
+  const canDelete = hasMinRole(role, Role.ADMIN_GLOBAL);
   const canExport = canEdit;
 
   const [exportVisible, setExportVisible] = useState(false);
@@ -199,7 +199,7 @@ export default function BatimentsPage() {
           label:   'Nouveau bâtiment',
           icon:    'pi-plus',
           onClick: openCreate,
-          visible: role === Role.ADMIN_GLOBAL,
+          visible: hasMinRole(role, Role.ADMIN_GLOBAL),
         }}
       />
 

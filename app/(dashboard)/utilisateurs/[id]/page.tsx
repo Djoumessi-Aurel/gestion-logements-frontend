@@ -24,7 +24,7 @@ import PageHeader from '@/components/shared/PageHeader';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import ErrorMessage from '@/components/shared/ErrorMessage';
 import { showConfirm } from '@/components/shared/ConfirmDialog';
-import { roleLabels, roleColors, rolesForAdmin } from '@/utils/role';
+import { hasMinRole, roleLabels, roleColors, rolesForAdmin } from '@/utils/role';
 import { generatePassword } from '@/utils/password';
 import { extractError } from '@/utils/error';
 
@@ -50,9 +50,9 @@ export default function UtilisateurDetailPage() {
   const currentId   = useAppSelector((s) => s.auth.user?.id);
   const userId      = Number(id);
 
-  const canEdit          = currentRole && currentRole !== Role.LOCATAIRE;
-  const canAssignBat     = currentRole === Role.ADMIN_GLOBAL;
-  const canAssignLog     = currentRole === Role.ADMIN_BATIMENT || currentRole === Role.ADMIN_GLOBAL;
+  const canEdit          = hasMinRole(currentRole, Role.ADMIN_LOGEMENT);
+  const canAssignBat     = hasMinRole(currentRole, Role.ADMIN_GLOBAL);
+  const canAssignLog     = hasMinRole(currentRole, Role.ADMIN_BATIMENT);
 
   // ── État principal ─────────────────────────────────────────────────────────
   const [user,    setUser]    = useState<Utilisateur | null>(null);

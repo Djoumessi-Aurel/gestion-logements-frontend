@@ -34,6 +34,7 @@ import ExportModal from '@/components/shared/ExportModal';
 import { formatMontant, labelPeriodeCourt } from '@/utils/format';
 import { formatDate, toDateStr } from '@/utils/date';
 import { extractError } from '@/utils/error';
+import { hasMinRole } from '@/utils/role';
 
 // ─── Schémas ──────────────────────────────────────────────────────────────────
 
@@ -118,7 +119,7 @@ export default function LogementsPage() {
     setLoading(true);
     setError(null);
     try {
-      const canFetchBatiments = role === Role.ADMIN_BATIMENT || role === Role.ADMIN_GLOBAL;
+      const canFetchBatiments = hasMinRole(role, Role.ADMIN_BATIMENT);
 
       const [logsRes, occsRes, batsRes, locsRes] = await Promise.all([
         logementsApi.getAll({ includeLoyer: true }),
@@ -269,9 +270,9 @@ export default function LogementsPage() {
   }
 
   // ── RBAC ───────────────────────────────────────────────────────────────────
-  const canEdit      = role === Role.ADMIN_BATIMENT || role === Role.ADMIN_GLOBAL;
+  const canEdit      = hasMinRole(role, Role.ADMIN_BATIMENT);
   const canDelete    = canEdit;
-  const canManageOcc = role === Role.ADMIN_LOGEMENT || role === Role.ADMIN_BATIMENT || role === Role.ADMIN_GLOBAL;
+  const canManageOcc = hasMinRole(role, Role.ADMIN_LOGEMENT);
   const canExport    = canManageOcc;
 
   const [exportVisible, setExportVisible] = useState(false);

@@ -19,6 +19,7 @@ import ErrorMessage from '@/components/shared/ErrorMessage';
 import DataTableWrapper from '@/components/shared/DataTableWrapper';
 import { formatMontant } from '@/utils/format';
 import { formatDate, isDatePassee } from '@/utils/date';
+import { hasMinRole } from '@/utils/role';
 
 // ─── Sous-composants ──────────────────────────────────────────────────────────
 
@@ -88,7 +89,7 @@ export default function DashboardPage() {
     ? Math.round((kpis.logementsOccupes / kpis.totalLogements) * 100)
     : 0;
 
-  const canSeeBatiments = role === Role.ADMIN_BATIMENT || role === Role.ADMIN_GLOBAL;
+  const canSeeBatiments = hasMinRole(role, Role.ADMIN_BATIMENT);
 
   return (
     <>

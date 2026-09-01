@@ -22,7 +22,7 @@ import DataTableWrapper from '@/components/shared/DataTableWrapper';
 import { showConfirm } from '@/components/shared/ConfirmDialog';
 import ExportModal from '@/components/shared/ExportModal';
 
-import { roleLabels, roleColors, rolesForAdmin } from '@/utils/role';
+import { hasMinRole, roleLabels, roleColors, rolesForAdmin } from '@/utils/role';
 import { generatePassword } from '@/utils/password';
 import { extractError } from '@/utils/error';
 
@@ -46,8 +46,8 @@ export default function UtilisateursPage() {
   const toast       = useRef<Toast>(null);
   const currentRole = useAppSelector((s) => s.auth.user?.role);
   const currentId   = useAppSelector((s) => s.auth.user?.id);
-  const canCreate   = currentRole && currentRole !== Role.LOCATAIRE;
-  const canExport   = currentRole && currentRole !== Role.LOCATAIRE;
+  const canCreate   = hasMinRole(currentRole, Role.ADMIN_LOGEMENT);
+  const canExport   = hasMinRole(currentRole, Role.ADMIN_LOGEMENT);
 
   // ── État ───────────────────────────────────────────────────────────────────
   const [utilisateurs, setUtilisateurs] = useState<Utilisateur[] | null>(null);

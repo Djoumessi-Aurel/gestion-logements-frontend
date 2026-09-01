@@ -15,6 +15,29 @@ export const roleColors: Record<Role, string> = {
 };
 
 /**
+ * Ordre hiérarchique des rôles — source unique de vérité pour tout le RBAC client.
+ * Chaque rôle englobe les capacités de ceux qui le précèdent.
+ */
+const ROLE_ORDER: Record<Role, number> = {
+  [Role.LOCATAIRE]:      0,
+  [Role.ADMIN_LOGEMENT]: 1,
+  [Role.ADMIN_BATIMENT]: 2,
+  [Role.ADMIN_GLOBAL]:   3,
+};
+
+/**
+ * true si `role` atteint au moins le niveau `minRole`.
+ *
+ * Un rôle absent (store pas encore réhydraté) n'a accès à rien : on masque par
+ * défaut plutôt que d'afficher un bouton avant de le retirer. Le backend reste
+ * de toute façon la source de vérité — ceci ne fait que piloter l'affichage.
+ */
+export function hasMinRole(role: Role | undefined, minRole: Role): boolean {
+  if (!role) return false;
+  return ROLE_ORDER[role] >= ROLE_ORDER[minRole];
+}
+
+/**
  * Rôles qu'un administrateur est autorisé à attribuer (UC-USR-02).
  * Le backend reste la source de vérité — ceci ne fait que masquer les options
  * interdites dans les sélecteurs.

@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setSidebarCollapsed } from '@/store/uiSlice';
 import { Role } from '@/types/enums';
+import { hasMinRole } from '@/utils/role';
 import { Button } from 'primereact/button';
 
 type NavItem = {
@@ -27,16 +28,9 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Export',       path: '/export',        icon: 'pi-download',    minRole: Role.ADMIN_LOGEMENT },
 ];
 
-const ROLE_ORDER: Record<Role, number> = {
-  [Role.LOCATAIRE]:       0,
-  [Role.ADMIN_LOGEMENT]:  1,
-  [Role.ADMIN_BATIMENT]:  2,
-  [Role.ADMIN_GLOBAL]:    3,
-};
-
 function hasAccess(userRole: Role, item: NavItem): boolean {
   if (item.exactRole) return userRole === item.minRole;
-  return ROLE_ORDER[userRole] >= ROLE_ORDER[item.minRole];
+  return hasMinRole(userRole, item.minRole);
 }
 
 export default function Sidebar() {

@@ -34,6 +34,7 @@ import PaiementFormDialog from '@/components/shared/PaiementFormDialog';
 import { formatMontant } from '@/utils/format';
 import { formatDate, toDateStr } from '@/utils/date';
 import { extractError } from '@/utils/error';
+import { hasMinRole } from '@/utils/role';
 
 // ─── Schémas ──────────────────────────────────────────────────────────────────
 
@@ -372,7 +373,7 @@ export default function OccupationsPage() {
   }
 
   // ── RBAC ────────────────────────────────────────────────────────────────────
-  const canManage = role === Role.ADMIN_LOGEMENT || role === Role.ADMIN_BATIMENT || role === Role.ADMIN_GLOBAL;
+  const canManage = hasMinRole(role, Role.ADMIN_LOGEMENT);
   const canExport = canManage;
 
   const [exportVisible, setExportVisible] = useState(false);

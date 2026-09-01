@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button } from 'primereact/button';
 import { Role } from '@/types/enums';
 import { useAppSelector } from '@/store/hooks';
+import { hasMinRole } from '@/utils/role';
 
 import PageHeader from '@/components/shared/PageHeader';
 import ExportModal from '@/components/shared/ExportModal';
@@ -79,20 +80,6 @@ const EXPORTS: ExportEntry[] = [
   },
 ];
 
-const ROLE_ORDER: Role[] = [
-  Role.ADMIN_LOGEMENT,
-  Role.ADMIN_BATIMENT,
-  Role.ADMIN_GLOBAL,
-];
-
-function hasAccess(userRole: Role | undefined, minRole: Role): boolean {
-  if (!userRole) return false;
-  if (userRole === Role.LOCATAIRE) return false;
-  const userIdx = ROLE_ORDER.indexOf(userRole);
-  const minIdx  = ROLE_ORDER.indexOf(minRole);
-  return userIdx >= minIdx;
-}
-
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ExportPage() {
@@ -100,7 +87,7 @@ export default function ExportPage() {
 
   const [active, setActive] = useState<ExportEntry | null>(null);
 
-  const accessible = EXPORTS.filter((e) => hasAccess(role, e.minRole));
+  const accessible = EXPORTS.filter((e) => hasMinRole(role, e.minRole));
 
   return (
     <>
