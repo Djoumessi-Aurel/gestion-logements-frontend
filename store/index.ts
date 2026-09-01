@@ -11,6 +11,7 @@ import {
   REGISTER,
   type PersistConfig,
 } from 'redux-persist';
+import createWebStorage from 'redux-persist/lib/storage/createWebStorage';
 import CryptoJS from 'crypto-js';
 
 import authReducer from './authSlice';
@@ -26,9 +27,13 @@ function createNoopStorage() {
   };
 }
 
+// `createWebStorage` est importé statiquement : il ne touche à aucune API
+// navigateur au chargement du module, seulement à l'appel. Le test sur `window`
+// reste néanmoins nécessaire — appelé côté serveur, il journalise une erreur
+// avant de retomber lui-même sur un storage neutre.
 const storage =
   typeof window !== 'undefined'
-    ? (require('redux-persist/lib/storage') as { default: typeof import('redux-persist/lib/storage').default }).default
+    ? createWebStorage('local')
     : createNoopStorage();
 
 // Transform de chiffrement CryptoJS pour le slice auth

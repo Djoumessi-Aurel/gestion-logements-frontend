@@ -1,20 +1,21 @@
 'use client';
 
-import { useRef } from 'react';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { PrimeReactProvider } from 'primereact/api';
 import { store, persistor } from './index';
 
+/**
+ * `store` et `persistor` sont des singletons créés à l'évaluation du module
+ * store/index.ts, donc déjà stables d'un rendu à l'autre : les envelopper dans
+ * un useRef n'apportait rien et enfreignait react-hooks/refs, qui interdit de
+ * lire `.current` pendant le rendu.
+ */
 export default function StoreProvider({ children }: { children: React.ReactNode }) {
-  // useRef évite de recréer le store à chaque rendu
-  const storeRef = useRef(store);
-  const persistorRef = useRef(persistor);
-
   return (
     <PrimeReactProvider>
-      <Provider store={storeRef.current}>
-        <PersistGate loading={null} persistor={persistorRef.current}>
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
           {children}
         </PersistGate>
       </Provider>
