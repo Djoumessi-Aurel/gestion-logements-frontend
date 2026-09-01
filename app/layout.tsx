@@ -3,7 +3,14 @@ import StoreProvider from '@/store/StoreProvider';
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import './globals.css';
 
+// URL publique du site — base de toutes les URLs absolues des métadonnées
+// (og:image, og:url…). Indispensable : sans metadataBase, Next.js ne peut pas
+// résoudre une image OG en URL absolue, et les crawlers de prévisualisation
+// (WhatsApp, Facebook, LinkedIn…) l'ignorent silencieusement.
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3001';
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: 'Gestion de Logements',
   description: 'Application de gestion de logements à louer',
 };

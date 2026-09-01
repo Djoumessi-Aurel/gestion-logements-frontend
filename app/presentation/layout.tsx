@@ -20,6 +20,9 @@ export const metadata: Metadata = {
       "Application web complète pour gérer vos bâtiments, logements, locataires et paiements. Suivi des arriérés, exports Excel et PDF, contrôle d'accès par rôle.",
     siteName: 'Gestion de Logements',
     locale:   'fr_FR',
+    // Résolu en URL absolue via metadataBase (app/layout.tsx).
+    // L'image og:image est fournie par le fichier opengraph-image.tsx de ce dossier.
+    url:      '/presentation',
   },
   twitter: {
     card:        'summary_large_image',
