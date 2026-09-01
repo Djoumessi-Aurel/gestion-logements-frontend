@@ -20,8 +20,6 @@ interface Props {
   existingFiles?: { nomOriginal: string; taille: number }[];
 }
 
-// ─── Utilitaires ──────────────────────────────────────────────────────────────
-
 // ─── Composant ────────────────────────────────────────────────────────────────
 
 export default function FileUploader({
@@ -34,12 +32,22 @@ export default function FileUploader({
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
 
-  // Limites lues depuis Redux (configurées par le backend via GET /config)
-  const config = useAppSelector((s) => s.config.config);
-  const limits = config?.upload[uploadType];
+  // Limites fournies par le backend via GET /config, chargées par ConfigLoader.
+  //
+  // Volontairement aucune valeur de repli codée en dur : elles sont configurables
+  // côté serveur (UPLOAD_CONTRAT_MAX_SIZE_MB, UPLOAD_PREUVE_MAX_SIZE_MB,
+  // UPLOAD_PREUVE_MAX_FILES) et divergeaient déjà des valeurs supposées ici.
+  // Annoncer une limite fausse revient à laisser l'utilisateur sélectionner un
+  // fichier que le serveur refusera ensuite — et une liste MIME vide désactive
+  // silencieusement tout filtrage de format.
+  const config      = useAppSelector((s) => s.config.config);
+  const configError = useAppSelector((s) => s.config.error);
+  const limits      = config?.upload[uploadType];
 
-  const maxSizeMb = limits?.maxSizeMb ?? (uploadType === 'contrat' ? 10 : 5);
-  const maxFiles  = limits?.maxFiles  ?? (uploadType === 'contrat' ? 1  : 10);
+  // Neutres tant que les limites sont absentes : le garde plus bas empêche
+  // alors le rendu de la zone de sélection, donc elles ne servent jamais.
+  const maxSizeMb = limits?.maxSizeMb ?? 0;
+  const maxFiles  = limits?.maxFiles  ?? 0;
   const mimeTypes = limits?.mimeTypes ?? [];
 
   // ── Validation et sélection ────────────────────────────────────────────────
@@ -79,6 +87,27 @@ export default function FileUploader({
     const updated = selectedFiles.filter((_, i) => i !== index);
     setSelectedFiles(updated);
     onFilesSelected(updated);
+  }
+
+  // ── Garde : sans limites connues, pas de sélection ─────────────────────────
+
+  if (!limits) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-gray-200 bg-gray-50 rounded-lg p-6 text-center">
+        {configError ? (
+          <>
+            <i className="pi pi-exclamation-triangle text-2xl text-[#92400e]" />
+            <p className="text-sm text-[#92400e]">{configError}</p>
+            <p className="text-xs text-gray-400">Rechargez la page pour réessayer.</p>
+          </>
+        ) : (
+          <>
+            <i className="pi pi-spin pi-spinner text-2xl text-[#3b82f6]" />
+            <p className="text-sm text-gray-500">Chargement des limites d&apos;upload…</p>
+          </>
+        )}
+      </div>
+    );
   }
 
   // ── Rendu ──────────────────────────────────────────────────────────────────

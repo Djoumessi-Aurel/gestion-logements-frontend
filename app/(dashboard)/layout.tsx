@@ -1,6 +1,7 @@
 import Sidebar from '@/components/layout/Sidebar';
 import Header from '@/components/layout/Header';
 import SessionGuard from '@/components/layout/SessionGuard';
+import ConfigLoader from '@/components/layout/ConfigLoader';
 import { ConfirmDialogProvider } from '@/components/shared/ConfirmDialog';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -22,6 +23,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Notification session expirée — doit être dans ce layout */}
       <SessionGuard />
+
+      {/* Charge les limites d'upload (GET /config) dans le store */}
+      <ConfigLoader />
 
       {/* Requis pour que showConfirm() fonctionne dans toutes les pages */}
       <ConfirmDialogProvider />
