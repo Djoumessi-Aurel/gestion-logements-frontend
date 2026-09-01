@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { TabView, TabPanel } from 'primereact/tabview';
 import { Column } from 'primereact/column';
@@ -103,7 +103,7 @@ export default function LogementDetailPage() {
   });
 
   // ── Chargement dashboard ───────────────────────────────────────────────────
-  async function loadDashboard() {
+  const loadDashboard = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -122,7 +122,7 @@ export default function LogementDetailPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [logId]);
 
   // ── Chargement loyers (lazy) ───────────────────────────────────────────────
   async function loadLoyers(force = false) {
@@ -156,7 +156,7 @@ export default function LogementDetailPage() {
     }
   }
 
-  useEffect(() => { loadDashboard(); }, [logId]);
+  useEffect(() => { loadDashboard(); }, [loadDashboard]);
 
   // ── Changement d'onglet → lazy load ───────────────────────────────────────
   function onTabChange(index: number) {

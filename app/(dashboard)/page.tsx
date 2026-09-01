@@ -78,7 +78,7 @@ export default function DashboardPage() {
     }
   }
 
-  useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { load(); }, []);
 
   if (loading) return <LoadingSpinner />;
   if (error || !kpis || !occupations) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from 'primereact/button';
 
@@ -55,7 +55,7 @@ export default function LocataireDashboardPage() {
   const [loading,    setLoading]    = useState(true);
   const [error,      setError]      = useState<string | null>(null);
 
-  async function loadAll() {
+  const loadAll = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -70,9 +70,9 @@ export default function LocataireDashboardPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [locId]);
 
-  useEffect(() => { loadAll(); }, [locId]);
+  useEffect(() => { loadAll(); }, [loadAll]);
 
   if (loading) return <LoadingSpinner />;
   if (error || !locataire || !dashboard) {

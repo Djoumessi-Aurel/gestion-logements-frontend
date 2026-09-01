@@ -230,7 +230,7 @@ export default function LocataireEspacePage() {
     }
   }
 
-  useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { load(); }, []);
 
   if (loading) return <LoadingSpinner />;
   if (noProfile) {

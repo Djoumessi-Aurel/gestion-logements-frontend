@@ -93,7 +93,7 @@ export default function UtilisateursPage() {
     }
   }
 
-  useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { load(); }, []);
 
   // ── Filtre global ──────────────────────────────────────────────────────────
   const filtered = useMemo(() => {

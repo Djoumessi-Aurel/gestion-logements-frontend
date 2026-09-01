@@ -7,6 +7,7 @@ import { toggleSidebar } from '@/store/uiSlice';
 import { clearAccessTokenCookie } from '@/utils/cookies';
 import { authApi } from '@/services/auth.api';
 import { Role } from '@/types/enums';
+import Logo from '@/components/shared/Logo';
 
 const ROLE_LABELS: Record<Role, string> = {
   [Role.LOCATAIRE]:       'Locataire',
@@ -52,7 +53,7 @@ export default function Header() {
 
       {/* Titre (desktop) */}
       <div className="hidden lg:flex items-center gap-2 text-[#1e293b] font-semibold text-base">
-        <img src="/web-app-manifest-192x192.png" alt="Gestion Logements" className="w-6 h-6 rounded-md" />
+        <Logo size={24} alt="Gestion Logements" className="rounded-md" />
         <span>Gestion de Logements</span>
       </div>
 

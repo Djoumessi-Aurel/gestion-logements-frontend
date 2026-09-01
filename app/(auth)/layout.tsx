@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Logo from '@/components/shared/Logo';
 
 export const metadata: Metadata = {
   title: 'Gestion de Logements — Connexion',
@@ -12,11 +13,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="w-full max-w-md flex-1 flex flex-col justify-center">
         {/* En-tête branding */}
         <div className="text-center mb-8">
-          <img
-            src="/web-app-manifest-192x192.png"
-            alt="Gestion de Logements"
-            className="inline-block w-14 h-14 rounded-2xl mb-4"
-          />
+          <Logo size={56} className="inline-block rounded-2xl mb-4" priority />
           <h1 className="text-2xl font-bold text-[#1e293b]">Gestion de Logements</h1>
           <p className="text-sm text-gray-500 mt-1">Plateforme de gestion locative</p>
         </div>

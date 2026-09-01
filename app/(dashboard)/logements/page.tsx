@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { Column } from 'primereact/column';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
@@ -115,7 +115,7 @@ export default function LogementsPage() {
   });
 
   // ── Chargement ─────────────────────────────────────────────────────────────
-  async function loadData() {
+  const loadData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -140,9 +140,9 @@ export default function LogementsPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [role]);
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => { loadData(); }, [loadData]);
 
   // ── Modal ──────────────────────────────────────────────────────────────────
   function openCreate() {

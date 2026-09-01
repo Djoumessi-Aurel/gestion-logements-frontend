@@ -7,6 +7,7 @@ import { setSidebarCollapsed } from '@/store/uiSlice';
 import { Role } from '@/types/enums';
 import { hasMinRole } from '@/utils/role';
 import { Button } from 'primereact/button';
+import Logo from '@/components/shared/Logo';
 
 type NavItem = {
   label: string;
@@ -77,11 +78,7 @@ export default function Sidebar() {
       >
         {/* Logo / titre */}
         <div className="flex items-center gap-3 px-5 py-5 border-b border-white/10">
-          <img
-            src="/web-app-manifest-192x192.png"
-            alt="Gestion Logements"
-            className="shrink-0 w-9 h-9 rounded-lg"
-          />
+          <Logo size={36} alt="Gestion Logements" className="shrink-0 rounded-lg" />
           <span className="font-semibold text-base leading-tight">
             Gestion<br />Logements
           </span>
