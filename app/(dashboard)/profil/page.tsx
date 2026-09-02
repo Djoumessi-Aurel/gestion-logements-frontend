@@ -10,7 +10,9 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { authApi } from '@/services/auth.api';
+import { organisationsApi } from '@/services/organisations.api';
 import { Role } from '@/types/enums';
+import type { OrganisationUsage } from '@/types/organisation';
 import { roleLabels, roleColors } from '@/utils/role';
 
 import PageHeader from '@/components/shared/PageHeader';
@@ -61,6 +63,9 @@ export default function ProfilPage() {
   const [submitting,  setSubmitting]  = useState(false);
   const [showCurrent, setShowCurrent] = useState(false);
 
+  const [orgUsage,  setOrgUsage]  = useState<OrganisationUsage | null>(null);
+  const [orgError,  setOrgError]  = useState<string | null>(null);
+
   const {
     control,
     handleSubmit,
@@ -85,6 +90,13 @@ export default function ProfilPage() {
   }
 
   useEffect(() => { load(); }, []);
+
+  useEffect(() => {
+    if (profile?.role !== Role.ADMIN_GLOBAL) return;
+    organisationsApi.getMine()
+      .then((res) => setOrgUsage(res.data.data))
+      .catch(() => setOrgError('Impossible de charger les informations de votre organisation.'));
+  }, [profile?.role]);
 
   const onSubmit = handleSubmit(async (values) => {
     setSubmitting(true);
@@ -163,6 +175,68 @@ export default function ProfilPage() {
           </div>
         </div>
       </div>
+
+      {/* ── Abonnement (ADMIN_GLOBAL uniquement) ────────────────────────────── */}
+      {role === Role.ADMIN_GLOBAL && (orgUsage || orgError) && (
+        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <h2 className="text-base font-semibold text-[#1e293b] mb-4">Votre abonnement</h2>
+
+          {orgError && <p className="text-sm text-[#991b1b]">{orgError}</p>}
+
+          {orgUsage && (
+            <div className="space-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-sm">
+                <div>
+                  <span className="text-gray-500">Organisation</span>
+                  <p className="font-medium text-[#1e293b] mt-0.5">{orgUsage.nom}</p>
+                </div>
+                <div>
+                  <span className="text-gray-500">Identifiant</span>
+                  <p className="font-medium text-[#1e293b] mt-0.5">{orgUsage.slug}</p>
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-sm text-gray-500">Logements</span>
+                  <span className="text-sm font-semibold text-[#1e293b]">
+                    {orgUsage.logementLimit === null
+                      ? `${orgUsage.logementsUtilises} (illimité)`
+                      : `${orgUsage.logementsUtilises} / ${orgUsage.logementLimit}`}
+                  </span>
+                </div>
+
+                {orgUsage.logementLimit !== null && (() => {
+                  const pct = Math.min(100, (orgUsage.logementsUtilises / orgUsage.logementLimit) * 100);
+                  const atLimit  = orgUsage.logementsUtilises >= orgUsage.logementLimit;
+                  const nearLimit = !atLimit && pct >= 80;
+                  const barColor = atLimit ? '#991b1b' : nearLimit ? '#92400e' : '#1e3a8a';
+                  return (
+                    <>
+                      <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all"
+                          style={{ width: `${pct}%`, backgroundColor: barColor }}
+                        />
+                      </div>
+                      {atLimit && (
+                        <p className="text-xs text-[#991b1b] mt-1.5">
+                          Quota atteint — contactez-nous pour passer à un palier supérieur.
+                        </p>
+                      )}
+                      {nearLimit && (
+                        <p className="text-xs text-[#92400e] mt-1.5">
+                          Vous approchez du quota de logements de votre palier.
+                        </p>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ── Changer le mot de passe ─────────────────────────────────────────── */}
       <div className="bg-white rounded-xl shadow-sm p-6">
