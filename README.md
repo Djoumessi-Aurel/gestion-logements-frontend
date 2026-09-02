@@ -232,19 +232,29 @@ au lieu du fichier entier, sur chaque page.
 
 ## Documentation complète
 
-### Guide utilisateur (clients)
+### Documents commerciaux et utilisateurs (`docs/`)
 
-[`docs/guide-utilisateur.html`](docs/guide-utilisateur.html) — document autonome de
-16 chapitres couvrant l'ensemble des fonctions, destiné à être remis aux clients. Il
-s'ouvre directement dans un navigateur, n'a aucune dépendance hors les polices Google,
-et s'imprime en PDF via `Ctrl + P`.
+Trois documents HTML autonomes, ouvrables directement dans un navigateur, sans
+dépendance hors les polices Google, et imprimables en PDF via `Ctrl + P`.
 
-**Ce fichier est la source de vérité du guide.** La version publiée en ligne en est un
-rendu&nbsp;: pour la mettre à jour, on retire le squelette HTML (`doctype`, `html`,
+| Fichier | Destinataire | Contenu |
+| ------- | ------------ | ------- |
+| [`guide-utilisateur.html`](docs/guide-utilisateur.html) | **Clients** | Manuel d'utilisation en 16 chapitres |
+| [`formules-client.html`](docs/formules-client.html) | **Clients** | Fiche tarifaire — 4 formules et prestations en supplément |
+| [`tarification-interne.html`](docs/tarification-interne.html) | **Interne uniquement** | Coûts d'hébergement, seuil de rentabilité, marges, tactique de négociation |
+
+> ⛔ **`tarification-interne.html` ne doit jamais être transmis à un client.** Il expose
+> la base de coûts et les marges. Un avertissement figure en tête du fichier.
+
+⚠️ `formules-client.html` porte encore `[à compléter]` à la place du téléphone et de
+l'e-mail, dans le bloc « Démarrer ». À renseigner avant tout envoi.
+
+**Ces fichiers sont la source de vérité.** Les versions publiées en ligne en sont des
+rendus&nbsp;: pour les mettre à jour, on retire le squelette HTML (`doctype`, `html`,
 `head`, `body`) et on republie le reste à la même URL. Ne jamais maintenir deux copies
 du contenu.
 
-Deux règles à respecter en le modifiant :
+Règles à respecter en modifiant le **guide utilisateur** :
 
 - **Ne jamais y chiffrer les limites d'upload.** Elles sont configurables côté serveur
   (`UPLOAD_*`) et le guide renvoie volontairement à ce qui est affiché dans la zone de

@@ -1,0 +1,753 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Dossier de tarification de l'application Gestion de Logements — document de travail interne.">
+
+<!--
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║  DOCUMENT INTERNE — NE JAMAIS TRANSMETTRE À UN CLIENT                ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+
+  Ce dossier contient la base de coûts d'hébergement, le seuil de rentabilité,
+  les marges et la tactique de négociation. Il est destiné à la préparation
+  commerciale, pas à la diffusion.
+
+  La fiche à remettre aux clients est docs/formules-client.html.
+
+  Document autonome, ouvrable directement dans un navigateur.
+
+  Ce fichier est la SOURCE DE VÉRITÉ. La version publiée en ligne en est un rendu :
+  pour la mettre à jour, on retire le squelette (doctype/html/head/body) et on
+  republie le reste à la même URL. Ne pas maintenir deux copies du contenu.
+
+  Aucune dépendance hors les polices Google. Impression : Ctrl + P.
+-->
+
+<title>Tarification Gestion de Logements</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Karla:wght@400;500;600;700&family=Spectral:wght@400;600;700&display=swap">
+
+<style>
+:root {
+  --ink:       #15201c;
+  --ink-2:     #47574f;
+  --ink-3:     #6f7f76;
+  --ground:    #f5f8f6;
+  --surface:   #ffffff;
+  --surface-2: #eaf0ec;
+  --line:      #d8e2db;
+  --line-soft: #e6ece8;
+
+  --brand:      #0f5245;
+  --brand-2:    #1c8a74;
+  --brand-wash: #dcefe8;
+  --brand-ink:  #0f5245;
+
+  --or:      #8a5410;   /* chiffres d'argent */
+  --or-wash: #fbf0dd;
+  --or-line: #ecd9b6;
+
+  --ok:   #166534;  --ok-bg:   #dcfce7;  --ok-line:   #bbf0cb;
+  --warn: #92400e;  --warn-bg: #fef3c7;  --warn-line: #f6dd9a;
+  --bad:  #991b1b;  --bad-bg:  #fee2e2;  --bad-line:  #f8c4c4;
+
+  --hero-bg:   #0f5245;
+  --hero-ink:  #ffffff;
+  --hero-lede: #bfe0d6;
+  --hero-dim:  #8fc4b5;
+  --hero-rule: rgba(255,255,255,.18);
+
+  --shadow: 0 1px 2px rgba(21,32,28,.05), 0 10px 28px -20px rgba(21,32,28,.35);
+
+  --serif: Spectral, Georgia, "Times New Roman", serif;
+  --sans:  Karla, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:  "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink:       #e2eae5;
+    --ink-2:     #a4b4ac;
+    --ink-3:     #78877f;
+    --ground:    #0c1210;
+    --surface:   #131b18;
+    --surface-2: #1a2420;
+    --line:      #28332e;
+    --line-soft: #1f2a26;
+
+    --brand:      #6fd3ba;
+    --brand-2:    #45b89b;
+    --brand-wash: #10312a;
+    --brand-ink:  #8adcc6;
+
+    --or:      #e3b264;  --or-wash: #2e2410;  --or-line: #4d3c1b;
+
+    --ok:   #8fe6ab;  --ok-bg:   #12301f;  --ok-line:   #1d4d31;
+    --warn: #fbd167;  --warn-bg: #33270b;  --warn-line: #574119;
+    --bad:  #fba5a5;  --bad-bg:  #381717;  --bad-line:  #5c2626;
+
+    --hero-bg:   #0b241f;
+    --hero-ink:  #eaf5f1;
+    --hero-lede: #a8c9bf;
+    --hero-dim:  #7ea79a;
+    --hero-rule: rgba(255,255,255,.12);
+
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 32px -22px rgba(0,0,0,.85);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ink:       #e2eae5;
+  --ink-2:     #a4b4ac;
+  --ink-3:     #78877f;
+  --ground:    #0c1210;
+  --surface:   #131b18;
+  --surface-2: #1a2420;
+  --line:      #28332e;
+  --line-soft: #1f2a26;
+
+  --brand:      #6fd3ba;
+  --brand-2:    #45b89b;
+  --brand-wash: #10312a;
+  --brand-ink:  #8adcc6;
+
+  --or:      #e3b264;  --or-wash: #2e2410;  --or-line: #4d3c1b;
+
+  --ok:   #8fe6ab;  --ok-bg:   #12301f;  --ok-line:   #1d4d31;
+  --warn: #fbd167;  --warn-bg: #33270b;  --warn-line: #574119;
+  --bad:  #fba5a5;  --bad-bg:  #381717;  --bad-line:  #5c2626;
+
+  --hero-bg:   #0b241f;
+  --hero-ink:  #eaf5f1;
+  --hero-lede: #a8c9bf;
+  --hero-dim:  #7ea79a;
+  --hero-rule: rgba(255,255,255,.12);
+
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 32px -22px rgba(0,0,0,.85);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16.5px;
+  line-height: 1.62;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--brand-2); text-underline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--brand-2); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ── En-tête ── */
+.masthead { background: var(--hero-bg); color: var(--hero-ink); padding: 3rem 1.5rem 2.5rem; }
+.wrap { max-width: 940px; margin: 0 auto; }
+.masthead .eyebrow {
+  font-family: var(--mono); font-size: .7rem; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--hero-dim); margin: 0 0 .9rem;
+}
+.masthead h1 {
+  font-family: var(--serif); font-weight: 700;
+  font-size: clamp(1.9rem, 4.6vw, 2.9rem); line-height: 1.08;
+  margin: 0 0 .8rem; color: var(--hero-ink); text-wrap: balance; letter-spacing: -.01em;
+}
+.masthead p { margin: 0; max-width: 60ch; color: var(--hero-lede); font-size: 1.04rem; }
+.masthead .meta {
+  margin-top: 1.6rem; padding-top: 1.1rem; border-top: 1px solid var(--hero-rule);
+  display: flex; flex-wrap: wrap; gap: .5rem 1.8rem;
+  font-family: var(--mono); font-size: .74rem; color: var(--hero-dim);
+}
+
+/* ── Corps ── */
+main { padding: 2.75rem 1.5rem 5rem; }
+section { margin-bottom: 3.5rem; }
+
+h2 {
+  font-family: var(--serif); font-size: clamp(1.4rem, 3vw, 1.85rem);
+  font-weight: 700; line-height: 1.18; margin: 0 0 .3rem;
+  padding-top: 1.5rem; border-top: 2px solid var(--line); text-wrap: balance;
+}
+h2 .num {
+  display: block; font-family: var(--mono); font-size: .72rem; font-weight: 500;
+  letter-spacing: .12em; color: var(--brand-2); margin-bottom: .5rem;
+}
+h3 { font-family: var(--serif); font-size: 1.2rem; font-weight: 600; margin: 2rem 0 .5rem; }
+h4 { font-size: .95rem; font-weight: 700; margin: 1.4rem 0 .4rem; }
+
+p, ul, ol { max-width: 70ch; }
+p { margin: 0 0 1rem; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin-bottom: .35rem; }
+strong { font-weight: 700; }
+em { font-style: italic; }
+
+code {
+  font-family: var(--mono); font-size: .85em; background: var(--surface-2);
+  border: 1px solid var(--line-soft); padding: .06em .36em; border-radius: 4px;
+}
+.montant { font-family: var(--mono); font-weight: 500; color: var(--or); white-space: nowrap; }
+
+/* ── Encarts ── */
+.note {
+  max-width: 70ch; margin: 1.3rem 0; padding: .9rem 1.05rem; border-radius: 8px;
+  background: var(--surface); border: 1px solid var(--line);
+  border-left: 3px solid var(--brand-2); font-size: .95rem;
+}
+.note > :last-child { margin-bottom: 0; }
+.note .t {
+  display: block; font-family: var(--mono); font-size: .67rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ink-3); margin-bottom: .35rem;
+}
+.note.warn { background: var(--warn-bg); border-color: var(--warn-line); border-left-color: var(--warn); color: var(--warn); }
+.note.warn .t { color: var(--warn); }
+.note.tip { background: var(--ok-bg); border-color: var(--ok-line); border-left-color: var(--ok); color: var(--ok); }
+.note.tip .t { color: var(--ok); }
+
+/* ── Tableaux ── */
+.tw { overflow-x: auto; margin: 1.2rem 0 1.5rem; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+th, td { text-align: left; padding: .6rem .8rem; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+thead th {
+  background: var(--surface-2); font-family: var(--mono); font-size: .68rem; font-weight: 500;
+  letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); white-space: nowrap;
+}
+tbody tr:last-child td { border-bottom: none; }
+td.r, th.r { text-align: right; }
+td.r { white-space: nowrap; }
+tfoot td { background: var(--surface-2); font-weight: 700; border-top: 2px solid var(--line); }
+
+/* ── Grille tarifaire ── */
+.grille {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(205px, 1fr));
+  gap: 1rem; margin: 1.6rem 0 1.4rem;
+}
+.plan {
+  display: flex; flex-direction: column;
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: 12px; padding: 1.15rem 1.05rem; box-shadow: var(--shadow);
+}
+.plan.phare { border-color: var(--brand-2); border-width: 2px; }
+.plan .rang {
+  font-family: var(--mono); font-size: .66rem; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--ink-3); margin-bottom: .5rem;
+  min-height: 2.05em; line-height: 1.35;
+}
+.plan.phare .rang { color: var(--brand-2); font-weight: 500; }
+.plan .nom { font-family: var(--serif); font-size: 1.22rem; font-weight: 700; margin-bottom: .1rem; }
+.plan .cible { font-size: .82rem; color: var(--ink-2); margin-bottom: .85rem; min-height: 2.4em; }
+.plan .prix { font-family: var(--mono); font-size: 1.55rem; font-weight: 500; color: var(--or); line-height: 1.1; }
+.plan .par { font-size: .76rem; color: var(--ink-3); margin-bottom: .8rem; }
+.plan .detail { border-top: 1px solid var(--line-soft); padding-top: .7rem; font-size: .81rem; color: var(--ink-2); margin-top: auto; }
+.plan .detail div { display: flex; justify-content: space-between; gap: .5rem; padding: .12rem 0; }
+.plan .detail span:last-child { font-family: var(--mono); color: var(--ink); }
+
+/* ── Bloc calcul ── */
+.calcul {
+  max-width: 70ch; margin: 1.3rem 0; border: 1px solid var(--line);
+  border-radius: 10px; overflow: hidden; background: var(--surface);
+}
+.calcul .h {
+  padding: .55rem .9rem; background: var(--or-wash); border-bottom: 1px solid var(--or-line);
+  font-family: var(--mono); font-size: .68rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--or);
+}
+.calcul .b { padding: .85rem .9rem; }
+.calcul dl { margin: 0; display: grid; grid-template-columns: 1fr max-content; gap: .3rem .9rem; font-size: .92rem; }
+.calcul dt { color: var(--ink-2); }
+.calcul dd { margin: 0; font-family: var(--mono); font-weight: 500; text-align: right; }
+.calcul .tot { border-top: 1px solid var(--line); margin-top: .5rem; padding-top: .5rem; }
+.calcul .tot dd { color: var(--or); }
+
+/* ── Étapes / script ── */
+ol.script { counter-reset: s; list-style: none; padding-left: 0; max-width: 70ch; }
+ol.script > li { counter-increment: s; position: relative; padding-left: 2.3rem; margin-bottom: .9rem; }
+ol.script > li::before {
+  content: counter(s); position: absolute; left: 0; top: .05rem;
+  width: 1.55rem; height: 1.55rem; display: grid; place-items: center; border-radius: 50%;
+  background: var(--brand-wash); color: var(--brand-ink);
+  font-family: var(--mono); font-size: .74rem; font-weight: 500;
+}
+
+.colophon { border-top: 2px solid var(--line); padding-top: 1.5rem; color: var(--ink-3); font-size: .86rem; }
+.colophon a { color: var(--brand-2); }
+
+@media print {
+  :root { --ground:#fff; --surface:#fff; --surface-2:#f2f5f3; --ink:#111; --ink-2:#333; --ink-3:#666; --hero-bg:#fff; --hero-ink:#111; --hero-lede:#333; --hero-dim:#555; }
+  .masthead { border-bottom: 2px solid #111; padding: 0 0 1.2rem; }
+  .masthead .meta { display: none; }
+  main { padding: 1.2rem 0 0; }
+  section { page-break-inside: auto; margin-bottom: 2rem; }
+  h2, h3, h4 { page-break-after: avoid; }
+  .plan, .note, .calcul, .tw { page-break-inside: avoid; }
+  body { font-size: 11pt; }
+  a { color: #111; text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<header class="masthead">
+  <div class="wrap">
+    <p class="eyebrow">Dossier de tarification</p>
+    <h1>Gestion de Logements</h1>
+    <p>
+      Grille d’abonnement mensuel par organisation, plancher de rentabilité,
+      et argumentaire pour la négociation en cours.
+    </p>
+    <div class="meta">
+      <span>Modèle&nbsp;: abonnement SaaS</span>
+      <span>Marché&nbsp;: Cameroun, F&nbsp;CFA</span>
+      <span>Septembre 2026</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ─────────── 01 ─────────── -->
+  <section>
+    <h2><span class="num">01 — Le plancher</span>Ce que l’application te coûte</h2>
+
+    <p>
+      Toute grille commence par là&nbsp;: en dessous de ce montant, tu perds de l’argent
+      à chaque client. Ta pile SaaS est <em>distincte</em> de la pile classique, donc
+      seuls les services qui servent les clients payants comptent ici.
+    </p>
+
+    <div class="calcul">
+      <div class="h">Coût mensuel fixe de la pile SaaS — ta configuration réelle</div>
+      <div class="b">
+        <dl>
+          <dt>Vercel Pro — 1 siège <span style="color:var(--ink-3)">(obligatoire dès que tu factures)</span></dt><dd>20 $</dd>
+          <dt>Render Starter — backend SaaS</dt><dd>7 $</dd>
+          <dt>Supabase Pro — 1 projet <span style="color:var(--ink-3)">(base + stockage des fichiers)</span></dt><dd>25 $</dd>
+          <dt>Resend — offre gratuite <span style="color:var(--ink-3)">(3 000 e-mails/mois)</span></dt><dd>0 $</dd>
+        </dl>
+        <dl class="tot">
+          <dt><strong>Total</strong></dt><dd>52 $ / mois</dd>
+          <dt><strong>Soit environ</strong></dt><dd>31 000 F CFA</dd>
+        </dl>
+      </div>
+    </div>
+
+    <p>
+      Un seul projet Supabase suffit&nbsp;: ta base est mutualisée entre organisations via
+      <code>organisationId</code>. Les 8&nbsp;Go de base et 100&nbsp;Go de stockage compris
+      dans le plan Pro couvrent largement plusieurs dizaines de clients — les contrats et
+      preuves de paiement sont des fichiers de quelques centaines de kilo-octets.
+    </p>
+
+    <p>
+      Le point décisif&nbsp;: ce coût est <strong>quasi indépendant du nombre de clients</strong>.
+      L’architecture multi-tenant partage la base, les services et le domaine. Le client
+      n°2 ne coûte presque rien de plus que le n°1 — seul le stockage des fichiers croît.
+      Ta rentabilité ne dépend donc pas du prix unitaire mais du <strong>nombre de clients</strong>.
+    </p>
+
+    <div class="note warn">
+      <span class="t">Trois dépenses que tu ne peux pas éviter</span>
+      <p>
+        <strong>L’offre gratuite de Supabase n’a aucune sauvegarde</strong>, et met le projet
+        en pause après sept jours d’inactivité. Héberger la comptabilité locative d’un client
+        payant sans sauvegarde n’est pas un risque technique, c’est un risque juridique&nbsp;:
+        une base perdue, ce sont des années d’encaissements qu’il ne peut plus prouver.
+        <strong>C’est le point le plus urgent des trois.</strong>
+      </p>
+      <p>
+        <strong>Ton backend SaaS est sur l’offre gratuite de Render.</strong> Je l’ai mesuré&nbsp;:
+        <strong>45&nbsp;secondes</strong> pour répondre après une mise en veille. Un client qui
+        ouvre l’application le matin et attend trois quarts de minute devant un écran blanc
+        ne renouvellera pas.
+      </p>
+      <p style="margin-bottom:0">
+        <strong>Le plan Hobby de Vercel interdit l’usage commercial.</strong> Dès la première
+        facture émise, tu dois être sur Pro.
+      </p>
+    </div>
+
+    <div class="note">
+      <span class="t">Et la pile classique&nbsp;?</span>
+      <p>
+        Elle a sa propre base. Si elle sert de vrais utilisateurs, elle mérite les mêmes
+        sauvegardes — mais c’est une décision distincte, que l’abonnement SaaS n’a pas à
+        financer. Attention toutefois&nbsp;: l’offre gratuite de Supabase plafonne à
+        <strong>deux projets actifs</strong>. Avec une base par pile, tu y es déjà.
+      </p>
+    </div>
+
+    <h3>Seuil de rentabilité</h3>
+    <p>
+      Avec un fixe de <span class="montant">31 000 F CFA</span> par mois, l’équilibre demande
+      <strong>deux clients</strong> — par exemple un Gérance et un Bailleur — ou
+      <strong>un seul client Agence</strong>. Un unique client au palier Gérance te laisse
+      très légèrement en dessous&nbsp;: <span class="montant">30 000 F</span> encaissés pour
+      <span class="montant">31 000 F</span> dépensés.
+    </p>
+    <p>
+      Ce n’est pas alarmant, c’est structurel&nbsp;: tu paies une infrastructure dimensionnée
+      pour des dizaines de clients dès le premier. Mais cela dit clairement où porter
+      l’effort — <strong>signer le deuxième client compte plus que bien négocier le premier</strong>.
+    </p>
+  </section>
+
+  <!-- ─────────── 02 ─────────── -->
+  <section>
+    <h2><span class="num">02 — Le plafond</span>Ce que l’application vaut</h2>
+
+    <p>
+      Un logiciel de gestion locative ne se vend pas au coût de revient, il se vend en
+      <strong>part des loyers encaissés</strong>. C’est la seule référence qu’un bailleur
+      comprend immédiatement, et elle joue en ta faveur&nbsp;: elle rend le prix minuscule
+      face au flux qu’il sécurise.
+    </p>
+
+    <p>
+      Sur le marché camerounais, un loyer de studio ou d’appartement géré avec ce type
+      d’outil se situe couramment entre <span class="montant">50 000</span> et
+      <span class="montant">120 000 F CFA</span> par mois. Je retiens
+      <span class="montant">70 000 F CFA</span> comme moyenne prudente pour tous les
+      calculs qui suivent&nbsp;— <strong>remplace-la par le chiffre réel de ton prospect</strong>,
+      c’est l’argument le plus fort du dossier.
+    </p>
+
+    <div class="calcul">
+      <div class="h">Ce qu’un client encaisse — et ce que tu lui factures</div>
+      <div class="b">
+        <div class="tw" style="margin:0;border:none">
+          <table>
+            <thead>
+              <tr><th>Logements</th><th class="r">Loyers encaissés / mois</th><th class="r">Ton abonnement</th><th class="r">Part</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>15</td><td class="r">1 050 000 F</td><td class="r">12 000 F</td><td class="r">1,14 %</td></tr>
+              <tr><td>50</td><td class="r">3 500 000 F</td><td class="r">30 000 F</td><td class="r">0,86 %</td></tr>
+              <tr><td>150</td><td class="r">10 500 000 F</td><td class="r">65 000 F</td><td class="r">0,62 %</td></tr>
+              <tr><td>300</td><td class="r">21 000 000 F</td><td class="r">105 000 F</td><td class="r">0,50 %</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <p>
+      <strong>Toujours sous 1,2 %</strong>, et dégressif. Un prospect qui compare ton prix
+      à son chiffre d’affaires locatif n’a aucune raison de bloquer. C’est cette phrase
+      qu’il faut prononcer, pas le montant nu.
+    </p>
+
+    <div class="note tip">
+      <span class="t">L’argument qui emporte la décision</span>
+      <p>
+        Ne vends pas des fonctionnalités, vends <strong>l’arriéré que le client ne voit pas
+        aujourd’hui</strong>. Sur 50 logements, deux locataires avec un mois de retard qui
+        passe inaperçu, c’est <span class="montant">140 000 F CFA</span> immobilisés — soit
+        près de cinq mois d’abonnement, perdus une seule fois. L’application les détecte
+        automatiquement, tous les jours, sans que personne ne tienne un tableau.
+      </p>
+    </div>
+  </section>
+
+  <!-- ─────────── 03 ─────────── -->
+  <section>
+    <h2><span class="num">03 — La grille</span>Quatre paliers, indexés sur les logements</h2>
+
+    <p>
+      Le nombre de logements gérés est la bonne unité&nbsp;: c’est ce qui porte la valeur,
+      c’est mesurable sans discussion, et cela croît naturellement avec le client.
+    </p>
+
+    <div class="grille">
+      <div class="plan">
+        <div class="rang">Palier 1</div>
+        <div class="nom">Bailleur</div>
+        <div class="cible">Propriétaire particulier qui gère lui-même</div>
+        <div class="prix">12 000 F</div>
+        <div class="par">par mois · jusqu’à 15 logements</div>
+        <div class="detail">
+          <div><span>Au logement</span><span>800 F</span></div>
+          <div><span>Annuel (−17 %)</span><span>120 000 F</span></div>
+        </div>
+      </div>
+
+      <div class="plan phare">
+        <div class="rang">Palier 2 · cœur de cible</div>
+        <div class="nom">Gérance</div>
+        <div class="cible">Multi-propriétaire ou petit gestionnaire</div>
+        <div class="prix">30 000 F</div>
+        <div class="par">par mois · 16 à 50 logements</div>
+        <div class="detail">
+          <div><span>Au logement</span><span>600 F</span></div>
+          <div><span>Annuel (−17 %)</span><span>300 000 F</span></div>
+        </div>
+      </div>
+
+      <div class="plan">
+        <div class="rang">Palier 3</div>
+        <div class="nom">Agence</div>
+        <div class="cible">Agence immobilière, gestion pour compte de tiers</div>
+        <div class="prix">65 000 F</div>
+        <div class="par">par mois · 51 à 150 logements</div>
+        <div class="detail">
+          <div><span>Au logement</span><span>433 F</span></div>
+          <div><span>Annuel (−17 %)</span><span>650 000 F</span></div>
+        </div>
+      </div>
+
+      <div class="plan">
+        <div class="rang">Palier 4</div>
+        <div class="nom">Grand compte</div>
+        <div class="cible">Parc important, besoins spécifiques</div>
+        <div class="prix">Sur devis</div>
+        <div class="par">au-delà de 150 logements</div>
+        <div class="detail">
+          <div><span>Base</span><span>350 F / log.</span></div>
+          <div><span>Plancher</span><span>65 000 F</span></div>
+        </div>
+      </div>
+    </div>
+
+    <p>
+      Le prix au logement <strong>décroît de 800 à 350 F</strong> en montant les paliers.
+      C’est volontaire&nbsp;: le gros client obtient un tarif qu’il estime mérité, et tu
+      restes très au-dessus de ton coût marginal, qui est proche de zéro.
+    </p>
+
+    <h3>Ce qui est compris dans tous les paliers</h3>
+    <ul>
+      <li>L’application complète — aucune fonctionnalité n’est réservée à un palier supérieur.</li>
+      <li>Le sous-domaine dédié à l’organisation, et l’hébergement.</li>
+      <li>Les comptes utilisateurs en nombre illimité, tous rôles confondus.</li>
+      <li>Les comptes locataires, pour que chacun consulte sa situation sans t’appeler.</li>
+      <li>Le stockage des contrats de bail et des preuves de paiement.</li>
+      <li>Les mises à jour et les corrections.</li>
+      <li>Le support par e-mail ou WhatsApp, en jours ouvrés.</li>
+    </ul>
+
+    <div class="note">
+      <span class="t">Pourquoi ne rien réserver aux paliers supérieurs</span>
+      <p>
+        Brider des fonctions demanderait du développement que tu n’as pas fait, et fâcherait
+        le petit client sans rien rapporter. Le nombre de logements suffit à segmenter&nbsp;:
+        il grandit tout seul, et la facture suit.
+      </p>
+    </div>
+
+    <h3>Facturé en supplément</h3>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Prestation</th><th class="r">Tarif indicatif</th><th>Quand la proposer</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Reprise de l’historique<br><span style="color:var(--ink-3);font-size:.85em">saisie des logements, locataires, occupations et loyers existants</span></td>
+            <td class="r">50 000 à 150 000 F</td>
+            <td>Systématiquement. C’est du travail réel, et c’est ta meilleure monnaie d’échange.</td>
+          </tr>
+          <tr><td>Formation sur site (demi-journée)</td><td class="r">50 000 F</td><td>Agences et grands comptes.</td></tr>
+          <tr><td>Développement spécifique</td><td class="r">Sur devis</td><td>Jamais offert. Chiffre au temps passé.</td></tr>
+          <tr><td>Export ou récupération des données au départ</td><td class="r">Gratuit</td><td>À dire spontanément&nbsp;: cela lève la peur d’être prisonnier.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ─────────── 04 ─────────── -->
+  <section>
+    <h2><span class="num">04 — La négociation</span>Conduire l’entretien en cours</h2>
+
+    <p>
+      Tu négocies ton premier client. Ce prix va servir de référence à tous les suivants —
+      il vaut donc mieux céder des mois que des pourcentages.
+    </p>
+
+    <ol class="script">
+      <li>
+        <strong>N’annonce pas le prix en premier.</strong> Demande d’abord combien de
+        logements il gère, le loyer moyen, et <em>combien il estime avoir d’impayés
+        aujourd’hui</em>. Cette troisième question fait le travail à ta place&nbsp;: peu de
+        bailleurs savent répondre, et l’aveu vaut démonstration.
+      </li>
+      <li>
+        <strong>Ancre sur le pourcentage, jamais sur le montant.</strong>
+        «&nbsp;Moins de 1&nbsp;% de ce que vous encaissez chaque mois&nbsp;» s’accepte&nbsp;;
+        «&nbsp;30 000 francs par mois&nbsp;» se discute.
+      </li>
+      <li>
+        <strong>Annonce le palier au-dessus de son besoin actuel</strong>, puis positionne-le
+        au bon palier. Il obtient une réduction sans que tu aies bougé ton prix.
+      </li>
+      <li>
+        <strong>Face à l’objection prix, offre des mois, pas une remise.</strong> Deux mois
+        offerts coûtent <span class="montant">60 000 F</span> une fois. Passer de 30 000 à
+        20 000 F coûte <span class="montant">120 000 F</span> par an, chaque année, et
+        contamine ta grille pour les clients suivants.
+      </li>
+      <li>
+        <strong>Échange la reprise de l’historique contre l’engagement annuel.</strong>
+        «&nbsp;Je reprends gratuitement vos données existantes si vous réglez l’année.&nbsp;»
+        Tu encaisses <span class="montant">300 000 F</span> immédiatement, tu supprimes le
+        recouvrement mensuel, et tu élimines le risque de départ au troisième mois.
+      </li>
+      <li>
+        <strong>Fixe ton point de rupture avant d’entrer.</strong> En dessous de
+        <span class="montant">15 000 F</span> par mois pour un client de palier 2, le support
+        et les échanges coûtent plus que ce qu’ils rapportent. Ce client-là, il vaut mieux
+        ne pas l’avoir.
+      </li>
+    </ol>
+
+    <div class="note tip">
+      <span class="t">Ce qui rassure un premier client, et ne te coûte rien</span>
+      <ul style="margin-bottom:0">
+        <li>Un mois d’essai avec ses vraies données&nbsp;: le produit se démontre seul.</li>
+        <li>Aucun engagement de durée sur l’abonnement mensuel.</li>
+        <li>L’export de ses données à tout moment, gratuitement.</li>
+        <li>Le tarif garanti sans hausse pendant douze mois.</li>
+      </ul>
+    </div>
+
+    <div class="note warn">
+      <span class="t">Ne le présente jamais comme un client pilote</span>
+      <p>
+        La tentation est grande de dire «&nbsp;vous êtes le premier, je vous fais un prix&nbsp;».
+        Cela déplace la conversation vers le risque qu’il prend, et installe un tarif que tu
+        ne pourras plus remonter. Il achète un produit fini — il l’est.
+      </p>
+    </div>
+
+    <h3>Encaissement</h3>
+    <p>
+      Prévois Mobile Money (MTN MoMo, Orange Money) pour les paliers 1 et 2, et le virement
+      bancaire pour les agences. Facture d’avance, jamais à terme échu&nbsp;: le levier de
+      relance d’un impayé, c’est la suspension de l’accès, et elle est bien plus simple à
+      manier quand le service n’a pas encore été rendu.
+    </p>
+  </section>
+
+  <!-- ─────────── 05 ─────────── -->
+  <section>
+    <h2><span class="num">05 — Les préalables</span>Ce qui doit être vrai pour tenir ce prix</h2>
+
+    <p>
+      J’ai vérifié l’état réel du produit et du déploiement. Quatre points conditionnent la
+      grille ci-dessus.
+    </p>
+
+    <div class="tw">
+      <table>
+        <thead><tr><th>Point</th><th>État constaté</th><th>À faire</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Sauvegardes</strong></td>
+            <td>Aucune sur l’offre gratuite Supabase, et mise en pause après 7 jours d’inactivité</td>
+            <td>Supabase Pro <strong>avant la signature</strong>. C’est la priorité absolue.</td>
+          </tr>
+          <tr>
+            <td><strong>Démarrage à froid</strong></td>
+            <td>45 s de latence mesurée sur le backend SaaS (offre gratuite Render)</td>
+            <td>Passer en Starter <strong>avant la signature</strong>. Rédhibitoire sinon.</td>
+          </tr>
+          <tr>
+            <td><strong>Usage commercial</strong></td>
+            <td>Vercel Hobby interdit la facturation</td>
+            <td>Basculer sur Pro dès la première facture.</td>
+          </tr>
+          <tr>
+            <td><strong>Volume d’e-mails</strong></td>
+            <td>Resend gratuit&nbsp;: 3 000/mois, mais <strong>100 par jour</strong> et un seul domaine</td>
+            <td>Rien pour l’instant. Le plafond journalier se heurte vers 500 logements sous gestion, si les relances partent le même jour.</td>
+          </tr>
+          <tr>
+            <td><strong>Contrôle des paliers</strong></td>
+            <td>L’entité <code>Organisation</code> n’a ni plan ni quota&nbsp;: rien ne limite le nombre de logements</td>
+            <td>Rien dans l’immédiat. Compter les logements est une requête, et à trois clients cela se vérifie à la main. À automatiser vers dix clients.</td>
+          </tr>
+          <tr>
+            <td><strong>Impayés</strong></td>
+            <td><code>Organisation.isActive</code> existe déjà</td>
+            <td>Rien. Le levier de suspension est en place, c’est l’essentiel.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      <span class="t">Ce que l’application ne sait pas encore faire</span>
+      <p>
+        Il n’y a <strong>aucun module de facturation ni de gestion d’abonnement</strong>.
+        Émission des factures, encaissement et relances se font hors de l’outil. C’est
+        parfaitement tenable jusqu’à une dizaine de clients, et inutile de développer avant
+        d’en avoir la preuve par le nombre.
+      </p>
+    </div>
+  </section>
+
+  <!-- ─────────── 06 ─────────── -->
+  <section>
+    <h2><span class="num">06 — La trajectoire</span>Où mène cette grille</h2>
+
+    <div class="tw">
+      <table>
+        <thead>
+          <tr><th>Portefeuille</th><th class="r">Revenu mensuel</th><th class="r">Coûts</th><th class="r">Marge</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1 client Gérance</td><td class="r">30 000 F</td><td class="r">31 000 F</td><td class="r" style="color:var(--bad)">− 1 000 F</td></tr>
+          <tr><td>1 Gérance + 1 Bailleur</td><td class="r">42 000 F</td><td class="r">31 000 F</td><td class="r">11 000 F</td></tr>
+          <tr><td>3 Bailleur + 2 Gérance</td><td class="r">96 000 F</td><td class="r">31 000 F</td><td class="r">65 000 F</td></tr>
+          <tr><td>5 Bailleur + 4 Gérance + 1 Agence</td><td class="r">245 000 F</td><td class="r">31 000 F</td><td class="r">214 000 F</td></tr>
+        </tbody>
+        <tfoot>
+          <tr><td>Marge annuelle à 10 clients</td><td class="r">2 940 000 F</td><td class="r">372 000 F</td><td class="r">2 568 000 F</td></tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <p>
+      La colonne des coûts ne bouge pas d’une ligne à l’autre, et c’est tout le propos&nbsp;:
+      un projet Supabase, un service Render et un siège Vercel servent aussi bien dix clients
+      qu’un seul. <strong>Le premier client paie l’hébergement et rien d’autre</strong>&nbsp;;
+      le deuxième te met à l’équilibre&nbsp;; à partir du cinquième, chaque signature est
+      presque intégralement de la marge.
+    </p>
+    <p>
+      Conclusion pratique&nbsp;: ce n’est pas le prix qu’il faut optimiser, c’est le rythme
+      d’acquisition. Une remise de 20&nbsp;% consentie pour signer plus vite coûte
+      infiniment moins cher qu’un trimestre passé à négocier.
+    </p>
+
+    <div class="note">
+      <span class="t">Quand revoir cette grille</span>
+      <p>
+        Ne touche à rien avant cinq clients&nbsp;: tu n’auras pas assez de signal. Augmente
+        seulement si tu perds peu d’affaires sur le prix — c’est le symptôme d’un tarif trop
+        bas. Et n’applique jamais une hausse à un client existant sans un préavis de trois
+        mois, ni pendant sa première année.
+      </p>
+    </div>
+  </section>
+
+  <div class="colophon">
+    <p>
+      Montants en francs CFA (XAF). Conversions au taux fixe de 655,957&nbsp;XAF pour
+      1&nbsp;EUR, et environ 600&nbsp;XAF pour 1&nbsp;USD. Les coûts d’hébergement sont des
+      ordres de grandeur relevés en septembre 2026 — à confirmer sur les pages de
+      tarification avant tout engagement.
+    </p>
+    <p style="margin-bottom:0">
+      Sources des coûts&nbsp;:
+      <a href="https://vercel.com/pricing">Vercel</a> ·
+      <a href="https://render.com/pricing">Render</a> ·
+      <a href="https://supabase.com/pricing">Supabase</a> ·
+      <a href="https://resend.com/pricing">Resend</a>
+    </p>
+  </div>
+
+</main>
+</body>
+</html>
