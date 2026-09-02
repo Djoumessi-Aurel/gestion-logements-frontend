@@ -239,15 +239,23 @@ dépendance hors les polices Google, et imprimables en PDF via `Ctrl + P`.
 
 | Fichier | Destinataire | Contenu |
 | ------- | ------------ | ------- |
-| [`guide-utilisateur.html`](docs/guide-utilisateur.html) | **Clients** | Manuel d'utilisation en 16 chapitres |
-| [`formules-client.html`](docs/formules-client.html) | **Clients** | Fiche tarifaire — 4 formules et prestations en supplément |
-| [`tarification-interne.html`](docs/tarification-interne.html) | **Interne uniquement** | Coûts d'hébergement, seuil de rentabilité, marges, tactique de négociation |
+| [`public/tarifs.html`](public/tarifs.html) | **Clients — en ligne** | Fiche tarifaire, servie sur `/tarifs.html` |
+| [`docs/guide-utilisateur.html`](docs/guide-utilisateur.html) | **Clients** | Manuel d'utilisation en 16 chapitres |
+| [`docs/tarification-interne.html`](docs/tarification-interne.html) | **Interne uniquement** | Coûts d'hébergement, seuil de rentabilité, marges, tactique de négociation |
 
 > ⛔ **`tarification-interne.html` ne doit jamais être transmis à un client.** Il expose
-> la base de coûts et les marges. Un avertissement figure en tête du fichier.
+> la base de coûts et les marges. Il est délibérément **hors de `public/`**, donc jamais
+> servi par le site. Un avertissement figure également en tête du fichier.
 
-⚠️ `formules-client.html` porte encore `[à compléter]` à la place du téléphone et de
-l'e-mail, dans le bloc « Démarrer ». À renseigner avant tout envoi.
+**La fiche tarifaire est publiée** sur `https://<domaine>/tarifs.html`, en `noindex`
+volontaire&nbsp;: accessible par lien partagé, mais absente des moteurs de recherche —
+une grille de prix indexée affaiblit la négociation des grands comptes. Pour la rendre
+indexable, retirer la balise `robots` de `public/tarifs.html` **et** la ligne
+`/tarifs.html` de [`app/robots.ts`](app/robots.ts).
+
+⚠️ Une page statique placée dans `public/` doit avoir son extension exclue du `matcher`
+de [`proxy.ts`](proxy.ts) — `html` y a été ajouté pour cette raison. Sans cela, tout
+visiteur non connecté est redirigé vers `/login`.
 
 **Ces fichiers sont la source de vérité.** Les versions publiées en ligne en sont des
 rendus&nbsp;: pour les mettre à jour, on retire le squelette HTML (`doctype`, `html`,

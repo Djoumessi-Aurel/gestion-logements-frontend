@@ -110,8 +110,12 @@ export const config = {
   matcher: [
     // Exclure :
     //  - routes Next.js internes (_next/*)
-    //  - fichiers statiques avec extension (images, fonts, xml, txt, json…)
+    //  - fichiers statiques avec extension (html, images, fonts, xml, txt, json…)
     //  - fichiers service worker générés par next-pwa (sw.js, workbox-*, etc.)
-    '/((?!api|_next/static|_next/image|favicon\\.ico|sw\\.js|workbox-|worker-|fallback-|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|xml|txt|json|woff2?|ttf|otf)).*)',
+    //
+    // ⚠️ `html` est indispensable : les pages statiques servies depuis public/
+    // (ex. /tarifs.html) traverseraient sinon le proxy, qui ne les connaît pas
+    // et redirigerait tout visiteur non connecté vers /login.
+    '/((?!api|_next/static|_next/image|favicon\\.ico|sw\\.js|workbox-|worker-|fallback-|.*\\.(?:html|svg|png|jpg|jpeg|gif|webp|ico|xml|txt|json|woff2?|ttf|otf)).*)',
   ],
 };

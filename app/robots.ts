@@ -25,6 +25,10 @@ export default function robots(): MetadataRoute.Robots {
           '/locataire',
           '/offline',
           '/api/',
+          // Fiche tarifaire : accessible par lien partagé, volontairement absente
+          // des moteurs de recherche. Retirer cette ligne ET la balise robots de
+          // public/tarifs.html pour la rendre indexable.
+          '/tarifs.html',
         ],
       },
     ],
