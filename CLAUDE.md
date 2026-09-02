@@ -64,12 +64,39 @@ curl -s -X POST https://gestion-logements-saas.onrender.com/auth/login \
 Checklist d'origine, conservée pour ajouter un nouveau domaine racine ou refaire la bascule ailleurs :
 
 1. Domaine racine dédié au SaaS (ex. `monapp.com`) + **DNS wildcard** `*.monapp.com` pointant vers l'hébergement du frontend.
-2. Hébergeur du frontend configuré pour accepter ce wildcard (ex. Vercel : "Wildcard Domain", fonctionnalité payante — à vérifier selon l'hébergeur retenu).
+2. Hébergeur du frontend configuré pour accepter ce wildcard. Chez Vercel, le wildcard est disponible sur **tous les plans**, y compris l'offre gratuite — mais il impose de déléguer la zone à ses serveurs de noms. ⚠️ Le plan Hobby interdit en revanche l'usage commercial.
 3. Backend : `SAAS_ROOT_DOMAIN=monapp.com` (autorise l'origine en CORS) + déploiement issu de `aurel-saas`.
 4. Frontend : `NEXT_PUBLIC_API_URL` → backend `aurel-saas`, et `NEXT_PUBLIC_MULTI_TENANT_BACKEND=true`.
 5. Organisation provisionnée en base : `npm run provision:org -- --slug client1 ...` (côté backend).
 
-**C'est cette variante qui a été retenue en production**, sans domaine racine dédié : sous-domaine à 4 labels type `client1.gestion-logements.aureldjoumessi.com`. `getTenantSlug()` ne lisant que le premier label, le code fonctionne tel quel — le wildcard DNS et hébergeur est simplement configuré un niveau plus bas (points 1-2 décalés).
+**C'est cette variante qui a été retenue en production**, sans domaine racine dédié : sous-domaine à 4 labels type `client1.gestion-logements.aureldjoumessi.com`. `getTenantSlug()` ne lisant que le premier label, le code fonctionne tel quel.
+
+### Le wildcard, en pratique
+
+Un vrai wildcard `*.gestion-logements.aureldjoumessi.com` est en place sur Vercel
+(vérifié le 02/09/2026), avec un certificat `CN=*.gestion-logements.aureldjoumessi.com`.
+**Provisionner une Organisation en base suffit donc à ouvrir son sous-domaine** — plus
+rien à faire côté DNS, Vercel ni backend.
+
+- Le domaine racine `aureldjoumessi.com` est délégué aux serveurs de noms de Vercel
+  (`ns1`/`ns2.vercel-dns.com`). C'est **obligatoire** pour un wildcard : Vercel doit
+  contrôler la zone pour émettre le certificat. Un enregistrement CNAME ne suffit pas.
+- ⚠️ Basculer les nameservers efface tout enregistrement non recréé chez Vercel,
+  **les MX en premier** — la messagerie du domaine tombe. Sans objet ici, ce domaine
+  n'a pas de MX, mais c'est le piège à connaître avant de refaire l'opération ailleurs.
+- Un wildcard ne couvre qu'**un seul niveau** : `client1.gestion-logements…` oui,
+  `a.b.gestion-logements…` non.
+- Un wildcard compte pour **une seule entrée** dans le quota de domaines de l'hébergeur
+  (50 par projet sur l'offre Hobby de Vercel, 100 000 sur Pro). Sans lui, chaque tenant
+  consomme une entrée et doit être déclaré à la main.
+
+**Vérifier qu'il s'agit bien d'un wildcard** — un seul nom qui résout ne prouve rien,
+il faut tester un nom arbitraire :
+
+```bash
+# Doit résoudre. Si NXDOMAIN, les tenants sont déclarés un par un.
+nslookup zzz-inexistant.gestion-logements.aureldjoumessi.com 8.8.8.8
+```
 
 ## Couleurs principales (charte graphique)
 - Bleu principal : `#1e3a8a`
