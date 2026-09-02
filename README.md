@@ -33,6 +33,7 @@ cp .env.example .env.local   # puis éditer .env.local
 | -------- | ------- | ----------- |
 | `NEXT_PUBLIC_API_URL` | oui | URL du backend NestJS sans slash final (ex : `http://localhost:3000`) |
 | `NEXT_PUBLIC_CRYPTO_SECRET` | oui | Clé de chiffrement pour redux-persist — chaîne aléatoire longue |
+| `NEXT_PUBLIC_CURRENCY` | non | Devise d'affichage, code ISO 4217. Défaut `XAF`. Un code invalide est ignoré (repli sur `XAF`) avec un avertissement en console |
 | `NEXT_PUBLIC_SITE_URL` | oui en prod | URL publique du frontend. Sert de `metadataBase` (donc aux URLs absolues `og:image`/`og:url`) ainsi qu'à `sitemap.xml` et `robots.txt` |
 | `NEXT_PUBLIC_MULTI_TENANT_BACKEND` | non | `"true"` **uniquement** si `NEXT_PUBLIC_API_URL` pointe vers un backend multi-tenant. Voir l'avertissement CORS dans `CLAUDE.md` — l'activer à tort bloque toutes les requêtes |
 | `NEXT_PUBLIC_DEV_TENANT_SLUG` | non | Slug d'organisation à forcer en développement local (pas de sous-domaine sur `localhost`) |
@@ -117,7 +118,7 @@ Aucun de ces helpers ne doit être redéfini localement dans une page.
 | Module | Contenu |
 | ------ | ------- |
 | `utils/date.ts` | `formatDate`, `toDateStr`, `addPeriode`, `addOneDay`, `isDatePassee` |
-| `utils/format.ts` | `formatMontant`, `formatSize`, `mimeLabel`, `mimeIcon`, `labelPeriode`, `labelPeriodeCourt` |
+| `utils/format.ts` | `devise`, `formatMontant`, `formatSize`, `mimeLabel`, `mimeIcon`, `labelPeriode`, `labelPeriodeCourt` |
 | `utils/error.ts` | `extractError` — extrait le message affichable d'une erreur Axios |
 | `utils/role.ts` | `roleLabels`, `roleColors`, `hasMinRole`, `rolesForAdmin` |
 | `utils/password.ts` | `generatePassword` — mot de passe initial généré côté admin |
@@ -239,9 +240,17 @@ dépendance hors les polices Google, et imprimables en PDF via `Ctrl + P`.
 
 | Fichier | Destinataire | Contenu |
 | ------- | ------------ | ------- |
-| [`public/tarifs.html`](public/tarifs.html) | **Clients — en ligne** | Fiche tarifaire, servie sur `/tarifs.html` |
+| [`public/tarifs.html`](public/tarifs.html) | **Clients — en ligne** | Fiche tarifaire Cameroun, servie sur `/tarifs.html` |
 | [`docs/guide-utilisateur.html`](docs/guide-utilisateur.html) | **Clients** | Manuel d'utilisation en 16 chapitres |
-| [`docs/tarification-interne.html`](docs/tarification-interne.html) | **Interne uniquement** | Coûts d'hébergement, seuil de rentabilité, marges, tactique de négociation |
+| [`docs/tarifs-{pays}.html`](docs/) | **Clients** | Fiches tarifaires Gabon, Côte d'Ivoire et Maroc |
+| [`docs/tarification-interne.html`](docs/tarification-interne.html) | **Interne uniquement** | Coûts, seuil de rentabilité, marges, tactique de négociation — Cameroun |
+| [`docs/tarification-interne-{pays}.html`](docs/) | **Interne uniquement** | Les mêmes, pour Gabon, Côte d'Ivoire et Maroc |
+
+**Les variantes pays** sont des projections, pas des offres en vigueur. Elles reposent
+sur une hypothèse de loyer moyen relevée par ville (Libreville 180 000 XAF, Abidjan
+120 000 XOF, Casablanca 5 000 MAD) et sur une base de coûts convertie prudemment. Toute
+modification de la grille camerounaise doit être répercutée en régénérant ces variantes,
+sinon elles divergent silencieusement.
 
 > ⛔ **`tarification-interne.html` ne doit jamais être transmis à un client.** Il expose
 > la base de coûts et les marges. Il est délibérément **hors de `public/`**, donc jamais

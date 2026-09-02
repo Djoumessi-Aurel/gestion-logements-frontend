@@ -17,7 +17,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import type { Occupation } from '@/types/occupation';
 import type { Logement, Loyer } from '@/types/logement';
 import { paiementsApi } from '@/services/paiements.api';
-import { formatMontant } from '@/utils/format';
+import { devise, formatMontant } from '@/utils/format';
 import { formatDate, toDateStr, addPeriode } from '@/utils/date';
 import { extractError } from '@/utils/error';
 
@@ -341,7 +341,7 @@ export default function PaiementFormDialog({
           <>
             <div>
               <label className="block text-sm font-medium text-[#1e293b] mb-1">
-                Montant payé (XAF) <span className="text-red-500">*</span>
+                Montant payé ({devise}) <span className="text-red-500">*</span>
               </label>
               <Controller name="montantPaye" control={opt2Form.control} render={({ field }) => (
                 <InputNumber

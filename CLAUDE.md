@@ -804,6 +804,12 @@ silencieusement tout filtrage de format.
 ```
 NEXT_PUBLIC_API_URL=http://localhost:3000
 NEXT_PUBLIC_CRYPTO_SECRET=...    ← clé de chiffrement redux-persist
+NEXT_PUBLIC_CURRENCY=XAF         ← optionnel. Devise d'affichage, code ISO 4217 (XAF, XOF,
+                                   MAD, EUR…). Défaut XAF. Le nombre de décimales suit la
+                                   devise ; un code invalide retombe sur XAF avec un
+                                   avertissement. Ne jamais réécrire de devise en dur :
+                                   utiliser formatMontant() et la constante devise
+                                   (utils/format.ts) pour les libellés de champ.
 NEXT_PUBLIC_SITE_URL=...         ← URL publique du frontend. Sert de metadataBase (URLs
                                    absolues og:image / og:url) + sitemap.xml + robots.txt.
                                    Obligatoire en production : sans elle, les aperçus de

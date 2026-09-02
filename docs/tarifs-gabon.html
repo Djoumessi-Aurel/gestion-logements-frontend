@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Fiche tarifaire de l'application Gestion de Logements, destinée aux clients.">
+<meta name="robots" content="noindex, nofollow">
+
+<!--
+  Fiche tarifaire remise aux clients et prospects.
+
+  ⚠️ À compléter avant tout envoi : les coordonnées du bloc « Démarrer »
+  portent encore [à compléter] (téléphone/WhatsApp et e-mail).
+
+  Servi publiquement à /tarifs.html — c'est ce lien que l'on partage aux prospects.
+  En noindex volontaire : accessible par lien, mais absent des moteurs de recherche.
+  Pour le rendre indexable : retirer la balise robots ci-dessous ET la ligne
+  correspondante dans app/robots.ts.
+
+  Le raisonnement qui sous-tend ces tarifs — coûts, marges, argumentaire de
+  négociation — est dans docs/tarification-interne.html, qui ne doit PAS
+  être transmis aux clients.
+
+  Document autonome, ouvrable directement dans un navigateur.
+
+  Ce fichier est la SOURCE DE VÉRITÉ. La version publiée en ligne en est un rendu :
+  pour la mettre à jour, on retire le squelette (doctype/html/head/body) et on
+  republie le reste à la même URL. Ne pas maintenir deux copies du contenu.
+
+  Aucune dépendance hors les polices Google. Impression : Ctrl + P.
+-->
+
+<title>Formules Gabon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap">
+
+<style>
+:root {
+  --ink:       #16202e;
+  --ink-2:     #47566b;
+  --ink-3:     #6f7d92;
+  --ground:    #f4f7fb;
+  --surface:   #ffffff;
+  --surface-2: #eaf0f8;
+  --line:      #d9e2ee;
+  --line-soft: #e7edf6;
+
+  --bleu:      #1e3a8a;
+  --bleu-2:    #3b82f6;
+  --bleu-wash: #dbeafe;
+  --bleu-ink:  #1e3a8a;
+
+  --ok:   #166534;  --ok-bg:   #dcfce7;  --ok-line: #bbf0cb;
+  --bad:  #991b1b;  --bad-bg:  #fee2e2;
+
+  --hero-bg:   #1e3a8a;
+  --hero-ink:  #ffffff;
+  --hero-lede: #d5e2fa;
+  --hero-dim:  #a8c3f2;
+  --hero-rule: rgba(255,255,255,.2);
+
+  --shadow:    0 1px 2px rgba(22,32,46,.05), 0 10px 26px -18px rgba(22,32,46,.3);
+  --shadow-lg: 0 2px 4px rgba(22,32,46,.06), 0 18px 40px -24px rgba(30,58,138,.45);
+
+  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --sans:  "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink:       #e4ebf5;
+    --ink-2:     #a7b5c8;
+    --ink-3:     #7b8a9e;
+    --ground:    #0d1219;
+    --surface:   #141b25;
+    --surface-2: #1b2430;
+    --line:      #29323f;
+    --line-soft: #212a36;
+
+    --bleu:      #9dbcff;
+    --bleu-2:    #6ea0ff;
+    --bleu-wash: #16233c;
+    --bleu-ink:  #b8cdff;
+
+    --ok:  #8fe6ab;  --ok-bg:  #12301f;  --ok-line: #1d4d31;
+    --bad: #fba5a5;  --bad-bg: #381717;
+
+    --hero-bg:   #101a2e;
+    --hero-ink:  #eef3fc;
+    --hero-lede: #b9c9e6;
+    --hero-dim:  #8fa5c9;
+    --hero-rule: rgba(255,255,255,.14);
+
+    --shadow:    0 1px 2px rgba(0,0,0,.4), 0 10px 28px -20px rgba(0,0,0,.8);
+    --shadow-lg: 0 2px 4px rgba(0,0,0,.5), 0 20px 44px -26px rgba(0,0,0,.9);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ink:       #e4ebf5;
+  --ink-2:     #a7b5c8;
+  --ink-3:     #7b8a9e;
+  --ground:    #0d1219;
+  --surface:   #141b25;
+  --surface-2: #1b2430;
+  --line:      #29323f;
+  --line-soft: #212a36;
+
+  --bleu:      #9dbcff;
+  --bleu-2:    #6ea0ff;
+  --bleu-wash: #16233c;
+  --bleu-ink:  #b8cdff;
+
+  --ok:  #8fe6ab;  --ok-bg:  #12301f;  --ok-line: #1d4d31;
+  --bad: #fba5a5;  --bad-bg: #381717;
+
+  --hero-bg:   #101a2e;
+  --hero-ink:  #eef3fc;
+  --hero-lede: #b9c9e6;
+  --hero-dim:  #8fa5c9;
+  --hero-rule: rgba(255,255,255,.14);
+
+  --shadow:    0 1px 2px rgba(0,0,0,.4), 0 10px 28px -20px rgba(0,0,0,.8);
+  --shadow-lg: 0 2px 4px rgba(0,0,0,.5), 0 20px 44px -26px rgba(0,0,0,.9);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16.5px;
+  line-height: 1.6;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--bleu-2); text-underline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--bleu-2); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+.wrap { max-width: 1000px; margin: 0 auto; padding: 0 1.5rem; }
+
+/* ── Bandeau ── */
+.hero { background: var(--hero-bg); color: var(--hero-ink); padding: 3.25rem 0 3rem; }
+.hero .eyebrow {
+  font-size: .74rem; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--hero-dim); margin: 0 0 1rem; font-weight: 500;
+}
+.hero h1 {
+  font-family: var(--serif); font-weight: 700;
+  font-size: clamp(2rem, 5vw, 3rem); line-height: 1.07; letter-spacing: -.015em;
+  margin: 0 0 .9rem; color: var(--hero-ink); text-wrap: balance;
+}
+.hero .lede { margin: 0; max-width: 56ch; font-size: 1.1rem; color: var(--hero-lede); }
+.hero .rassure {
+  margin-top: 1.9rem; padding-top: 1.3rem; border-top: 1px solid var(--hero-rule);
+  display: flex; flex-wrap: wrap; gap: .55rem 1.8rem; font-size: .9rem; color: var(--hero-lede);
+}
+.hero .rassure span { display: inline-flex; align-items: center; gap: .45rem; }
+.hero .rassure b { color: var(--hero-ink); font-weight: 600; }
+
+/* ── Sections ── */
+main { padding-bottom: 4.5rem; }
+section { padding-top: 3.25rem; }
+
+h2 {
+  font-family: var(--serif); font-size: clamp(1.45rem, 3.1vw, 1.95rem);
+  font-weight: 700; line-height: 1.16; margin: 0 0 .45rem; text-wrap: balance;
+}
+.sous { color: var(--ink-2); margin: 0 0 1.6rem; max-width: 62ch; }
+
+/* ── Bénéfices ── */
+.benefices { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 1rem; }
+.benefice {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: 12px; padding: 1.1rem 1.05rem;
+}
+.benefice h3 {
+  font-family: var(--serif); font-size: 1.06rem; font-weight: 600;
+  margin: 0 0 .3rem; color: var(--bleu-ink);
+}
+.benefice p { margin: 0; font-size: .89rem; color: var(--ink-2); line-height: 1.5; }
+
+/* ── Paliers ── */
+.paliers { display: grid; grid-template-columns: repeat(auto-fit, minmax(212px, 1fr)); gap: 1rem; }
+.palier {
+  display: flex; flex-direction: column;
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: 14px; overflow: hidden; box-shadow: var(--shadow);
+}
+.palier .bande {
+  background: var(--bleu-wash); color: var(--bleu-ink);
+  padding: .7rem 1.05rem; border-bottom: 1px solid var(--line-soft);
+}
+.palier .bande .cle { font-size: 1.02rem; font-weight: 600; line-height: 1.2; }
+.palier .bande .cle-sous { font-size: .74rem; color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; margin-top: .1rem; }
+.palier .corps { padding: 1.05rem; display: flex; flex-direction: column; flex: 1; }
+.palier .nom { font-family: var(--serif); font-size: 1.3rem; font-weight: 700; line-height: 1.15; }
+.palier .pour { font-size: .85rem; color: var(--ink-2); margin: .2rem 0 1rem; min-height: 2.6em; line-height: 1.4; }
+.palier .prix { font-size: 1.85rem; font-weight: 600; color: var(--bleu-ink); line-height: 1.05; letter-spacing: -.02em; }
+.palier .prix .u { font-size: .95rem; font-weight: 500; color: var(--ink-2); letter-spacing: 0; }
+.palier .annuel {
+  margin-top: auto; padding-top: .85rem; border-top: 1px solid var(--line-soft);
+  font-size: .85rem; color: var(--ink-2);
+}
+.palier .annuel .ligne { display: flex; justify-content: space-between; gap: .6rem; align-items: baseline; }
+.palier .annuel b { color: var(--ink); font-weight: 600; }
+.palier .eco {
+  display: inline-block; margin-top: .35rem; font-size: .76rem; font-weight: 600;
+  color: var(--ok); background: var(--ok-bg); border: 1px solid var(--ok-line);
+  border-radius: 999px; padding: .05rem .5rem;
+}
+
+/* ── Inclus ── */
+.inclus {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: 14px; padding: 1.5rem 1.4rem; box-shadow: var(--shadow);
+}
+.inclus ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(285px, 1fr)); gap: .55rem 1.6rem; }
+.inclus li { display: flex; gap: .6rem; align-items: flex-start; font-size: .93rem; }
+.inclus li::before {
+  content: "✓"; flex: 0 0 auto; width: 1.25rem; height: 1.25rem; margin-top: .12rem;
+  display: grid; place-items: center; border-radius: 50%;
+  background: var(--ok-bg); color: var(--ok); font-size: .72rem; font-weight: 700;
+}
+.inclus li b { font-weight: 600; }
+
+/* ── Tableau supplément ── */
+.tw { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow); }
+table { border-collapse: collapse; width: 100%; font-size: .92rem; }
+th, td { text-align: left; padding: .8rem .95rem; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+thead th {
+  background: var(--surface-2); font-size: .72rem; font-weight: 600;
+  letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); white-space: nowrap;
+}
+tbody tr:last-child td { border-bottom: none; }
+td.tarif { white-space: nowrap; font-weight: 600; color: var(--bleu-ink); }
+td .precision { display: block; font-size: .84em; color: var(--ink-3); font-weight: 400; margin-top: .15rem; }
+.gratuit { color: var(--ok); font-weight: 700; }
+
+/* ── Clôture ── */
+.final {
+  margin-top: 3.25rem; background: var(--bleu); color: #fff;
+  border-radius: 16px; padding: 2rem 1.75rem; box-shadow: var(--shadow-lg);
+}
+.final h2 { color: #fff; margin-bottom: .5rem; }
+.final p { color: #d5e2fa; max-width: 58ch; margin: 0 0 1.2rem; }
+.final .etapes { list-style: none; margin: 0 0 1.4rem; padding: 0; counter-reset: e; display: grid; gap: .6rem; }
+.final .etapes li { counter-increment: e; display: flex; gap: .7rem; align-items: flex-start; color: #e7eefc; font-size: .95rem; }
+.final .etapes li::before {
+  content: counter(e); flex: 0 0 auto; width: 1.5rem; height: 1.5rem;
+  display: grid; place-items: center; border-radius: 50%;
+  background: rgba(255,255,255,.16); color: #fff; font-size: .78rem; font-weight: 600;
+}
+.contact {
+  border-top: 1px solid var(--hero-rule); padding-top: 1.2rem;
+  display: flex; flex-wrap: wrap; gap: .5rem 2rem; font-size: .95rem; color: #d5e2fa;
+}
+.contact b { color: #fff; }
+.contact a { color: #fff; }
+
+.pied { margin-top: 1.6rem; font-size: .82rem; color: var(--ink-3); }
+
+@media print {
+  :root {
+    --ground:#fff; --surface:#fff; --surface-2:#f3f6fa;
+    --ink:#111; --ink-2:#333; --ink-3:#666;
+    --hero-bg:#fff; --hero-ink:#111; --hero-lede:#333; --hero-dim:#555; --hero-rule:#ccc;
+    --shadow:none; --shadow-lg:none;
+  }
+  .hero { border-bottom: 2px solid #111; padding: 0 0 1.2rem; }
+  .wrap { padding: 0; max-width: none; }
+  main { padding-bottom: 0; }
+  section { padding-top: 1.5rem; }
+  .final { background: #fff; color: #111; border: 2px solid #111; box-shadow: none; }
+  .final h2, .final p, .final .etapes li, .contact, .contact b, .contact a { color: #111; }
+  .final .etapes li::before { background: #eee; color: #111; }
+  .palier, .benefice, .inclus, .tw, .final { page-break-inside: avoid; }
+  h2 { page-break-after: avoid; }
+  body { font-size: 10.5pt; }
+  a { color: #111; text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Formules et tarifs — Gabon</p>
+    <h1>Gestion de Logements</h1>
+    <p class="lede">
+      L’application qui suit vos loyers, détecte vos impayés et vous dit régulièrement
+      qui relancer. Vous ne payez qu’en fonction du nombre de logements que vous gérez.
+    </p>
+    <div class="rassure">
+      <span><b>Tout est compris</b> — aucune option payante</span>
+      <span><b>Utilisateurs illimités</b></span>
+      <span><b>Vos données vous appartiennent</b></span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ── Ce que ça change ── -->
+  <section class="wrap">
+    <h2>Ce que l’application change pour vous</h2>
+    <p class="sous">
+      Pas un tableur de plus&nbsp;: un outil qui calcule à votre place et vous alerte
+      avant que l’argent ne manque.
+    </p>
+
+    <div class="benefices">
+      <div class="benefice">
+        <h3>Vos impayés, visibles</h3>
+        <p>
+          L’application sait à tout instant jusqu’à quelle date chaque locataire a payé.
+          Elle calcule seule les arriérés, les montants dus et les périodes concernées.
+          Plus de retard qui passe inaperçu pendant trois mois.
+        </p>
+      </div>
+      <div class="benefice">
+        <h3>Un paiement en dix secondes</h3>
+        <p>
+          Vous saisissez le nombre de loyers réglés&nbsp;; la période couverte et le montant
+          se calculent automatiquement. Joignez le reçu ou la capture du transfert, et le
+          dossier est complet.
+        </p>
+      </div>
+      <div class="benefice">
+        <h3>Chacun à sa place</h3>
+        <p>
+          Vos gestionnaires n’accèdent qu’aux bâtiments ou logements qui leur sont confiés.
+          Vos locataires consultent leur propre situation, sans vous appeler.
+        </p>
+      </div>
+      <div class="benefice">
+        <h3>Vos chiffres, exportables</h3>
+        <p>
+          Paiements, arriérés, occupations, locataires&nbsp;: chaque rapport s’exporte en
+          Excel ou en PDF, pour votre comptabilité comme pour vos réunions.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Paliers ── -->
+  <section class="wrap">
+    <h2>Nos formules</h2>
+    <p class="sous">
+      Il n’y a rien à choisir&nbsp;: <strong>votre nombre de logements détermine votre
+      formule</strong>. Toutes donnent accès à l’intégralité de l’application.
+    </p>
+
+    <div class="paliers">
+
+      <div class="palier">
+        <div class="bande">
+          <div class="cle">Jusqu’à 10 logements</div>
+          <div class="cle-sous">Palier 1</div>
+        </div>
+        <div class="corps">
+          <div class="nom">Bailleur</div>
+          <div class="pour">Propriétaire particulier qui gère lui-même</div>
+          <div class="prix">38 000 F <span class="u">/ mois</span></div>
+          <div class="annuel">
+            <div class="ligne"><span>Paiement annuel</span><b>418 000 F</b></div>
+            <span class="eco">1 mois offert</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="palier">
+        <div class="bande">
+          <div class="cle">Jusqu’à 40 logements</div>
+          <div class="cle-sous">Palier 2</div>
+        </div>
+        <div class="corps">
+          <div class="nom">Gérance</div>
+          <div class="pour">Petit gestionnaire</div>
+          <div class="prix">90 000 F <span class="u">/ mois</span></div>
+          <div class="annuel">
+            <div class="ligne"><span>Paiement annuel</span><b>900 000 F</b></div>
+            <span class="eco">2 mois offerts</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="palier">
+        <div class="bande">
+          <div class="cle">Jusqu’à 100 logements</div>
+          <div class="cle-sous">Palier 3</div>
+        </div>
+        <div class="corps">
+          <div class="nom">Agence</div>
+          <div class="pour">Agence immobilière, gestion pour compte de tiers</div>
+          <div class="prix">165 000 F <span class="u">/ mois</span></div>
+          <div class="annuel">
+            <div class="ligne"><span>Paiement annuel</span><b>1 650 000 F</b></div>
+            <span class="eco">2 mois offerts</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="palier">
+        <div class="bande">
+          <div class="cle">Plus de 100 logements</div>
+          <div class="cle-sous">Palier 4</div>
+        </div>
+        <div class="corps">
+          <div class="nom">Grand compte</div>
+          <div class="pour">Parc important, besoins spécifiques</div>
+          <div class="prix">Sur devis</div>
+          <div class="annuel">
+            <span>Tarif dégressif, établi selon votre parc et vos besoins.</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <p class="pied">
+      Montants en F CFA (XAF), hors taxes. Le palier est déterminé par le nombre de
+      logements enregistrés dans l’application&nbsp;; il évolue avec votre parc.
+    </p>
+  </section>
+
+  <!-- ── Inclus ── -->
+  <section class="wrap">
+    <h2>Compris dans toutes les formules</h2>
+    <p class="sous">
+      Aucune fonctionnalité n’est réservée à une formule supérieure. Vous payez pour la
+      taille de votre parc, pas pour débloquer des options.
+    </p>
+
+    <div class="inclus">
+      <ul>
+        <li><span><b>L’application complète</b> — bâtiments, logements, locataires, occupations, paiements, arriérés.</span></li>
+        <li><span><b>Votre espace dédié</b>, à votre propre adresse web.</span></li>
+        <li><span><b>Comptes utilisateurs illimités</b>, avec des droits adaptés à chaque collaborateur.</span></li>
+        <li><span><b>Comptes locataires</b>, pour qu’ils consultent leur situation sans vous solliciter.</span></li>
+        <li><span><b>Contrats de bail et preuves de paiement</b> stockés et consultables en ligne.</span></li>
+        <li><span><b>Exports Excel et PDF</b> de tous vos rapports.</span></li>
+        <li><span><b>Relances automatiques</b> des arriérés par e-mail.</span></li>
+        <li><span><b>Hébergement, sauvegardes et mises à jour</b> assurés par nos soins.</span></li>
+        <li><span><b>Support par e-mail et WhatsApp</b>, en jours ouvrés.</span></li>
+        <li><span><b>Accès depuis téléphone, tablette et ordinateur</b>, sans rien installer.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── Supplément ── -->
+  <section class="wrap">
+    <h2>Facturé en supplément</h2>
+    <p class="sous">
+      Des prestations ponctuelles, proposées seulement si vous en avez besoin.
+    </p>
+
+    <div class="tw">
+      <table>
+        <thead>
+          <tr><th>Prestation</th><th>Tarif</th><th>À quel moment</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <b>Reprise de votre historique</b>
+              <span class="precision">Saisie de vos bâtiments, logements, locataires, occupations et loyers existants, pour démarrer avec vos données réelles plutôt qu’une base vide.</span>
+            </td>
+            <td class="tarif">130 000 à 380 000 F</td>
+            <td>Une seule fois, au démarrage. Le tarif dépend du volume à reprendre.</td>
+          </tr>
+          <tr>
+            <td>
+              <b>Formation sur site</b>
+              <span class="precision">Une demi-journée dans vos locaux, avec vos équipes et vos propres dossiers.</span>
+            </td>
+            <td class="tarif">130 000 F</td>
+            <td>À la demande. La prise en main à distance reste comprise dans l’abonnement.</td>
+          </tr>
+          <tr>
+            <td>
+              <b>Développement spécifique</b>
+              <span class="precision">Un rapport, un export ou une fonction propres à votre organisation.</span>
+            </td>
+            <td class="tarif">Sur devis</td>
+            <td>Après étude de votre besoin, devis préalable systématique.</td>
+          </tr>
+          <tr>
+            <td>
+              <b>Récupération de vos données</b>
+              <span class="precision">L’intégralité de vos données, dans un format exploitable, si vous décidez de partir.</span>
+            </td>
+            <td class="tarif"><span class="gratuit">Gratuit</span></td>
+            <td>À tout moment, sans condition.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── Démarrer ── -->
+  <section class="wrap">
+    <div class="final">
+      <h2>Démarrer</h2>
+      <p>
+        La mise en service prend quelques jours. Vous n’avez ni serveur à prévoir, ni
+        logiciel à installer&nbsp;: une adresse web et vos identifiants suffisent.
+      </p>
+      <ol class="etapes">
+        <li>Nous faisons le point sur votre parc et le nombre de logements à gérer.</li>
+        <li>Nous créons votre espace et vos comptes utilisateurs.</li>
+        <li>Vous saisissez vos données, ou nous les reprenons pour vous.</li>
+        <li>Vous êtes opérationnel, et vous encaissez le premier loyer dans l’application.</li>
+      </ol>
+      <div class="contact">
+        <span><b>Aurel Djoumessi</b></span>
+        <span>Téléphone / WhatsApp&nbsp;: <b>+237 693 03 77 48</b></span>
+        <span>E-mail&nbsp;: <b>aurelbazir@gmail.com</b></span>
+        <span><a href="https://aureldjoumessi.com">aureldjoumessi.com</a></span>
+      </div>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

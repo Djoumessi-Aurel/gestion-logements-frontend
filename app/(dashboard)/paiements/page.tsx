@@ -31,7 +31,7 @@ import { showConfirm } from '@/components/shared/ConfirmDialog';
 import FileUploader from '@/components/shared/FileUploader';
 import ExportModal from '@/components/shared/ExportModal';
 import PaiementFormDialog from '@/components/shared/PaiementFormDialog';
-import { formatMontant, formatSize, mimeIcon } from '@/utils/format';
+import { devise, formatMontant, formatSize, mimeIcon } from '@/utils/format';
 import { formatDate, toDateStr } from '@/utils/date';
 import { extractError } from '@/utils/error';
 import { hasMinRole } from '@/utils/role';
@@ -482,7 +482,7 @@ export default function PaiementsPage() {
 
           {/* Montant */}
           <div>
-            <label className="block text-sm font-medium text-[#1e293b] mb-1">Montant payé (XAF)</label>
+            <label className="block text-sm font-medium text-[#1e293b] mb-1">Montant payé ({devise})</label>
             <Controller name="montantPaye" control={editForm.control} render={({ field }) => (
               <InputNumber
                 value={field.value ?? null}

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Logo from '@/components/shared/Logo';
+import { devise } from '@/utils/format';
 
 // ─── Données ──────────────────────────────────────────────────────────────────
 
@@ -227,7 +228,7 @@ const jsonLd = {
   offers: {
     '@type': 'Offer',
     price: '0',
-    priceCurrency: 'XAF',
+    priceCurrency: devise,
   },
 };
 

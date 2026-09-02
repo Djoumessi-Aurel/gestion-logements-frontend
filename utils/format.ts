@@ -2,10 +2,44 @@ import { PeriodeType } from '@/types/enums';
 
 /** Helpers de formatage pour l'affichage. */
 
-/** Montant en francs CFA, sans décimales (ex : « 150 000 F CFA »). */
+// ─── Devise ───────────────────────────────────────────────────────────────────
+
+const DEVISE_PAR_DEFAUT = 'XAF';
+
+/**
+ * Code ISO 4217 de la devise, issu de `NEXT_PUBLIC_CURRENCY`.
+ *
+ * Résolu une seule fois au chargement du module, et **validé** : un code
+ * invalide ferait lever `Intl.NumberFormat` à chaque affichage de montant,
+ * c'est-à-dire sur pratiquement toutes les pages. Mieux vaut un repli visible
+ * dans la console qu'une application qui ne s'affiche plus.
+ */
+function resoudreDevise(): string {
+  const code = process.env.NEXT_PUBLIC_CURRENCY?.trim().toUpperCase();
+  if (!code) return DEVISE_PAR_DEFAUT;
+  try {
+    new Intl.NumberFormat('fr-FR', { style: 'currency', currency: code }).format(0);
+    return code;
+  } catch {
+    console.warn(
+      `NEXT_PUBLIC_CURRENCY="${code}" n'est pas un code ISO 4217 valide — repli sur ${DEVISE_PAR_DEFAUT}.`,
+    );
+    return DEVISE_PAR_DEFAUT;
+  }
+}
+
+/** Code de la devise active — à afficher dans les libellés de champs. */
+export const devise = resoudreDevise();
+
+/**
+ * Montant dans la devise configurée (ex : « 150 000 F CFA », « 1 500,00 MAD »).
+ *
+ * Le nombre de décimales n'est pas forcé : `Intl` applique celui de la devise —
+ * aucune pour les francs CFA, deux pour le dirham ou l'euro.
+ */
 export function formatMontant(val: number): string {
   return new Intl.NumberFormat('fr-FR', {
-    style: 'currency', currency: 'XAF', maximumFractionDigits: 0,
+    style: 'currency', currency: devise,
   }).format(val);
 }
 
