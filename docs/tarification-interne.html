@@ -383,18 +383,23 @@ ol.script > li::before {
 
     <h3>Seuil de rentabilité</h3>
     <p>
-      Avec un fixe de <span class="montant">31 000 F CFA</span> par mois,
-      <strong>un seul client Gérance suffit</strong>&nbsp;:
-      <span class="montant">35 000 F</span> encaissés pour
+      Avec un fixe de <span class="montant">31 000 F CFA</span> par mois, un seul client
+      Gérance suffit <strong>s’il paie au mois</strong>&nbsp;:
+      <span class="montant">35 000 F</span> encaissés contre
       <span class="montant">31 000 F</span> dépensés, soit
-      <span class="montant">4 000 F</span> de marge dès la première signature. Un client
-      Agence te met à <span class="montant">34 000 F</span>. En revanche il faut
-      <strong>trois clients Bailleur</strong> pour atteindre l’équilibre.
+      <span class="montant">4 000 F</span> de marge. Un client Agence te met à
+      <span class="montant">34 000 F</span>, et il faut <strong>trois clients Bailleur</strong>
+      pour atteindre l’équilibre.
     </p>
     <p>
-      C’est un argument à avoir en tête en rendez-vous&nbsp;: dès le premier client de taille
-      Gérance, l’affaire s’autofinance. Mais la marge réelle reste dans le nombre — tu paies
-      dès le premier client une infrastructure dimensionnée pour des dizaines, donc
+      ⚠️ <strong>Mais s’il règle l’année, ce n’est plus vrai.</strong> Au tarif annuel, un
+      Gérance rapporte <span class="montant">29 167 F</span> par mois — il te manque encore
+      <span class="montant">1 833 F</span> pour couvrir l’hébergement. Un premier client en
+      paiement annuel ne t’amène donc pas à l’équilibre&nbsp;: il faut le deuxième.
+    </p>
+    <p>
+      Dans tous les cas, la marge réelle est dans le nombre — tu paies dès le premier client
+      une infrastructure dimensionnée pour des dizaines, donc
       <strong>signer le deuxième compte plus que bien négocier le premier</strong>.
     </p>
   </section>
@@ -606,7 +611,11 @@ ol.script > li::before {
         <strong>Échange la reprise de l’historique contre l’engagement annuel.</strong>
         «&nbsp;Je reprends gratuitement vos données existantes si vous réglez l’année.&nbsp;»
         Tu encaisses <span class="montant">350 000 F</span> immédiatement, tu supprimes le
-        recouvrement mensuel, et tu élimines le risque de départ au troisième mois.
+        recouvrement mensuel, et tu élimines le risque de départ au troisième mois. Le prix
+        de ces trois avantages&nbsp;: <span class="montant">70 000 F</span> de revenu en
+        moins sur l’année, puisque 12 mois pleins en feraient
+        <span class="montant">420 000 F</span>. C’est un arbitrage, pas un cadeau — décide-le
+        en connaissance de cause.
       </li>
       <li>
         <strong>Fixe ton point de rupture avant d’entrer.</strong> En dessous de
@@ -710,25 +719,34 @@ ol.script > li::before {
     <div class="tw">
       <table>
         <thead>
-          <tr><th>Portefeuille</th><th class="r">Revenu mensuel</th><th class="r">Coûts</th><th class="r">Marge</th></tr>
+          <tr><th>Portefeuille</th><th class="r">Revenu — au mois</th><th class="r">Revenu — à l’année</th><th class="r">Coûts</th><th class="r">Marge (mois / année)</th></tr>
         </thead>
         <tbody>
-          <tr><td>1 client Bailleur</td><td class="r">15 000 F</td><td class="r">31 000 F</td><td class="r" style="color:var(--bad)">− 16 000 F</td></tr>
-          <tr><td>1 client Gérance</td><td class="r">35 000 F</td><td class="r">31 000 F</td><td class="r">4 000 F</td></tr>
-          <tr><td>3 Bailleur + 2 Gérance</td><td class="r">115 000 F</td><td class="r">31 000 F</td><td class="r">84 000 F</td></tr>
-          <tr><td>5 Bailleur + 4 Gérance + 1 Agence</td><td class="r">280 000 F</td><td class="r">31 000 F</td><td class="r">249 000 F</td></tr>
+          <tr><td>1 client Bailleur</td><td class="r">15 000 F</td><td class="r">13 750 F</td><td class="r">31 000 F</td><td class="r" style="color:var(--bad)">− 16 000 / − 17 250 F</td></tr>
+          <tr><td>1 client Gérance</td><td class="r">35 000 F</td><td class="r">29 167 F</td><td class="r">31 000 F</td><td class="r">4 000 / <span style="color:var(--bad)">− 1 833</span> F</td></tr>
+          <tr><td>3 Bailleur + 2 Gérance</td><td class="r">115 000 F</td><td class="r">99 584 F</td><td class="r">31 000 F</td><td class="r">84 000 / 68 584 F</td></tr>
+          <tr><td>5 Bailleur + 4 Gérance + 1 Agence</td><td class="r">280 000 F</td><td class="r">239 583 F</td><td class="r">31 000 F</td><td class="r">249 000 / 208 583 F</td></tr>
         </tbody>
         <tfoot>
-          <tr><td>Marge annuelle à 10 clients</td><td class="r">3 360 000 F</td><td class="r">372 000 F</td><td class="r">2 988 000 F</td></tr>
+          <tr><td>Sur douze mois, à 10 clients</td><td class="r">3 360 000 F</td><td class="r">2 875 000 F</td><td class="r">372 000 F</td><td class="r">2 988 000 / 2 503 000 F</td></tr>
         </tfoot>
       </table>
     </div>
 
     <p>
-      La colonne des coûts ne bouge pas d’une ligne à l’autre, et c’est tout le propos&nbsp;:
-      un projet Supabase, un service Render et un siège Vercel servent aussi bien dix clients
-      qu’un seul. <strong>Un seul client Gérance couvre déjà toute l’infrastructure</strong>&nbsp;;
-      tout ce qui vient ensuite est presque intégralement de la marge.
+      Les deux colonnes de revenu encadrent la réalité&nbsp;: tes clients se répartiront entre
+      paiement mensuel et paiement annuel, donc tu atterriras entre les deux. La colonne des
+      coûts, elle, ne bouge pas d’une ligne à l’autre — un projet Supabase, un service Render
+      et un siège Vercel servent aussi bien dix clients qu’un seul. Tout ce qui vient après le
+      premier client est presque intégralement de la marge.
+    </p>
+    <p>
+      <strong>Ce que coûte l’engagement annuel.</strong> Généralisé, il te retire
+      <span class="montant">485 000 F</span> de marge par an à dix clients, soit
+      <strong>16 %</strong>. En échange&nbsp;: la trésorerie encaissée d’avance, la fin du
+      recouvrement mensuel en Mobile Money, et un client qui ne peut plus partir au troisième
+      mois. L’échange est bon tant que tu as besoin de trésorerie et de stabilité — c’est-à-dire
+      maintenant. Il le sera moins quand le portefeuille sera constitué.
     </p>
     <p>
       Conclusion pratique&nbsp;: ce n’est pas le prix qu’il faut optimiser, c’est le rythme
