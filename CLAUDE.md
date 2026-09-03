@@ -73,17 +73,64 @@ Checklist d'origine, conservée pour ajouter un nouveau domaine racine ou refair
 
 ### Le wildcard, en pratique
 
-Un vrai wildcard `*.gestion-logements.aureldjoumessi.com` est en place sur Vercel
-(vérifié le 02/09/2026), avec un certificat `CN=*.gestion-logements.aureldjoumessi.com`.
-**Provisionner une Organisation en base suffit donc à ouvrir son sous-domaine** — plus
-rien à faire côté DNS, Vercel ni backend.
+Un vrai wildcard `*.gestion-logements.aureldjoumessi.com` est en place, avec un
+certificat `CN=*.gestion-logements.aureldjoumessi.com` renouvelé automatiquement par
+Vercel (topologie stabilisée le 03/09/2026, voir l'historique ci-dessous — la première
+version de cette note, écrite le 02/09, décrivait un montage qui a dû être revu).
+**Provisionner une Organisation en base suffit à ouvrir son sous-domaine** — plus rien
+à faire côté DNS, Vercel ni backend.
 
-- Le domaine racine `aureldjoumessi.com` est délégué aux serveurs de noms de Vercel
-  (`ns1`/`ns2.vercel-dns.com`). C'est **obligatoire** pour un wildcard : Vercel doit
-  contrôler la zone pour émettre le certificat. Un enregistrement CNAME ne suffit pas.
-- ⚠️ Basculer les nameservers efface tout enregistrement non recréé chez Vercel,
-  **les MX en premier** — la messagerie du domaine tombe. Sans objet ici, ce domaine
-  n'a pas de MX, mais c'est le piège à connaître avant de refaire l'opération ailleurs.
+**Topologie actuelle — deux autorités DNS sur le même domaine.** `aureldjoumessi.com`
+(racine) est délégué aux nameservers **Cloudflare**, qui restent seuls responsables des
+sous-domaines `api-logements(-saas).aureldjoumessi.com` (proxifiés, nuage orange — voir
+l'artéfact « Migration API Cloudflare » pour le pourquoi). Mais `gestion-logements.
+aureldjoumessi.com`, **lui, est délégué en NS à Vercel** (`ns1`/`ns2.vercel-dns.com`)
+directement depuis la zone Cloudflare :
+
+```
+Type  Nom                    Valeur
+NS    gestion-logements      ns1.vercel-dns.com
+NS    gestion-logements      ns2.vercel-dns.com
+```
+
+Vercel est donc seul autoritaire sur tout ce qui vit sous `gestion-logements` — le site,
+son wildcard, et strictement rien d'autre ne doit résider sous ce nom dans Cloudflare :
+tout enregistrement qui s'y trouverait deviendrait injoignable (Cloudflare l'affiche
+d'ailleurs avec un avertissement « shadowed by NS records »).
+
+**Pourquoi une délégation complète, et pas plus fine.** Un wildcard exige le défi ACME
+DNS-01, qui exige que l'émetteur du certificat (Vercel) puisse écrire lui-même la preuve
+de contrôle en DNS — impossible sans autorité sur la zone. Vercel documente une
+alternative plus fine, ne déléguer que `_acme-challenge.<sous-domaine>` en NS pour ne
+pas céder tout le sous-domaine :
+[Can I use wildcard domains without switching to Vercel Nameservers?](https://vercel.com/kb/guide/wildcard-domain-without-vercel-nameservers)
+⚠️ **Testé et non concluant sur Cloudflare** : quand un wildcard `*.gestion-logements…`
+recouvre déjà ce nom dans la même zone, Cloudflare sert la synthèse du wildcard plutôt
+que d'honorer la délégation `_acme-challenge` — vérifié sur trois résolveurs publics
+(Google, 1.1.1.1) longtemps après expiration du TTL, donc pas un simple retard de cache.
+Seule une requête directe à l'autoritaire Cloudflare montrait la délégation — la
+résolution réelle, elle, ne la respectait jamais. Ne pas retenter cette variante ici ;
+si la question se repose sur un autre domaine, vérifier d'abord si l'hébergeur DNS
+respecte la préséance correspondance-exacte > wildcard avant d'y compter.
+
+⚠️ **Avant de déléguer un sous-domaine entier, en lister tout le contenu, pas seulement
+ce qu'on y a mis soi-même.** `gestion-logements.aureldjoumessi.com` hébergeait aussi,
+sans lien avec le site, les enregistrements de vérification d'envoi Resend (service mail
+des relances d'arriérés) :
+
+| Type | Nom | Rôle |
+|---|---|---|
+| MX | `send.gestion-logements` | gestion des bounces (AWS SES, utilisé par Resend) |
+| TXT | `send.gestion-logements` | SPF — `v=spf1 include:amazonses.com ~all` |
+| TXT | `resend._domainkey.gestion-logements` | DKIM |
+
+Ces trois enregistrements existaient déjà côté Vercel depuis avant la migration
+Cloudflare (jamais supprimés) ; seules leurs copies dans Cloudflare — importées lors du
+scan initial du domaine — sont devenues obsolètes et ont pu être retirées sans rien
+recréer. Mais si un futur enregistrement de ce genre n'existe **que** chez Cloudflare au
+moment de déléguer, il faut le recréer côté **Vercel → Domains → le domaine → DNS
+Records** avant de couper, sous peine de casser l'envoi de mail sans avertissement.
+
 - Un wildcard ne couvre qu'**un seul niveau** : `client1.gestion-logements…` oui,
   `a.b.gestion-logements…` non.
 - Un wildcard compte pour **une seule entrée** dans le quota de domaines de l'hébergeur
@@ -91,11 +138,19 @@ rien à faire côté DNS, Vercel ni backend.
   consomme une entrée et doit être déclaré à la main.
 
 **Vérifier qu'il s'agit bien d'un wildcard** — un seul nom qui résout ne prouve rien,
-il faut tester un nom arbitraire :
+il faut tester un nom arbitraire, et vérifier aussi le certificat servi (le domaine de
+base peut sembler fonctionner par coïncidence même quand le wildcard est cassé, voir
+l'incident du 03/09 dans l'artéfact de migration) :
 
 ```bash
-# Doit résoudre. Si NXDOMAIN, les tenants sont déclarés un par un.
+# DNS : doit résoudre vers Vercel (vercel-dns-XXX.com), pas vers une IP Cloudflare.
 nslookup zzz-inexistant.gestion-logements.aureldjoumessi.com 8.8.8.8
+
+# Certificat : le SAN doit être *.gestion-logements.aureldjoumessi.com (Let's Encrypt),
+# pas *.aureldjoumessi.com (Cloudflare) ni une alerte de handshake.
+echo | openssl s_client -connect zzz-inexistant.gestion-logements.aureldjoumessi.com:443 \
+  -servername zzz-inexistant.gestion-logements.aureldjoumessi.com 2>/dev/null \
+  | openssl x509 -noout -issuer -subject -ext subjectAltName
 ```
 
 ## Couleurs principales (charte graphique)
