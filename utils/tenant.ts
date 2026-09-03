@@ -30,9 +30,20 @@
 
 const IPV4_REGEX = /^\d{1,3}(\.\d{1,3}){3}$/;
 
+/**
+ * true si le frontend cible un backend multi-tenant (pile SaaS).
+ *
+ * À utiliser pour masquer toute fonctionnalité propre au SaaS (ex : la section
+ * "Votre abonnement" du profil, qui appelle `GET /organisations/me` — un endpoint
+ * qui n'existe pas sur la pile classique et y échouerait systématiquement).
+ */
+export function isMultiTenant(): boolean {
+  return process.env.NEXT_PUBLIC_MULTI_TENANT_BACKEND === 'true';
+}
+
 export function getTenantSlug(): string | undefined {
   if (typeof window === 'undefined') return undefined;
-  if (process.env.NEXT_PUBLIC_MULTI_TENANT_BACKEND !== 'true') return undefined;
+  if (!isMultiTenant()) return undefined;
 
   const hostname = window.location.hostname;
 

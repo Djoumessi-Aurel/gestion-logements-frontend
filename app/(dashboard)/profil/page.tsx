@@ -14,6 +14,7 @@ import { organisationsApi } from '@/services/organisations.api';
 import { Role } from '@/types/enums';
 import type { OrganisationUsage } from '@/types/organisation';
 import { roleLabels, roleColors } from '@/utils/role';
+import { isMultiTenant } from '@/utils/tenant';
 
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
@@ -92,7 +93,10 @@ export default function ProfilPage() {
   useEffect(() => { load(); }, []);
 
   useEffect(() => {
-    if (profile?.role !== Role.ADMIN_GLOBAL) return;
+    // La section abonnement n'a de sens que sur la pile SaaS multi-tenant :
+    // GET /organisations/me n'existe pas sur la pile classique et y échouerait
+    // systématiquement (voir isMultiTenant() dans utils/tenant.ts).
+    if (!isMultiTenant() || profile?.role !== Role.ADMIN_GLOBAL) return;
     organisationsApi.getMine()
       .then((res) => setOrgUsage(res.data.data))
       .catch(() => setOrgError('Impossible de charger les informations de votre organisation.'));
@@ -177,7 +181,7 @@ export default function ProfilPage() {
       </div>
 
       {/* ── Abonnement (ADMIN_GLOBAL uniquement) ────────────────────────────── */}
-      {role === Role.ADMIN_GLOBAL && (orgUsage || orgError) && (
+      {isMultiTenant() && role === Role.ADMIN_GLOBAL && (orgUsage || orgError) && (
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <h2 className="text-base font-semibold text-[#1e293b] mb-4">Votre abonnement</h2>
 
