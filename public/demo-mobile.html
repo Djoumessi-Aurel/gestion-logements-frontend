@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Démo interactive mobile de l'application Gestion de Logements — bâtiments, logements, locataires, paiements, arriérés, exports.">
+<meta name="robots" content="noindex, nofollow">
+
+<!--
+  Démo interactive à but commercial, destinée aux prospects — VERSION MOBILE.
+
+  Contrepartie de demo-desktop.html, adaptée à un affichage téléphone :
+  barre d'onglets en bas au lieu de la sidebar, listes en cartes au lieu
+  de tableaux, feuilles modales ancrées en bas ("bottom sheet"), grille
+  KPI en 2 colonnes. Mêmes données fictives, même moteur de scènes
+  (autoplay + navigation manuelle) que la version desktop.
+
+  Document autonome, ouvrable directement dans un navigateur, sans backend.
+-->
+
+<title>Démo Gestion Logements — Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+
+<style>
+:root {
+  --page-ground: #f4f6f8;
+  --page-surface: #ffffff;
+  --page-ink: #1e293b;
+  --page-ink-2: #5b6b7d;
+  --page-line: #e2e8ee;
+  --page-accent: #1e3a8a;
+  --page-accent-2: #3b82f6;
+  --page-accent-wash: #dbeafe;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page-ground: #0e1216;
+    --page-surface: #161b21;
+    --page-ink: #e7edf2;
+    --page-ink-2: #a3b1bf;
+    --page-line: #262f38;
+    --page-accent: #7fa5e0;
+    --page-accent-2: #9dbcff;
+    --page-accent-wash: #16233c;
+  }
+}
+:root[data-theme="dark"] {
+  --page-ground: #0e1216;
+  --page-surface: #161b21;
+  --page-ink: #e7edf2;
+  --page-ink-2: #a3b1bf;
+  --page-line: #262f38;
+  --page-accent: #7fa5e0;
+  --page-accent-2: #9dbcff;
+  --page-accent-wash: #16233c;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page-ground); color: var(--page-ink); font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif; }
+a { color: var(--page-accent); }
+
+/* ── Page wrapper ─────────────────────────────────────────────────────────── */
+.page { max-width: 720px; margin: 0 auto; padding: 3rem 1.25rem 4rem; }
+.page-head { text-align: center; margin-bottom: 1.75rem; }
+.eyebrow {
+  display: inline-block; font-size: .72rem; font-weight: 700; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--page-accent-2); margin-bottom: .8rem;
+}
+.page-head h1 {
+  font-size: clamp(1.5rem, 5vw, 2rem); font-weight: 800; margin: 0 0 .7rem; text-wrap: balance;
+}
+.page-head p { margin: 0 auto; max-width: 30rem; color: var(--page-ink-2); font-size: 1rem; line-height: 1.55; }
+
+/* ── "Stage" = cadre du téléphone (même principe que la version desktop) ── */
+.stage {
+  max-width: 420px; margin: 2.2rem auto 0; border-radius: 26px; overflow: hidden;
+  box-shadow: 0 1px 2px rgba(15,23,42,.06), 0 30px 60px -30px rgba(15,23,42,.35);
+  border: 1px solid var(--page-line); background: #fff;
+}
+
+.pstatusbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 20px 3px; background: #fff; font-size: 13px; font-weight: 700; color: #0f172a;
+}
+.pstatusbar .sicons { display: flex; align-items: center; gap: 5px; }
+.pstatusbar .sicons svg { width: 15px; height: 11px; color: #0f172a; }
+.pstatusbar .sicons svg.batt { width: 21px; height: 11px; }
+
+.paddrbar {
+  background: #eef2f6; padding: .5rem .9rem; display: flex; align-items: center; justify-content: center;
+  border-bottom: 1px solid #dfe6ee; position: relative;
+}
+.paddrbar .addr {
+  font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: .68rem; color: #64748b;
+  background: #ffffff; border: 1px solid #dfe6ee; border-radius: 999px; padding: .28rem 1rem;
+  display: inline-flex; align-items: center; gap: .35rem; max-width: 100%; overflow: hidden;
+  white-space: nowrap; text-overflow: ellipsis;
+}
+.demo-flag {
+  position: absolute; right: .6rem; top: 50%; transform: translateY(-50%);
+  font-size: .58rem; font-weight: 700; letter-spacing: .03em; color: #92400e;
+  background: #fef3c7; border: 1px solid #fde68a; padding: .16rem .4rem; border-radius: 999px;
+  display: none;
+}
+
+.appshell-outer { width: 100%; overflow: hidden; background: #f8fafc; }
+#device {
+  position: relative; width: 390px; height: 782px; display: flex; flex-direction: column;
+  font-size: 16px; color: #1e293b; background: #fff; transform-origin: top left; overflow: hidden;
+}
+
+/* Top app bar (remplace la sidebar) */
+.ptopbar { height: 52px; flex-shrink: 0; background: #fff; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; }
+.ptopbar .lead { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.ptopbar .lead .mark { width: 24px; height: 24px; border-radius: 7px; background: #1e3a8a; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.ptopbar .lead .mark svg { width: 14px; height: 14px; color: #fff; }
+.ptopbar .lead span { font-weight: 700; font-size: 14px; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ptopbar .trail { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.ptopbar .avatar { width: 27px; height: 27px; border-radius: 999px; background: #1e3a8a; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+.ptopbar .more { width: 27px; height: 27px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #94a3b8; }
+.ptopbar .more svg { width: 17px; height: 17px; }
+
+.content { flex: 1; overflow: hidden; position: relative; padding: 14px 14px 12px; }
+
+/* Scenes */
+.scene { position: absolute; inset: 0; padding: 14px 14px 12px; opacity: 0; transform: translateY(6px); transition: opacity .38s ease, transform .38s ease; pointer-events: none; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.scene.is-active { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.scene::-webkit-scrollbar { display: none; }
+
+.pageheader { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; gap: 10px; }
+.pageheader .crumbs { font-size: 10.5px; color: #9ca3af; margin-bottom: 2px; }
+.pageheader .crumbs b { color: #1e293b; font-weight: 600; }
+.pageheader h2 { font-size: 17px; font-weight: 700; color: #1e293b; margin: 0; }
+.btn { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; padding: 7px 14px; border-radius: 8px; border: 1px solid transparent; cursor: pointer; }
+.btn svg { width: 14px; height: 14px; }
+.btn.primary { background: #1e3a8a; color: #fff; }
+.btn.outline { background: #fff; border-color: #cbd5e1; color: #475569; }
+
+.iconbtn { width: 34px; height: 34px; border-radius: 9px; border: 1px solid #cbd5e1; background: #fff; color: #475569; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.iconbtn svg { width: 16px; height: 16px; }
+.iconbtn.primary { background: #1e3a8a; border-color: #1e3a8a; color: #fff; }
+
+/* KPI grid — 2 colonnes sur mobile */
+.kpigrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 9px; margin-bottom: 14px; }
+.kpi { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 11px 12px; display: flex; gap: 9px; align-items: flex-start; box-shadow: 0 1px 2px rgba(15,23,42,.03); }
+.kpi .ic { background: #dbeafe; border-radius: 8px; padding: 6px; flex-shrink: 0; }
+.kpi .ic svg { width: 14px; height: 14px; color: #1e3a8a; }
+.kpi .label { font-size: 9.5px; text-transform: uppercase; letter-spacing: .02em; color: #6b7280; line-height: 1.2; }
+.kpi .value { font-size: 16px; font-weight: 700; margin-top: 2px; color: #1e293b; }
+.kpi .sub { font-size: 9.5px; color: #9ca3af; margin-top: 2px; }
+
+/* Card shell */
+.card { background: #fff; border-radius: 12px; box-shadow: 0 1px 2px rgba(15,23,42,.04); padding: 13px; }
+.card .card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 9px; }
+.card .card-head h3 { font-size: 13px; font-weight: 600; color: #1e293b; margin: 0; }
+.card .card-head .hint { font-size: 10px; color: #9ca3af; font-weight: 400; }
+
+/* Listes en cartes — remplacent les tableaux */
+.rowlist { display: flex; flex-direction: column; gap: 8px; }
+.rowcard { background: #fff; border: 1px solid #e5e7eb; border-radius: 11px; padding: 10px 12px; box-shadow: 0 1px 2px rgba(15,23,42,.03); }
+.rowcard.active { background: #eff6ff; border-color: #bfdbfe; }
+.rc-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+.rc-name { font-weight: 700; font-size: 13px; color: #1e3a8a; }
+.rc-mid { font-size: 11.5px; color: #475569; margin-bottom: 5px; }
+.rc-bot { display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; color: #64748b; }
+.rc-actions { display: flex; gap: 5px; justify-content: flex-end; margin-top: 6px; }
+
+.pill { display: inline-flex; align-items: center; gap: 4px; font-size: 9.5px; font-weight: 700; padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
+.pill svg { width: 9px; height: 9px; }
+.pill.ok  { background: #dcfce7; color: #166534; }
+.pill.bad { background: #fee2e2; color: #991b1b; }
+.pill.info{ background: #dbeafe; color: #1e3a8a; }
+.pill.muted{ background: #f3f4f6; color: #9ca3af; }
+
+.rowbtn { width: 27px; height: 27px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; color: #64748b; cursor: pointer; background: #f8fafc; flex-shrink: 0; }
+.rowbtn svg { width: 13px; height: 13px; }
+
+/* Search bar */
+.searchbar { position: relative; margin-bottom: 11px; }
+.searchbar svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #9ca3af; }
+.searchbar input { width: 100%; padding: 9px 10px 9px 30px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 12.5px; font-family: inherit; color: #334155; }
+.searchbar input:focus { outline: 2px solid #93c5fd; outline-offset: 1px; }
+
+/* Bottom sheet (remplace le Modal centré) */
+.modal-scrim { position: absolute; inset: 0; background: rgba(15,23,42,.42); display: flex; align-items: flex-end; justify-content: center; z-index: 5; }
+.sheet { background: #fff; border-radius: 20px 20px 0 0; box-shadow: 0 -12px 40px -12px rgba(15,23,42,.4); width: 100%; overflow: hidden; animation: sheetUp .35s ease both; }
+@keyframes sheetUp { from { transform: translateY(26px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.sheet-handle { width: 34px; height: 4px; border-radius: 999px; background: #e2e8f0; margin: 8px auto 0; }
+.sheet .m-head { padding: 8px 18px 12px; font-weight: 700; font-size: 14.5px; color: #1e293b; text-align: center; border-bottom: 1px solid #f1f5f9; }
+.sheet .m-body { padding: 15px 18px; display: flex; flex-direction: column; gap: 12px; }
+.sheet .m-foot { padding: 12px 18px 20px; border-top: 1px solid #f1f5f9; display: flex; gap: 8px; }
+.sheet .m-foot .btn { flex: 1; justify-content: center; }
+.field label { display: block; font-size: 12px; font-weight: 600; color: #1e293b; margin-bottom: 5px; }
+.readonly-box { display: flex; align-items: center; gap: 7px; background: #f0f9ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 8px 11px; font-size: 12px; color: #1e293b; }
+.readonly-box svg { width: 13px; height: 13px; color: #3b82f6; flex-shrink: 0; }
+.readonly-box b { font-weight: 700; }
+.select2 { display: flex; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; }
+.select2 button { flex: 1; border: none; background: #fff; padding: 8px 6px; font-size: 12px; font-weight: 600; color: #475569; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+.select2 button svg { width: 13px; height: 13px; }
+.select2 button.on { background: #1e3a8a; color: #fff; }
+.stepper { display: inline-flex; align-items: center; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; }
+.stepper button { border: none; background: #f8fafc; width: 32px; height: 32px; font-weight: 700; color: #475569; cursor: pointer; font-size: 15px; }
+.stepper .val { width: 46px; text-align: center; font-weight: 700; font-size: 13.5px; color: #1e293b; }
+.preview-box { background: #dcfce7; border: 1px solid #bbf0cb; border-radius: 10px; padding: 12px 13px; }
+.preview-box .pt { font-size: 10.5px; font-weight: 700; color: #166534; text-transform: uppercase; letter-spacing: .03em; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
+.preview-box .pt svg { width: 12px; height: 12px; }
+.preview-box p { margin: 2px 0; font-size: 12.5px; color: #166534; }
+.preview-box b { font-weight: 700; }
+
+/* Export list — 1 colonne */
+.explist { display: flex; flex-direction: column; gap: 8px; }
+.expcard { background: #fff; border: 1px solid #e5e7eb; border-radius: 11px; padding: 10px 11px; display: flex; align-items: center; gap: 10px; }
+.expcard.hi { border-color: #1e3a8a; box-shadow: 0 0 0 1px #1e3a8a inset; }
+.expcard .ic { border-radius: 8px; padding: 7px; background: #dbeafe; flex-shrink: 0; display: flex; }
+.expcard.hi .ic { background: #1e3a8a; }
+.expcard .ic svg { width: 14px; height: 14px; color: #1e3a8a; }
+.expcard.hi .ic svg { color: #fff; }
+.expinfo { flex: 1; min-width: 0; }
+.expinfo .name { font-weight: 600; font-size: 12.5px; color: #1e293b; }
+.expinfo .desc { font-size: 10px; color: #6b7280; line-height: 1.3; margin-top: 1px; }
+
+/* Bottom tab bar (remplace la sidebar) */
+.pbottomnav { height: 62px; flex-shrink: 0; background: #fff; border-top: 1px solid #e5e7eb; display: flex; position: relative; }
+.pbottomnav .tabitem { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: #94a3b8; font-size: 9.5px; font-weight: 600; cursor: default; }
+.pbottomnav .tabitem svg { width: 19px; height: 19px; }
+.pbottomnav .tabitem.active { color: #1e3a8a; }
+.homeindicator { position: absolute; left: 50%; bottom: 6px; transform: translateX(-50%); width: 110px; height: 4px; border-radius: 999px; background: rgba(30,41,59,.22); pointer-events: none; }
+
+/* Demo controls */
+.stage-controls { background: #fff; border-top: 1px solid var(--page-line); padding: 10px 14px; display: flex; align-items: center; justify-content: center; gap: 12px; }
+.stage-controls .playbtn { width: 32px; height: 32px; border-radius: 999px; background: #1e3a8a; color: #fff; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+.stage-controls .playbtn svg { width: 13px; height: 13px; }
+.stage-controls .dots { display: flex; gap: 8px; }
+.stage-controls .dot { width: 8px; height: 8px; border-radius: 999px; background: #cbd5e1; border: none; cursor: pointer; padding: 0; }
+.stage-controls .dot.on { background: #1e3a8a; width: 22px; border-radius: 999px; transition: width .25s ease; }
+.stage-controls .scenelabel { font-size: 11.5px; color: #64748b; }
+
+/* Toast */
+.toast { position: absolute; left: 50%; bottom: 74px; transform: translateX(-50%) translateY(8px); background: #1e293b; color: #fff; font-size: 12px; padding: 8px 15px; border-radius: 999px; opacity: 0; transition: opacity .2s ease, transform .2s ease; pointer-events: none; z-index: 20; white-space: nowrap; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Footer CTA */
+.cta { max-width: 460px; margin: 2.4rem auto 0; text-align: center; }
+.cta p { color: var(--page-ink-2); margin: 0 0 1rem; font-size: .94rem; }
+.cta a.wa {
+  display: inline-flex; align-items: center; gap: 8px; background: #1e3a8a; color: #fff; font-weight: 700;
+  font-size: .92rem; padding: .7rem 1.4rem; border-radius: 10px; text-decoration: none;
+}
+.cta a.wa svg { width: 15px; height: 15px; }
+.cta a.wa:hover { background: #1e40af; }
+
+@media (prefers-reduced-motion: reduce) {
+  .scene, .stage-controls .dot, .sheet { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="page-head">
+    <span class="eyebrow">Démonstration · Version mobile</span>
+    <h1>Gestion Logements sur mobile</h1>
+    <p>Le même aperçu interactif, pensé pour un écran de téléphone. Laissez-le défiler seul, ou touchez les points en bas pour naviguer.</p>
+  </div>
+
+  <div class="stage">
+    <div class="pstatusbar">
+      <span class="time">9:41</span>
+      <span class="sicons" id="statusIcons"></span>
+    </div>
+    <div class="paddrbar">
+      <span class="addr">🔒 gestion-logements.aureldjoumessi.com</span>
+      <span class="demo-flag">Démo</span>
+    </div>
+
+    <div class="appshell-outer" id="shellOuter">
+      <div id="device">
+        <div class="ptopbar">
+          <div class="lead">
+            <div class="mark" id="topMark"></div>
+            <span>Gestion Logements</span>
+          </div>
+          <div class="trail">
+            <span class="avatar">RK</span>
+            <span class="more demo-inert" id="moreIc"></span>
+          </div>
+        </div>
+
+        <div class="content" id="sceneHost">
+          <!-- Scenes injected by JS -->
+        </div>
+
+        <div class="pbottomnav" id="bottomNav"></div>
+        <div class="homeindicator"></div>
+      </div>
+    </div>
+
+    <div class="stage-controls">
+      <button class="playbtn" id="playBtn" aria-label="Lecture / pause"></button>
+      <div class="dots" id="dots"></div>
+      <span class="scenelabel" id="sceneLabel"></span>
+    </div>
+  </div>
+
+  <div class="cta">
+    <p>Envie de voir ça avec vos propres logements ?</p>
+    <a class="wa" href="https://wa.me/237693037748" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-4 4V5Z"></path><line x1="8" y1="9" x2="16" y2="9"></line><line x1="8" y1="12.5" x2="13" y2="12.5"></line></svg>
+      Discuter sur WhatsApp
+    </a>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ── Icônes (même style que la version desktop, stroke 1.8, viewBox 24) ──
+  const I = {
+    grid: '<rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/>',
+    building: '<rect x="4" y="3" width="16" height="18" rx="1"/><line x1="9" y1="7" x2="9" y2="7.01"/><line x1="15" y1="7" x2="15" y2="7.01"/><line x1="9" y1="11" x2="9" y2="11.01"/><line x1="15" y1="11" x2="15" y2="11.01"/><path d="M9 21v-4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4"/>',
+    home: '<path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9a1 1 0 0 0 1 1h3v-5h4v5h3a1 1 0 0 0 1-1v-9"/>',
+    users: '<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.4"/><path d="M15.3 14.3c2.4.4 4.5 2.4 4.5 5.7"/>',
+    user: '<circle cx="12" cy="8" r="3.2"/><path d="M5.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5"/>',
+    calendar: '<rect x="3.5" y="5" width="17" height="16" rx="2"/><line x1="3.5" y1="9.5" x2="20.5" y2="9.5"/><line x1="7.5" y1="3" x2="7.5" y2="6.5"/><line x1="16.5" y1="3" x2="16.5" y2="6.5"/>',
+    wallet: '<path d="M3 7a2 2 0 0 1 2-2h13a1 1 0 0 1 1 1v3"/><path d="M3 7v10a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-7a1 1 0 0 0-1-1H6a2 2 0 0 1-2-2z"/><circle cx="16" cy="13" r="1.4"/>',
+    download: '<path d="M12 4v11"/><path d="M7.5 10.5 12 15l4.5-4.5"/><path d="M4.5 18.5h15"/>',
+    search: '<circle cx="10" cy="10" r="6.5"/><line x1="15" y1="15" x2="20" y2="20"/>',
+    pencil: '<path d="M4 20l1-4 11-11 3 3-11 11-4 1z"/><path d="M14 6l3 3"/>',
+    trash: '<path d="M5 7h14"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M7 7l1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13"/>',
+    chart: '<line x1="5" y1="20" x2="5" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="19" y1="20" x2="19" y2="15"/>',
+    lockOpen: '<rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 7.5-2"/>',
+    check: '<circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.5 2.5L16 9.5"/>',
+    exclam: '<circle cx="12" cy="12" r="9"/><line x1="12" y1="7.5" x2="12" y2="13"/><line x1="12" y1="16" x2="12" y2="16.01"/>',
+    triangle: '<path d="M12 3.5 21 20H3z"/><line x1="12" y1="9.5" x2="12" y2="14"/><line x1="12" y1="16.5" x2="12" y2="16.51"/>',
+    cross: '<circle cx="12" cy="12" r="9"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/>',
+    refresh: '<path d="M4 12a8 8 0 0 1 13.5-5.5L20 9"/><path d="M20 4v5h-5"/><path d="M20 12a8 8 0 0 1-13.5 5.5L4 15"/><path d="M4 20v-5h5"/>',
+    plus: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+    more: '<circle cx="12" cy="5" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1.6" fill="currentColor" stroke="none"/>',
+    fileExcel: '<path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v4h4"/><line x1="9" y1="13" x2="15" y2="18"/><line x1="15" y1="13" x2="9" y2="18"/>',
+    filePdf: '<path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v4h4"/><line x1="9" y1="13.5" x2="15" y2="13.5"/><line x1="9" y1="16.5" x2="13" y2="16.5"/>',
+    play: '<path d="M6 4l14 8-14 8V4z" fill="currentColor" stroke="none"/>',
+    pause: '<rect x="5" y="4" width="5" height="16" fill="currentColor" stroke="none"/><rect x="14" y="4" width="5" height="16" fill="currentColor" stroke="none"/>',
+    signal: '<rect x="1" y="8" width="2.6" height="4" rx="0.5" fill="currentColor" stroke="none"/><rect x="5" y="6" width="2.6" height="6" rx="0.5" fill="currentColor" stroke="none"/><rect x="9" y="3.5" width="2.6" height="8.5" rx="0.5" fill="currentColor" stroke="none"/><rect x="13" y="1" width="2.6" height="11" rx="0.5" fill="currentColor" stroke="none"/>',
+    wifi: '<path d="M2 7a15 15 0 0 1 20 0"/><path d="M5.2 10.6a10.5 10.5 0 0 1 13.6 0"/><path d="M8.6 14.1a5.8 5.8 0 0 1 6.8 0"/><circle cx="12" cy="17.3" r="1.1" fill="currentColor" stroke="none"/>',
+    battery: '<rect x="1" y="3" width="19" height="10" rx="2.4" stroke-width="1.5"/><rect x="21" y="6" width="1.6" height="4" rx="0.7" fill="currentColor" stroke="none"/><rect x="2.6" y="4.6" width="14.5" height="6.8" rx="1.2" fill="currentColor" stroke="none"/>',
+  };
+  function svg(name, extra) {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" ' + (extra || '') + '>' + I[name] + '</svg>';
+  }
+
+  document.getElementById('topMark').innerHTML = svg('building', 'style="width:13px;height:13px;color:#fff"');
+  document.getElementById('moreIc').innerHTML = svg('more');
+  document.getElementById('statusIcons').innerHTML =
+    svg('signal', 'style="width:15px;height:11px"') +
+    svg('wifi', 'style="width:14px;height:11px"') +
+    svg('battery', 'class="batt"');
+
+  // ── Barre d'onglets du bas (remplace la sidebar) ─────────────────────────
+  const TABS = [
+    { icon: 'grid', label: 'Accueil' },
+    { icon: 'calendar', label: 'Occupations' },
+    { icon: 'users', label: 'Locataires' },
+    { icon: 'download', label: 'Export' },
+  ];
+  const SCENE_LABEL = ['Tableau de bord', 'Enregistrer un paiement', 'Suivi des locataires', 'Export Excel / PDF'];
+
+  const bottomNav = document.getElementById('bottomNav');
+  bottomNav.innerHTML = TABS.map((t, i) =>
+    '<div class="tabitem" data-tab="' + i + '">' + svg(t.icon) + '<span>' + t.label + '</span></div>'
+  ).join('');
+
+  function setActiveTab(i) {
+    bottomNav.querySelectorAll('.tabitem').forEach((el, idx) => el.classList.toggle('active', idx === i));
+  }
+
+  // ── Toast ────────────────────────────────────────────────────────────────
+  const sceneHost = document.getElementById('sceneHost');
+  let toastEl = null;
+  function toast(msg) {
+    if (!toastEl) {
+      toastEl = document.createElement('div');
+      toastEl.className = 'toast';
+      document.getElementById('device').appendChild(toastEl);
+    }
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastEl._t);
+    toastEl._t = setTimeout(() => toastEl.classList.remove('show'), 2000);
+  }
+
+  // ── Format monnaie / date ────────────────────────────────────────────────
+  function fmtMontant(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' FCFA'; }
+  function fmtDate(d) {
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    return dd + '/' + mm + '/' + d.getFullYear();
+  }
+  function addMonthsClamped(date, n) {
+    const d = new Date(date);
+    const target = new Date(d.getFullYear(), d.getMonth() + n, 1);
+    const daysInTarget = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate();
+    target.setDate(Math.min(d.getDate(), daysInTarget));
+    return target;
+  }
+
+  // ── Scène 0 : Dashboard ──────────────────────────────────────────────────
+  const KPIS = [
+    { label: 'Bâtiments', value: '4', icon: 'building' },
+    { label: 'Logements', value: '32', icon: 'home' },
+    { label: 'Occupés', value: '27', sub: "84 % d'occupation", icon: 'user', vc: '#1e3a8a' },
+    { label: 'Vacants', value: '5', icon: 'lockOpen', vc: '#92400e' },
+    { label: 'Occupations actives', value: '27', icon: 'check' },
+    { label: 'Arriérés (occ. actives)', value: fmtMontant(460000), icon: 'triangle', vc: '#991b1b' },
+    { label: 'Arriérés (total)', value: fmtMontant(610000), icon: 'cross', vc: '#991b1b' },
+    { label: 'Total perçu', value: fmtMontant(8240000), icon: 'wallet', vc: '#166534' },
+  ];
+  const LOGEMENTS_ROWS = [
+    { late: true, logement: 'Appt 3B', locataire: 'Jean Fotso', date: '12/07/2026' },
+    { late: true, logement: 'Studio 12', locataire: 'Aïcha Traoré', date: '28/08/2026' },
+    { late: false, logement: 'Villa 2', locataire: 'Paul Mvondo', date: '30/09/2026' },
+    { late: false, logement: 'Appt 5A', locataire: 'Fatou Diallo', date: '15/10/2026' },
+    { late: false, logement: 'Bureau RDC', locataire: "Koffi N'Guessan", date: '31/10/2026' },
+  ];
+
+  function sceneDashboard() {
+    return (
+      '<div class="pageheader"><div><div class="crumbs"><b>Tableau de bord</b></div><h2>Tableau de bord</h2></div>' +
+      '<button class="iconbtn demo-inert" aria-label="Actualiser">' + svg('refresh') + '</button></div>' +
+      '<div class="kpigrid">' + KPIS.map((k) =>
+        '<div class="kpi"><div class="ic">' + svg(k.icon) + '</div><div><div class="label">' + k.label + '</div>' +
+        '<div class="value" style="' + (k.vc ? 'color:' + k.vc : '') + '">' + k.value + '</div>' +
+        (k.sub ? '<div class="sub">' + k.sub + '</div>' : '') + '</div></div>'
+      ).join('') + '</div>' +
+      '<div class="card"><div class="card-head"><h3>Logements occupés</h3><span class="hint">par échéance</span></div>' +
+      '<div class="rowlist">' + LOGEMENTS_ROWS.map((r) =>
+        '<div class="rowcard"><div class="rc-top"><span class="rc-name">' + r.logement + '</span>' +
+        (r.late
+          ? '<span class="pill bad">' + svg('exclam') + 'Arriéré</span>'
+          : '<span class="pill ok">' + svg('check') + 'À jour</span>') + '</div>' +
+        '<div class="rc-mid">' + r.locataire + '</div>' +
+        '<div class="rc-bot"><span style="font-weight:600;color:' + (r.late ? '#991b1b' : '#166534') + '">' + r.date + '</span>' +
+        '<span class="rowbtn demo-inert">' + svg('chart') + '</span></div></div>'
+      ).join('') + '</div></div>'
+    );
+  }
+
+  // ── Scène 1 : Paiement ───────────────────────────────────────────────────
+  const OCC_ROWS = [
+    { logement: 'Appt 3B', locataire: 'Jean Fotso', date: '12/07/2026', active: true },
+    { logement: 'Studio 12', locataire: 'Aïcha Traoré', date: '28/08/2026', active: false },
+    { logement: 'Villa 2', locataire: 'Paul Mvondo', date: '30/09/2026', active: false },
+  ];
+  const LOYER = 75000;
+  const DERNIER_JOUR = new Date(2026, 6, 12); // 12/07/2026
+
+  function sceneOccupations() {
+    const debut = new Date(DERNIER_JOUR); debut.setDate(debut.getDate() + 1);
+    return (
+      '<div class="pageheader"><div><div class="crumbs"><b>Occupations</b></div><h2>Occupations</h2></div>' +
+      '<button class="iconbtn primary demo-inert" aria-label="Nouvelle occupation">' + svg('plus') + '</button></div>' +
+      '<div class="rowlist">' + OCC_ROWS.map((r) =>
+        '<div class="rowcard' + (r.active ? ' active' : '') + '"><div class="rc-top"><span class="rc-name">' + r.logement + '</span><span class="pill info">Actif</span></div>' +
+        '<div class="rc-mid">' + r.locataire + '</div>' +
+        '<div class="rc-bot"><span>' + r.date + '</span><span class="rowbtn demo-inert" title="Enregistrer un paiement">' + svg('wallet') + '</span></div></div>'
+      ).join('') + '</div>' +
+
+      '<div class="modal-scrim"><div class="sheet">' +
+      '<div class="sheet-handle"></div>' +
+      '<div class="m-head">Enregistrer un paiement</div>' +
+      '<div class="m-body">' +
+      '<div class="field"><label>Occupation</label><div class="readonly-box" style="background:#f8fafc;border-color:#e2e8f0;">' + 'Appt 3B — Jean Fotso' + '</div></div>' +
+      '<div class="readonly-box">' + svg('calendar') + '<span>Début de période : <b>' + fmtDate(debut) + '</b></span></div>' +
+      '<div class="field"><label>Nombre de loyers</label><div class="stepper">' +
+      '<button id="stepDown">–</button><span class="val" id="nLoyersVal">2</span><button id="stepUp">+</button></div></div>' +
+      '<div class="preview-box" id="previewBox"></div>' +
+      '</div>' +
+      '<div class="m-foot"><button class="btn outline demo-inert">Annuler</button><button class="btn primary demo-inert">' + svg('check') + 'Enregistrer</button></div>' +
+      '</div></div>'
+    );
+  }
+
+  let nLoyers = 2;
+  function updatePreview() {
+    const debut = new Date(DERNIER_JOUR); debut.setDate(debut.getDate() + 1);
+    const fin = addMonthsClamped(debut, nLoyers); fin.setDate(fin.getDate() - 1);
+    const montant = nLoyers * LOYER;
+    const box = document.getElementById('previewBox');
+    const val = document.getElementById('nLoyersVal');
+    if (!box || !val) return;
+    val.textContent = nLoyers;
+    box.innerHTML =
+      '<div class="pt">' + svg('check') + 'Calcul automatique</div>' +
+      '<p>Fin de période : <b>' + fmtDate(fin) + '</b></p>' +
+      '<p>Montant : <b>' + fmtMontant(montant) + '</b></p>';
+  }
+
+  // ── Scène 2 : Locataires ─────────────────────────────────────────────────
+  const LOCATAIRE_ROWS = [
+    { nom: 'Fotso', prenom: 'Jean', tel: '+237 677 12 34 56', email: 'jean.fotso@email.com', statut: 'occupe', logement: 'Appt 3B', date: '12/07/2026', late: true },
+    { nom: 'Traoré', prenom: 'Aïcha', tel: '+225 07 12 34 56 78', email: '—', statut: 'occupe', logement: 'Studio 12', date: '28/08/2026', late: true },
+    { nom: 'Mvondo', prenom: 'Paul', tel: '+237 655 98 76 54', email: 'paul.mvondo@email.com', statut: 'occupe', logement: 'Villa 2', date: '30/09/2026', late: false },
+    { nom: 'Diallo', prenom: 'Fatou', tel: '+221 77 123 45 67', email: '—', statut: 'libre', logement: '—', date: '—', late: false },
+  ];
+
+  function sceneLocataires() {
+    return (
+      '<div class="pageheader"><div><div class="crumbs"><b>Dashboard</b> / Locataires</div><h2>Locataires</h2></div>' +
+      '<button class="iconbtn primary demo-inert" aria-label="Nouveau locataire">' + svg('plus') + '</button></div>' +
+      '<div class="searchbar">' + svg('search') + '<input placeholder="Rechercher…" disabled></div>' +
+      '<div class="rowlist">' + LOCATAIRE_ROWS.map((l) =>
+        '<div class="rowcard"><div class="rc-top"><span class="rc-name">' + l.prenom + ' ' + l.nom + '</span>' +
+        (l.statut === 'occupe'
+          ? '<span class="pill bad">' + svg('exclam') + 'Occupé</span>'
+          : '<span class="pill ok">' + svg('lockOpen') + 'Libre</span>') + '</div>' +
+        '<div class="rc-mid">' + l.tel + (l.email !== '—' ? ' · ' + l.email : '') + '</div>' +
+        '<div class="rc-bot"><span>' + (l.logement === '—' ? '<span style="color:#9ca3af">—</span>' : l.logement) + '</span>' +
+        '<span style="font-weight:600;color:' + (l.late ? '#dc2626' : l.date === '—' ? '#9ca3af' : '#15803d') + '">' + l.date + '</span></div>' +
+        '<div class="rc-actions"><span class="rowbtn demo-inert">' + svg('pencil') + '</span><span class="rowbtn demo-inert">' + svg('trash') + '</span></div>' +
+        '</div>'
+      ).join('') + '</div></div>'
+    );
+  }
+
+  // ── Scène 3 : Export ─────────────────────────────────────────────────────
+  const EXPORTS = [
+    { label: 'Paiements', desc: 'Historique de tous les paiements enregistrés', icon: 'wallet' },
+    { label: 'Arriérés', desc: 'Liste des arriérés en cours par occupation', icon: 'triangle' },
+    { label: 'Logements', desc: 'Fiche complète de tous les logements', icon: 'home' },
+    { label: 'Locataires', desc: 'Liste des locataires avec statut et solvabilité', icon: 'users' },
+    { label: 'Occupations', desc: 'Toutes les occupations passées et en cours', icon: 'calendar' },
+    { label: 'Utilisateurs', desc: 'Utilisateurs dans votre périmètre', icon: 'users' },
+    { label: 'Bâtiments', desc: 'Liste des bâtiments avec statistiques', icon: 'building' },
+    { label: 'Classeur complet', desc: 'Export Excel multi-onglets (toutes les données)', icon: 'fileExcel', hi: true },
+  ];
+
+  function sceneExport() {
+    return (
+      '<div class="pageheader"><div><div class="crumbs"><b>Dashboard</b> / Export</div><h2>Exports</h2></div></div>' +
+      '<div class="explist">' + EXPORTS.map((e) =>
+        '<div class="expcard' + (e.hi ? ' hi' : '') + '"><div class="ic">' + svg(e.icon) + '</div>' +
+        '<div class="expinfo"><div class="name">' + e.label + '</div><div class="desc">' + e.desc + '</div></div>' +
+        '<span class="rowbtn demo-inert" aria-label="Télécharger">' + svg('download') + '</span></div>'
+      ).join('') + '</div>' +
+
+      '<div class="modal-scrim"><div class="sheet">' +
+      '<div class="sheet-handle"></div>' +
+      '<div class="m-head">Exporter — Paiements</div>' +
+      '<div class="m-body">' +
+      '<div class="field"><label>Format</label><div class="select2" id="fmtToggle">' +
+      '<button class="on" data-f="excel">' + svg('fileExcel') + ' Excel</button>' +
+      '<button data-f="pdf">' + svg('filePdf') + ' PDF</button></div></div>' +
+      '</div>' +
+      '<div class="m-foot"><button class="btn outline demo-inert">Annuler</button><button class="btn primary demo-inert" id="dlBtn">' + svg('download') + 'Télécharger</button></div>' +
+      '</div></div>'
+    );
+  }
+
+  // ── Assemblage des scènes ────────────────────────────────────────────────
+  const builders = [sceneDashboard, sceneOccupations, sceneLocataires, sceneExport];
+  builders.forEach((fn, i) => {
+    const div = document.createElement('div');
+    div.className = 'scene';
+    div.dataset.scene = i;
+    div.innerHTML = fn();
+    sceneHost.appendChild(div);
+  });
+
+  // ── Interactions locales aux scènes ──────────────────────────────────────
+  function wireScene1() {
+    updatePreview();
+    const up = document.getElementById('stepUp');
+    const down = document.getElementById('stepDown');
+    if (up) up.onclick = () => { nLoyers = Math.min(6, nLoyers + 1); userTookOver = true; updatePreview(); };
+    if (down) down.onclick = () => { nLoyers = Math.max(1, nLoyers - 1); userTookOver = true; updatePreview(); };
+  }
+  let userTookOver = false;
+
+  function wireScene3() {
+    const toggle = document.getElementById('fmtToggle');
+    if (!toggle) return;
+    toggle.querySelectorAll('button').forEach((b) => {
+      b.onclick = () => {
+        toggle.querySelectorAll('button').forEach((x) => x.classList.remove('on'));
+        b.classList.add('on');
+      };
+    });
+    const dl = document.getElementById('dlBtn');
+    if (dl) dl.onclick = () => toast('Démo — téléchargement désactivé ici');
+  }
+
+  document.querySelectorAll('.demo-inert').forEach((el) => {
+    if (el.id === 'dlBtn') return; // câblé séparément
+    el.addEventListener('click', () => toast('Démo — action désactivée'));
+  });
+
+  // ── Défilement automatique des scènes trop hautes pour l'écran ──────────
+  function runAutoScroll(el, idx, startTs) {
+    const max = el.scrollHeight - el.clientHeight;
+    if (max <= 12) return;
+    const total = 6200;
+    function step(ts) {
+      if (current !== idx || !playing) return;
+      const t = Math.min(1, (ts - startTs) / total);
+      let pos;
+      if (t < 0.5) pos = (t / 0.5) * max;
+      else if (t < 0.62) pos = max;
+      else pos = max * (1 - (t - 0.62) / 0.38);
+      el.scrollTop = pos;
+      if (t < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  // ── Moteur de scènes (autoplay + navigation manuelle) ────────────────────
+  const scenes = Array.from(document.querySelectorAll('.scene'));
+  const dotsHost = document.getElementById('dots');
+  const sceneLabel = document.getElementById('sceneLabel');
+  const playBtn = document.getElementById('playBtn');
+  let current = 0;
+  let playing = true;
+  let mainTimer = null;
+  let cycleTimer = null;
+  let fmtTimer = null;
+
+  dotsHost.innerHTML = scenes.map((_, i) => '<button class="dot' + (i === 0 ? ' on' : '') + '" data-i="' + i + '"></button>').join('');
+  playBtn.innerHTML = svg('pause');
+
+  function clearSceneTimers() {
+    clearInterval(cycleTimer); cycleTimer = null;
+    clearInterval(fmtTimer); fmtTimer = null;
+  }
+
+  function goTo(i) {
+    current = (i + scenes.length) % scenes.length;
+    scenes.forEach((s, idx) => {
+      s.classList.toggle('is-active', idx === current);
+      if (idx === current) s.scrollTop = 0;
+    });
+    dotsHost.querySelectorAll('.dot').forEach((d, idx) => d.classList.toggle('on', idx === current));
+    sceneLabel.textContent = SCENE_LABEL[current];
+    setActiveTab(current);
+    clearSceneTimers();
+
+    const thisIdx = current;
+    if (playing) {
+      requestAnimationFrame((ts) => runAutoScroll(scenes[thisIdx], thisIdx, ts));
+    }
+
+    if (current === 1) {
+      wireScene1();
+      userTookOver = false;
+      if (playing) {
+        cycleTimer = setInterval(() => {
+          if (userTookOver) return;
+          nLoyers = nLoyers >= 3 ? 1 : nLoyers + 1;
+          updatePreview();
+        }, 1500);
+      }
+    }
+    if (current === 3) {
+      wireScene3();
+      if (playing) {
+        let excel = true;
+        fmtTimer = setInterval(() => {
+          excel = !excel;
+          const toggle = document.getElementById('fmtToggle');
+          if (!toggle) return;
+          toggle.querySelectorAll('button').forEach((b) => b.classList.toggle('on', (b.dataset.f === 'excel') === excel));
+        }, 1800);
+      }
+    }
+  }
+
+  function next() { goTo(current + 1); }
+
+  function startMain() {
+    clearInterval(mainTimer);
+    mainTimer = setInterval(next, 7000);
+  }
+
+  dotsHost.querySelectorAll('.dot').forEach((d) => {
+    d.addEventListener('click', () => { goTo(parseInt(d.dataset.i, 10)); if (playing) startMain(); });
+  });
+
+  bottomNav.querySelectorAll('.tabitem').forEach((el) => {
+    el.addEventListener('click', () => { goTo(parseInt(el.dataset.tab, 10)); if (playing) startMain(); });
+  });
+
+  playBtn.addEventListener('click', () => {
+    playing = !playing;
+    playBtn.innerHTML = svg(playing ? 'pause' : 'play');
+    if (playing) { startMain(); goTo(current); } else { clearInterval(mainTimer); clearSceneTimers(); }
+  });
+
+  // ── Mise à l'échelle responsive du "téléphone" (design fixe 390×782) ─────
+  const DESIGN_W = 390, DESIGN_H = 782;
+  const shellOuter = document.getElementById('shellOuter');
+  const device = document.getElementById('device');
+  function rescale() {
+    const w = shellOuter.clientWidth;
+    const scale = Math.min(1, w / DESIGN_W);
+    device.style.transform = 'scale(' + scale + ')';
+    shellOuter.style.height = (DESIGN_H * scale) + 'px';
+  }
+  window.addEventListener('resize', rescale);
+  rescale();
+
+  goTo(0);
+  startMain();
+})();
+</script>
+
+</body>
+</html>
