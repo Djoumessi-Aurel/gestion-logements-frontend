@@ -32,6 +32,7 @@ export default function robots(): MetadataRoute.Robots {
           // Démo commerciale : même logique — accessible par lien partagé aux
           // prospects, volontairement absente des moteurs de recherche.
           '/demo.html',
+          '/demo-mobile.html',
         ],
       },
     ],
