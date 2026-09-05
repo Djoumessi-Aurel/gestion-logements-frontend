@@ -494,8 +494,8 @@ export default function PresentationPage() {
             Intéressé par la solution ?
           </h2>
           <p className="text-blue-200 mb-3 text-lg">
-            L&apos;application est déployée en installation dédiée pour chaque client.
-            Contactez-moi pour discuter de vos besoins, obtenir un devis et connaître les modalités d&apos;accès.
+            L&apos;application est disponible en ligne. Vous pouvez aussi solliciter une installation sur vos propres serveurs.
+            Contactez-moi pour en discuter, obtenir un devis et connaître les modalités d&apos;accès.
           </p>
           <p className="text-blue-300 mb-8 text-sm">
             Tous mes contacts sont disponibles sur mon site web.
