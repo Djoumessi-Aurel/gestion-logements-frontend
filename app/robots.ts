@@ -29,6 +29,9 @@ export default function robots(): MetadataRoute.Robots {
           // des moteurs de recherche. Retirer cette ligne ET la balise robots de
           // public/tarifs.html pour la rendre indexable.
           '/tarifs.html',
+          // Démo commerciale : même logique — accessible par lien partagé aux
+          // prospects, volontairement absente des moteurs de recherche.
+          '/demo.html',
         ],
       },
     ],
